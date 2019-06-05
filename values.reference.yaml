@@ -267,14 +267,18 @@ services:
 # A table in Dashbase is the equivalent of an index for a dataset. All tables create
 # Kubernetes StatefulSet resources.
 tables:
-
+  #----------------------------- Example Table -----------------------------
   # An example of a table called 'sample' with a corresponding Kafka topic.
-  sample:
+  #sample:
     # Mapping of table partition(s) to Kafka partitions. To scale a table for
     # increased ingestion, add another partition and scale the Kafka topic.
-    partitions:
-      0: "0"
+    #partitions:
+      #0: "0"
       #1: "1"
+    
+    # Set the storage size in Gi for the disk allocated per partition.
+    #storage:
+      #size: 1000Gi
 
     # Additional configurations can be set just like a Dashbase service.
     #containerConfig:
@@ -287,12 +291,11 @@ tables:
           #memory: 28G
 
     #environment:
-
       # Retention
       # Set the log retention for the table. We recommend setting this to 80% of 
       # available disk. The retention of logs in days that this translate to
       # depends on the data.
-      #RETENTION_SIZE_GB: 5100
+      #RETENTION_SIZE_GB: 800
 
       # Number of Indexing Threads
       # Set this to increase number of threads allocated for indexing. Recommended 
