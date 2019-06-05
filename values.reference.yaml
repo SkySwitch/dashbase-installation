@@ -9,7 +9,7 @@
 # as the version tag.
 # See https://dashbase.atlassian.net/wiki/spaces/DK/pages/17039399/Release+Notes
 # for information regarding available versions and release notes.
-dashbase_version: 0.20.1
+dashbase_version:
 
 # License Information
 username:
