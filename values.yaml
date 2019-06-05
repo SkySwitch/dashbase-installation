@@ -1,0 +1,310 @@
+######################## Dashbase Reference Values YAML ############################
+# This file is a full configuration example documenting all non-deprecated
+# options in comments.
+
+#=============================== Global Settings ==================================
+
+# Dashbase Version
+# All Dashbase deployed services will use Docker images with the dashbase_version 
+# as the version tag.
+# See https://dashbase.atlassian.net/wiki/spaces/DK/pages/17039399/Release+Notes
+# for information regarding available versions and release notes.
+dashbase_version: 0.20.1
+
+# License Information
+username:
+license:
+
+# HTTPS
+# Enable HTTPS between Dashbase services.
+# Setting this setting to true requires creation of self-signed keystore 
+# secret files. Generate with the following command:
+# 'docker run -v $PWD/config/init:/config/init dashbase/k8s-helper --https'
+# then 'kubectl apply -f config/init' to create the resources.
+https: false
+
+# Pod Priority
+# Pod priority is necessary to guarantee ordered scheduling by Kubernetes.
+# Recommended for production deployment only.
+# Enabling pod priority adds three Dashbase PriorityClass resources:
+# dashbase-high-priority
+# dashbase-normal-priority
+# dashbase-low-priority
+# Set 'priorityClassName: <PRIORITY>' for any Dashbase service or table.
+enablePodPriority: false
+
+# Storage Classes
+# Dashbase requires two Kubernetes StorageClass resources, each mapped to
+# the equivalent of SSD and HDD type disks on a supported cloud platform:
+# 'dashbase-meta' (SSD)
+# 'dashbase-data' (HDD)
+# StorageClasses are used by the stateful Dashbase services and tables.
+# The available platforms are:
+# aws | gce | azure | docker (for testing) | minikube (for testing)
+default_storageclass_provider:
+  platform:
+  # Optional additional settings.
+  # See https://kubernetes.io/docs/concepts/storage/storage-classes/#parameters.
+  #parameters:
+  #metadata:
+
+# Kubernetes Ingress
+# Enabling this creates an Kubernetes ingress resource with rules for all 
+# Dashbase services. Rules are created with the host: <SERVICE.HOST>
+# Example: web.dashbase.io
+ingress:
+  enabled: false
+  # Set this to your domain like the above example.
+  host:
+  # Enabling the certmanager setting will automatically create an Issuer
+  # resource using Let's Encrypt and additional signed Certificate resources
+  certmanager: false 
+
+# etcd Cluster
+# https://github.com/helm/charts/tree/master/stable/etcd-operator
+# Dashbase services use etcd for service discovery and syncing. 
+# Recommended for production deployment only.
+# If enabled, first deploy an etcd cluster using the etcd-operator.
+# Install etcd-operator onto the same namespace as Dashbase:
+# 'helm install stable/etcd-operator --name etcd-operator --namespace <NAMESPACE>'
+etcd_cluster:
+  enabled: false
+
+# Default Section
+# Configurations described in this section are applied to all services and/or
+# tables if specified. All available configuration options can be set, however
+# individual service or table configurations will take precedence.
+default:
+  # Below is an example of a default setting that would be applied to all services.
+  #storage:
+    #class: dashbase-meta
+    #size: 10Gi
+  # By default, stateful Dashbase services are configured with a 10Gi SSD disk.
+
+  # Default Table Settings
+  #table:
+    # Like the example above, this default setting would be applied to all tables.
+    #storage:
+      #class: dashbase-data
+      #size: 1000Gi
+    # By default, Dashbase tables do not have a configured size. Please set this per
+    # your requirements.
+
+# Filebeat Log Monitoring
+# Enable this setting to collect logs from all Dashbase Pods for a remote 
+# monitoring setup via a Kubernetes DaemonSet resource.
+# Recommended for production deployment only.
+# If enabled, configure the 'elasticsearch_url' to point to a Dashbase monitoring
+# URL.
+# Note that this setting requires and creates the following Kubernetes resources:
+# - ClusterRole
+# - ClusterRoleBinding
+# - ServiceAccount
+# - ConfigMap
+# - DaemonSet
+filebeat:
+  enabled: false
+  elasticsearch_url:
+
+# Prometheus ServiceAccount
+# Enable this setting to create a ClusterRole and ServiceAccount required by the
+# provided Prometheus service to scrape metrics from all Dashbase Pods. 
+accounts:
+  prometheus: false
+
+# Kube State Metrics
+# Deploy a pre-configured https://github.com/kubernetes/kube-state-metrics
+# Recommended for production deployment only.
+kube-state-metrics:
+  enabled: false
+  # Specify available collectors below.
+  #collectors:
+
+#============================== Dashbase Services =================================
+
+services:
+  #----------------------------- Example Service -----------------------------
+  # Below is an example of a service and some of the available configurations.
+  # We create Kubernetes Pod resources for all Dashbase services.
+  #service:
+
+    # Enable the service by setting this value to 'true'.
+    #enabled: false
+
+  # Set the number of replicas for the service. Defaults to '1' if not specified.
+  #replicas: 1
+
+  # Set container configurations.
+  #containerConfig:
+
+    # Set container resource requests and limits. We recommend setting these for all
+    # services/tables. We also recommend setting requests and limits to be the same.
+    # See Kubernetes Concepts documentation for additional details.
+    #resources:
+        #limits:
+          #cpu:
+          #memory:
+        #requests:
+          #cpu:
+          #memory:
+
+  # Set pod configurations.
+  #podConfig:
+
+    # Example of a configuration to constrain the pod to be scheduled only on nodes
+    # with the given label.
+    #nodeSelector:
+      #beta.kubernetes.io/instance-type: r5.xlarge
+
+  # List of environment variables in 'KEY: value' format.
+  #environment:
+    #KEY: value
+
+  # Configure the service to use a different class (dashbase-meta | dashbase-data)
+  # or modify the size of the volume.
+  #storage:
+    #class:
+    #size:
+
+  # Override the image used by this service if needed.
+  #image:
+
+  # Add any additional metadata labels for the Kubernetes Pod resources that the
+  # service creates.
+  #labels:
+  
+  #----------------------------- General Services -----------------------------
+  # etcd
+  # Enabled by default; deploy a single instance etcd useful for development or
+  # testing. For production, disable this and deploy the etcd cluster undere Global
+  # Settings instead. Creates a Kubernetes Deployment resource.
+  etcd:
+    enabled: true
+
+  # Dashbase API Service
+  # Enabled by default; handles queries to the tables. Creates a Kubernetes 
+  # Deployment resource.
+  api:
+    enabled: true
+
+  # Dashbase Web Service
+  # Enabled by default; the UI to use for querying Dashbase tables. Creates a 
+  # Kubernetes StatefulSet resource.
+  web:
+    enabled: true
+
+  # Dashbase Proxy Service
+  # Disabled by default; stateless service to parse events from Filebeat and send to
+  # a commit queue (Kafka) for tables to ingest from.
+  # Creates a Kubernetes Deployment resource.
+  proxy:
+    enabled: true
+    # Increase the number of replicas to handle .
+    replicas: 1
+  
+  # Kafka Service
+  # Disabled by default; deploys Kafka broker(s) used by Dashbase as a commit queue.
+  # Creates a Kubernetes StatefulSet resource.
+  kafka:
+    enabled: true
+    # Replicas in this case control the number of brokers.
+    replicas: 1
+    # List of example environment variables that can be set for the Kafka image.
+    #environment:
+      #KAFKA_LOG_RETENTION_HOURS: "1"
+      #KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "3"
+      #KAFKA_DEFAULT_REPLICATION_FACTOR: "1"
+      #KAFKA_LOG_RETENTION_BYTES: "1000000000000"
+      #KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092
+      #KAFKA_HEAP_OPTS: "-Xmx4g -Xms4g -XX:NewSize=2g"
+
+  # ZooKeeper
+  # Disabled by default; deploys a ZooKeeper used by Kafka. Creates a Kubernetes
+  # StatefulSet resource.
+  zookeeper:
+    enabled: true
+
+  #----------------------------- Optional Services -----------------------------
+  # Prometheus
+  # Internal Prometheus pre-configured to scrape metrics from all Dashbase services
+  # and tables. Creates a Kubernetes StatefulSet resource.
+  # Recommended for production deployment.
+  prometheus:
+    enabled: false
+    # Uncomment the following if the default account has permission issues.
+    # You will also need the 'prometheus' account enabled.
+    #podConfig:
+      #serviceAccountName: prometheus
+  
+  # Grafana
+  # Internal Grafana that contains packaged Dashbase dashboards for better
+  # observability of Dashbase services and table(s) health and performance.
+  # Recommended for production deployment. Creates a Kubernetes StatefulSet 
+  # resource.
+  grafana:
+    enabled: false
+  
+  # Pushgateway
+  # Internal Pushgateway for Dashbase log collectors to push metrics from production
+  # for Prometheus to scrape. Creates a Kubernetes Deployment resource.
+  pushgateway:
+    enabled: false
+
+  # Alertmanager
+  # Preconfigured Alertmanager useful for managing Dashbase packaged Prometheus
+  # alerts. Creates a Kubernetes StatefulSet resource.
+  alertmanager:
+    enabled: false
+
+  # Influxdb
+  # Optional InfluxDB for Prometheus to use as remote read/write database in a
+  # remote monitoring setup. Creates a Kubernetes StatefulSet resource.
+  influxdb:
+    enabled: false
+
+#------------------------------- Dashbase Tables -------------------------------
+# List of Tables
+# A table in Dashbase is the equivalent of an index for a dataset. All tables create
+# Kubernetes StatefulSet resources.
+tables:
+
+  # An example of a table called 'sample' with a corresponding Kafka topic.
+  sample:
+    # Mapping of table partition(s) to Kafka partitions. To scale a table for
+    # increased ingestion, add another partition and scale the Kafka topic.
+    partitions:
+      0: "0"
+      #1: "1"
+
+    # Additional configurations can be set just like a Dashbase service.
+    #containerConfig:
+      #resources:
+        #limits:
+          #cpu: 3.8
+          #memory: 28G
+        #requests:
+          #cpu: 3.8
+          #memory: 28G
+
+    #environment:
+
+      # Retention
+      # Set the log retention for the table. We recommend setting this to 80% of 
+      # available disk. The retention of logs in days that this translate to
+      # depends on the data.
+      #RETENTION_SIZE_GB: 5100
+
+      # Number of Indexing Threads
+      # Set this to increase number of threads allocated for indexing. Recommended 
+      # to set to half of the requested CPU cores. Defaults to 2 if not specified.
+      #NUM_INDEXING_THREADS: 2
+
+      # Java Options
+      # Set any Java options. For JVM heap settings, we recommend setting the max to
+      # half of the requested memory.
+      #JAVA_OPTS: -Xmx14g -Xms10g -XX:NewSize=2g
+
+      # Buffer Settings
+      # Set the maximum delay in seconds for the indexer to flush a segment. This
+      # setting directly affects how quickly data can be searchable after ingestion.
+      #MAX_BUFFER_DELAY_IN_SEC: 90
