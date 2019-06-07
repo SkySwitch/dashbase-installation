@@ -1,0 +1,13 @@
+---
+- name: Transfer and execute a script.
+  hosts: filebeat
+  become: yes
+  become_method: sudo
+  tasks:
+
+     - name: Stop Filebeat Service
+       service: 
+        name: filebeat
+        state: stopped
+
+
