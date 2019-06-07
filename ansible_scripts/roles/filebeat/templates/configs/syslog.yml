@@ -1,0 +1,19 @@
+- type: log
+  paths:
+    - /var/log/syslog
+  fields:
+    _message_parser:
+      type: grok
+      pattern: '%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
+    app_name: syslog
+    app_log_type: syslog
+    env: {{ environ }}
+    hostname: {{ ansible_hostname }}
+  multiline.pattern: ^\n
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
