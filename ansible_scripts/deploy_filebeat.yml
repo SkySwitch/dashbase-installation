@@ -15,7 +15,5 @@
       private: no
 
   vars:
-    environ: "prod"
     filebeat_version: "6.6.2"
     dashbase_url: "proxy_url"
-    ansible_ssh_private_key_file: /Users/narsky/.ssh/google_compute_engine
