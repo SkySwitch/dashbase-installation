@@ -50,10 +50,7 @@ output.elasticsearch:
   compression_level: 5
   hosts: "{{ dashbase_url }}:9200"
   index: "{{ index }}"
-  ssl.certificate_authorities: ["/etc/filebeat/certs/ca.crt1", "/etc/filebeat/certs/ca.crt2"]
-  ssl.certificate: "/etc/filebeat/certs/client.crt"
-  ssl.key: "/etc/filebeat/certs/server-pkcs8.key"
-  protocol: "https"
+  protocol: "http"
 
 #================================ Logging =====================================
 

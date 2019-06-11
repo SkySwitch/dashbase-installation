@@ -17,11 +17,6 @@
     deb: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
     state: present
     
-- name: Copy filebeat cert files
-  copy:
-    src: certs
-    dest: /etc/filebeat/
-
 - name: create filebeat config directory
   file:
     path: /etc/filebeat/configs
