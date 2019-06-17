@@ -74,7 +74,7 @@ etcd_cluster:
 # Configurations described in this section are applied to all services and/or
 # tables if specified. All available configuration options can be set, however
 # individual service or table configurations will take precedence.
-default:
+default: {}
   # Below is an example of a default setting that would be applied to all services.
   #storage:
     #class: dashbase-meta
