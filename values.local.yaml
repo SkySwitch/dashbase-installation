@@ -1,0 +1,40 @@
+dashbase_version: 0.21.6
+
+# Your license information goes here.
+username:
+license:
+
+https: false
+
+ingress:
+  enabled: true
+  host: 127.0.0.1.xip.io
+
+services:
+  etcd:
+    enabled: true
+
+  api:
+    enabled: true
+
+  web:
+    enabled: true
+
+  kafka:
+    enabled: true
+
+  zookeeper:
+    enabled: true
+
+  proxy:
+    enabled: true
+
+  elasticsearch:
+    enabled: true
+
+tables:
+  logs:
+    partitions:
+      0: "0"
+    environment:
+      JAVA_OPTS: "-Xmx4g -Xms2g"
