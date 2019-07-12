@@ -110,7 +110,7 @@ Want to first try out Dashbase on your laptop? Give the following steps a try, t
     ```
     We've already pre-configured the Kubernetes Ingress resource for you, so you can get the full list of available endpoints by describing the ingress.
     ```bash
-    $ kubectl describe ingress
+    $ kubectl describe ingress --namespace dashbase
     Name:             ingress
     Namespace:        dashbase
     Address:
