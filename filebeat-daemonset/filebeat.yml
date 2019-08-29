@@ -1,0 +1,227 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: filebeat
+  labels:
+    k8s-app: filebeat
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources:
+  - namespaces
+  - pods
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: filebeat
+subjects:
+- kind: ServiceAccount
+  name: filebeat
+  namespace: dashbase
+roleRef:
+  kind: ClusterRole
+  name: filebeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: filebeat
+  namespace: dashbase
+  labels:
+    k8s-app: filebeat
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: dashbase
+  labels:
+    k8s-app: filebeat
+data:
+  filebeat.yml: |-
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          include_annotations:
+            - "dashbase.io/filebeat.parser.type"
+            - "dashbase.io/filebeat.parser.pattern"
+            - "dashbase.io/filebeat.parser.defaultTimeZone"
+            - "dashbase.io/filebeat.parser.parsers.0.type"
+            - "dashbase.io/filebeat.parser.parsers.0.pattern"
+            - "dashbase.io/filebeat.parser.parsers.0.defaultTimeZone"
+            - "dashbase.io/filebeat.parser.parsers.1.type"
+            - "dashbase.io/filebeat.parser.parsers.1.pattern"
+            - "dashbase.io/filebeat.parser.parsers.1.defaultTimeZone"
+            - "dashbase.io/filebeat.parser.parsers.2.type"
+            - "dashbase.io/filebeat.parser.parsers.2.pattern"
+            - "dashbase.io/filebeat.parser.parsers.2.defaultTimeZone"
+
+          templates:
+            - config:
+                - type: docker
+                  close_removed: false
+                  containers.ids:
+                    - "${data.kubernetes.container.id}"
+                  multiline:
+                    pattern: ${data.kubernetes.annotations.dashbase.io/filebeat.multiline.pattern:^.}
+                    negate: ${data.kubernetes.annotations.dashbase.io/filebeat.multiline.negate:true}
+                    match: ${data.kubernetes.annotations.dashbase.io/filebeat.multiline.match:after}
+
+    processors:
+      - add_cloud_metadata:
+      - rename:
+          fields:
+            - from: "kubernetes.annotations.dashbase.io/filebeat.parser"
+              to: "fields._message_parser"
+          ignore_missing: true
+          fail_on_error: false
+
+    http.enabled: true
+    http.host: 127.0.0.1
+    http.port: 5066
+
+    setup.template.enabled: false
+
+    output.elasticsearch:
+      hosts: ['proxy:9200']
+      index: "filebeat"
+      protocol: "http"
+      ssl.verification_mode: "none"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-config
+  namespace: dashbase
+  labels:
+    k8s-app: telegraf
+data:
+  telegraf.conf: |-
+    [global_tags]
+        table = "filebeat"
+    [agent]
+        interval = "10s"
+        debug = false
+        round_interval = true
+        flush_interval = "10s"
+        flush_jitter = "0s"
+        logfile = "/var/log/telegraf/telegraf.log"
+        omit_hostname = false
+
+    ###############################################################################
+    #                                  OUTPUTS                                    #
+    ###############################################################################
+
+    [[outputs.prometheus_client]]
+        listen = ":29273"
+        expiration_interval = "60s"
+
+    ###############################################################################
+    #                                  INPUTS                                     #
+    ###############################################################################
+
+    [[inputs.exec]]
+        commands = ["night-watch watch-append -p '/var/lib/docker/containers/*/*.log'"]
+        timeout = "10s"
+        data_format = "influx"
+    # [[inputs.exec]]
+    #     commands = ["night-watch verify --api http://proxy:9200 --column 'host.name' --value $HOSTNAME --table kubernetes-logs -p '/var/lib/docker/containers/*/*.log' -f '2006-01-02T15:04:05.999999999Z07:00' -o 1800 -d 30"]
+    #     timeout = "1800s"
+    #     interval = "3600s"
+    #     data_format = "influx"
+
+    [[inputs.http]]
+        urls = ["http://localhost:5066/stats"]
+        data_format = "json"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: dashbase
+  labels:
+    app: dashbase-daemonsets
+    component: filebeat
+spec:
+  selector:
+    matchLabels:
+      app: dashbase-daemonsets
+      component: filebeat
+  template:
+    metadata:
+      labels:
+        app: dashbase-daemonsets
+        component: filebeat
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: filebeat
+        image: docker.elastic.co/beats/filebeat:6.6.0
+        args: [
+          "-c", "/etc/filebeat.yml",
+          "-e",
+        ]
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 1
+            memory: 1Gi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/filebeat.yml
+          readOnly: true
+          subPath: filebeat.yml
+        - name: data
+          mountPath: /usr/share/filebeat/data
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      - name: telegraf
+        image: dashbase/night-watch:v1.1.0
+        args: [
+          "--config", "/etc/telegraf.conf"
+        ]
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        env:
+          - name: GATEWAY_URL
+            value: "http://pushgateway:9091/metrics/job/filebeat/instance/$HOSTNAME"
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc/telegraf.conf
+          readOnly: true
+          subPath: telegraf.conf
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0600
+          name: filebeat-config
+      - name: telegraf-config
+        configMap:
+          defaultMode: 0600
+          name: telegraf-config
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: data
+        hostPath:
+          path: /var/lib/filebeat-data
+          type: DirectoryOrCreate
