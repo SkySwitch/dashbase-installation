@@ -1,0 +1,100 @@
+---
+- name: Generate app list
+  set_fact:
+    app_name_list: "{{ app_name.split(',') }}"
+
+- name: Install cURL
+  yum:
+    name: curl
+    state: present
+    
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+    - /etc/telegraf/configs
+    - /var/run/telegraf
+
+- name: Copy telegraf package
+  copy:
+    src: telegraf-1.10.4-1.x86_64.rpm
+    dest: /opt/scripts/telegraf-1.10.4-1.x86_64.rpm
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install RHEL initscripts
+  yum:
+    name: initscripts
+    state: present
+
+- name: Install Telegraf
+  yum:
+    name: /opt/scripts/telegraf-1.10.4-1.x86_64.rpm
+    state: present
+    
+- name: Change User of Telegraf Log Directory
+  file:
+    path: /var/log/telegraf/
+    owner: telegraf
+    group: telegraf
+    mode: 0755
+
+- name: Create nightwatch command
+  set_fact:
+     nightwatch_configs: "{{ nightwatch_configs }} --config /etc/telegraf/configs/{{ item }}_nw.yml"
+  with_items:
+      "{{ app_name_list }}"
+
+- name: Copy Telegraf App Config Files
+  template:
+    src: "configs/{{ item }}_nw.yml"
+    dest: "/etc/telegraf/configs/"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    "{{ app_name_list }}"
+
+- name: Copy telegraf.yml  and 20-dashbase.yml files
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+    - { src: 'templates/telegraf.yml.j2', dest: '/etc/telegraf/telegraf.conf' } 
+    - { src: 'templates/20-dashbase.yml.j2', dest: '/etc/telegraf/telegraf.d/20-dashbase.conf' } 
+
+- name: Copy night-watch rpm
+  copy:
+    src: night-watch_{{ nightwatch_version }}-rc4_Linux_64-bit.rpm
+    dest: /opt/scripts/night-watch_{{ nightwatch_version }}-rc4_Linux_64-bit.rpm
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install night-watch
+  yum:
+    name: /opt/scripts/night-watch_{{ nightwatch_version }}-rc4_Linux_64-bit.rpm
+    state: present
+
+- name: "RedHat | Install cron package"
+  yum:
+    name: "crontabs"
+  become: yes
+  when:
+    - prometheus_pushgateway_enable
+
+- name: Retart Telegraf Service
+  service: 
+    name: telegraf
+    state: restarted
+
+- name: Create Prometheus pushgateway crontab
+  cron:
+    name: "telegraf pushgateway"
+    job: "curl -s {{ prometheus_local_exporter_url }} | curl --connect-timeout 10 --data-binary @- {{ prometheus_pushgateway_url }} &> /dev/null"
+  when:
+    - prometheus_pushgateway_enable

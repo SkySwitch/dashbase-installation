@@ -1,6 +1,6 @@
 ---
 - name: Transfer and execute a script.
-  hosts: "filebeat"
+  hosts: "freeswitch"
   become: yes
   become_method: sudo
   roles:

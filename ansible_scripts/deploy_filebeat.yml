@@ -1,6 +1,6 @@
 ---
 - name: Transfer and execute a script.
-  hosts: "filebeat"
+  hosts: "freeswitch"
   become: yes
   become_method: sudo
   roles:
@@ -16,4 +16,4 @@
 
   vars:
     filebeat_version: "6.6.2"
-    dashbase_url: "proxy_url"
+    dashbase_url: "table_url"

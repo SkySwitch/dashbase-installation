@@ -1,0 +1,33 @@
+---
+- name: Generate app list
+  set_fact:
+    app_name_list: "{{ app_name.split(',') }}"
+
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+
+- name: Copy filebeat package
+  copy:
+    src: 
+         filebeat-{{ filebeat_version }}-x86_64.rpm
+    dest: /opt/scripts/filebeat-{{ filebeat_version }}-x86_64.rpm
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Filebeat
+  yum:
+    name: /opt/scripts/filebeat-{{ filebeat_version }}-x86_64.rpm
+    state: present
+
+- name: Install RHEL initscripts
+  yum:
+    name: initscripts
+    state: present

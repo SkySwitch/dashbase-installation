@@ -1,0 +1,50 @@
+filebeat.prospectors:
+- paths:
+   - /var/log/freeswitch/freeswitch.log
+  input_type: log
+  multiline.pattern: '^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12} 20|^20|^recv|^send'
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    hostname: ${HOSTNAME}
+    _message_parser:
+      type: multi
+      parsers:
+        freeswitch:
+          type: grok
+          pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
+        sip:
+          type: sip
+
+queue.mem:
+  events: 180000
+  flush.min_events: 3000
+
+processors:
+  - add_locale: ~
+  - rename:
+      fields:
+        - from: "beat.timezone"
+          to: "fields._message_parser.defaultTimeZone"
+  - drop_fields:
+      fields: ["offset", "beat", "prospector", "host", "input"]
+
+# https://www.elastic.co/guide/en/beats/filebeat/6.6/configuration-template.html
+setup.template.enabled: false
+
+output.elasticsearch:
+  hosts: ["table-freeswitch:7888"]
+  index: "freeswitch"
+  bulk_max_size: 3000
+  worker: 30
+  compression_level: 5
+  protocol: "http"
+
+http.enabled: true
+http.host: 127.0.0.1
+http.port: 1050
