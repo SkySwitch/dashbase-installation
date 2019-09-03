@@ -1,7 +1,7 @@
 - paths:
    - /var/log/freeswitch/freeswitch.log
   type: log
-  multiline.pattern: '^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12} 20|^20|^recv|^send'
+  multiline.pattern: '^[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} \d{4}-\d{2}-\d{2}|^\d{4}-\d{2}-\d{2}|^recv|^send'
   multiline.negate: true
   multiline.match: after
   close_inactive: 90s
