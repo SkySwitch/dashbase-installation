@@ -1,0 +1,30 @@
+[agent]
+  interval = "60s"
+  round_interval = false
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  collection_jitter = "0s"
+  flush_interval = "60s"
+  flush_jitter = "0s"
+  precision = ""
+  debug = true
+  quiet = false
+  hostname = ""
+  omit_hostname = false
+  logfile = "/var/log/telegraf/telegraf.log"
+[[inputs.cpu]]
+  percpu = false
+  totalcpu = true
+  fielddrop = ["time_*"]
+  fieldpass = ["usage_system*","usage_user*","usage_iowait*","usage_idle*"]
+[[inputs.diskio]]
+[[inputs.disk]]
+  ignore_fs = ["tmpfs", "devtmpfs", "devfs", "overlay", "aufs", "squashfs"]
+[[inputs.kernel]]
+  fieldpass = ["interrupts*","context_switches*"]
+[[inputs.mem]]
+[[inputs.processes]]
+[[inputs.net]]
+  fieldpass = ["bytes*","drop*","packets*","err*"]
+[global_tags]
+  table = "{{ index }}"
