@@ -1,0 +1,21 @@
+- paths:
+   - /var/log/freeswitch/freeswitch.log
+  type: log
+  multiline.pattern: '^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12} 20|^20|^recv|^send'
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    hostname: {{ ansible_hostname }}
+    _message_parser:
+      type: multi
+      parsers:
+        freeswitch:
+          type: grok
+          pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
+        sip:
+          type: sip

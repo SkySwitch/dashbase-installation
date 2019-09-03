@@ -1,0 +1,73 @@
+# This file is an example configuration file highlighting only the most common
+# options. The filebeat.full.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+#=========================== Filebeat prospectors =============================
+
+filebeat.registry_flush: 30s
+filebeat.config.inputs:
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+#=========================== HTTP health endpoint =============================
+
+http.enabled: true
+http.port: 1050
+
+queue.mem:
+  events: 180000
+  flush.min_events: 3000
+
+#================================ Outputs =====================================
+
+# Drop metadata added by Filebeat to save bandwidth as it's unnecessary
+
+processors:
+  - add_locale: ~
+  - rename:
+     fields:
+      - from: "beat.timezone"
+        to: "fields._message_parser.defaultTimeZone"
+  - drop_fields:
+      fields: ["offset", "beat", "prospector", "host", "offset", "input"]
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+setup.template:
+  name: "{{ index }}"
+  pattern: "{{ index }}"
+
+#-------------------------- Elasticsearch output ------------------------------
+
+output.elasticsearch:
+  bulk_max_size: 3000
+  worker: 30
+  compression_level: 5
+  hosts: "{{ dashbase_url }}:7888"
+  index: "{{ index }}"
+  protocol: "http"
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["publish"]
+#logging.selectors: ["*"]
+logging.metrics.enabled: false
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 5
+  permissions: 0644
