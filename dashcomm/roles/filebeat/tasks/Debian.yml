@@ -1,0 +1,28 @@
+---
+- name: Generate app list
+  set_fact:
+    app_name_list: "{{ app_name.split(',') }}"
+
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+
+- name: Copy filebeat package
+  copy:
+    src: 
+         filebeat-{{ filebeat_version }}-amd64.deb
+    dest: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Filebeat
+  apt:
+    deb: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
+    state: present

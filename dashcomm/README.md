@@ -35,4 +35,3 @@
      2) run the playbook
 
        >ansible-playbook -i inventory deploy_filebeat.yml -e "index=freeswitch app_name=freeswitch"
-
