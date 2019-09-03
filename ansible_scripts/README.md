@@ -74,4 +74,3 @@
      3) run the playbook
 
        >ansible-playbook -i inventory_syslog deploy_filebeat.yml -e "index=applogs app_name=syslog"
-

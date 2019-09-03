@@ -16,4 +16,4 @@
 
   vars:
     filebeat_version: "6.6.2"
-    dashbase_url: "proxy_url"
+    dashbase_url: "table_url"
