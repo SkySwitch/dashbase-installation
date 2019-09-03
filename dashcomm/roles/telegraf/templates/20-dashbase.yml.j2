@@ -1,0 +1,21 @@
+[[inputs.http]]
+  ## filebeat health endpoints
+  urls = [
+    "http://localhost:1050/stats",
+    "http://localhost:1050"
+  ]
+  tag_keys=["beat_info_ephemeral_id", "name"]
+  json_string_fields = ["hostname"]
+  method = "GET"
+  timeout = "10s"
+  data_format = "json"
+[[inputs.exec]]
+  commands = [
+   "nice -n 19 night-watch watch-append {{ nightwatch_configs }}"
+  ]
+  timeout = "10s"
+  data_format = "influx"
+[[outputs.prometheus_client]]
+    listen = ":29273"
+    expiration_interval = "60s"
+

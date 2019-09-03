@@ -1,0 +1,62 @@
+---
+- name: Generate app list
+  set_fact:
+    app_name_list: "{{ app_name.split(',') }}"
+
+- name: Copy filebeat package
+  copy:
+    src: 
+         filebeat-{{ filebeat_version }}-amd64.deb
+    dest: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Filebeat
+  apt:
+    deb: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
+    state: present
+    
+- name: create filebeat config directory
+  file:
+    path: /etc/filebeat/configs
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+## Copy app related config files
+- name: Copy filebeat app config files
+  template:
+    src: "configs/{{ item }}.yml"
+    dest: "/etc/filebeat/configs/"
+  with_items:
+    "{{ app_name_list }}"
+
+##copy filebeat fields.yml
+- name: Copy fields file
+  copy:
+    src: fields.yml
+    dest: /etc/filebeat/fields.yml
+
+## Copy the filebeat config file
+- name: Copy filebeat.yml file
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Stop Filebeat Service
+  service:
+    name: filebeat
+    state: stopped
+
+- name: Wait for monitoring port to stop listening
+  shell: sleep 5
+
+- name: Restart Filebeat Service
+  service:
+    name: filebeat
+    state: started

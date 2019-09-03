@@ -10,9 +10,9 @@
         >cat inventory_syslog
 
 
-[syslog_hosts]
-192.168.131.98
-192.84.16.128
+        [syslog_hosts]
+        192.168.131.98
+        192.84.16.128
 
 
      2) create app specific "app_name_nw.yml" file and place it under roles/telegraf/templates/configs/<app_name_nw.yml>
@@ -23,11 +23,11 @@
        >cat roles/telegraf/templates/configs/syslog_nw.yml
 
 
-- paths: ["/var/log/syslog"]        # path to the logs, can be glob pattern
-  java_format: "yyyy-MM-dd HH:mm:ss"                  # format of the date of log entries - java_format
-  zone: Local                                         # time zone, if Local, then machine time zone will be detected automatically
-  exclude_files: ['_']                                # pattern to use to exclude files (optional parameter)
- 
+        - paths: ["/var/log/syslog"]        # path to the logs, can be glob pattern
+          java_format: "yyyy-MM-dd HH:mm:ss"                  # format of the date of log entries - java_format
+          zone: Local                                         # time zone, if Local, then machine time zone will be detected automatically
+          exclude_files: ['_']                                # pattern to use to exclude files (optional parameter)
+         
 
      3) run the playbook
 
@@ -54,22 +54,22 @@
         Example of filebeat "yml" file with two paths:
 
 
-- type: log
-  paths:
-    - /var/log/syslog
-  fields:
-    _message_parser:
-      type: grok
-      pattern: '%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
-    hostname: {{ ansible_hostname }}
-  multiline.pattern: ^\[
-  multiline.negate: true
-  multiline.match: after
-  close_inactive: 90s
-  harvester_limit: 5000
-  scan_frequency: 1s
-  symlinks: true
-  clean_removed: true
+        - type: log
+          paths:
+            - /var/log/syslog
+          fields:
+            _message_parser:
+              type: grok
+              pattern: '%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
+            hostname: {{ ansible_hostname }}
+          multiline.pattern: ^\[
+          multiline.negate: true
+          multiline.match: after
+          close_inactive: 90s
+          harvester_limit: 5000
+          scan_frequency: 1s
+          symlinks: true
+          clean_removed: true
 
      3) run the playbook
 
