@@ -48,7 +48,7 @@ output.elasticsearch:
   bulk_max_size: 3000
   worker: 30
   compression_level: 5
-  hosts: "{{ dashbase_url }}:7888"
+  hosts: "{{ dashbase_url }}"
   index: "{{ index }}"
   protocol: "http"
 

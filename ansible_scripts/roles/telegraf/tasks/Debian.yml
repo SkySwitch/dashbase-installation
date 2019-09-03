@@ -61,7 +61,7 @@
     - { src: 'templates/telegraf.yml.j2', dest: '/etc/telegraf/telegraf.conf' } 
     - { src: 'templates/20-dashbase.yml.j2', dest: '/etc/telegraf/telegraf.d/20-dashbase.conf' } 
 
-- name: Copy night-watch rpm
+- name: Copy night-watch deb
   copy:
     src: night-watch_{{ nightwatch_version }}-rc4_Linux_64-bit.deb
     dest: /opt/scripts/night-watch_{{ nightwatch_version }}-rc4_Linux_64-bit.deb

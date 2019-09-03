@@ -1,7 +1,8 @@
 - paths:
    - /var/log/freeswitch/freeswitch.log
+   - /usr/local/freeswitch/log/freeswitch.log
   type: log
-  multiline.pattern: '^[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} \d{4}-\d{2}-\d{2}|^\d{4}-\d{2}-\d{2}|^recv|^send'
+  multiline.pattern: '^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?\d{4}-\d{2}-\d{2}|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?EXECUTE|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?Dialplan|^recv|^send'
   multiline.negate: true
   multiline.match: after
   close_inactive: 90s
@@ -19,3 +20,6 @@
           pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
         sip:
           type: sip
+        universal:
+          type: grok
+          pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
