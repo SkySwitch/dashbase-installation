@@ -1,0 +1,10 @@
+dashbase:
+  ingress:
+    # Set it to false to disable nginx ingress resource.
+    # This requires nginx ingress controller have installed in your k8s cluster.
+    enabled: true
+    # Your domain
+    host:
+  # License Information
+  username:
+  license:

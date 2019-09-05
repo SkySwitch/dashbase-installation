@@ -1,37 +1,57 @@
-# Ansible Playbooks to deploy filebeat and telegraf
+### Dashcomm
 
-##### TO DEPLOY TELEGRAF #####
+#### Create a new k8s cluster on aws (k8s version>1.11.0)
 
-     0) update value of "pushgateway_url" in deploy_telegraf.yml with correct value
+This eks cluster requires one `r5.2xlarge` for dashbase-table and one `m5.xlarge` to dashbase-core services.
 
-     1) populate the inventory file
-        Example:
+The following steps assuming you have provision the k8s cluster with `helm`, `kubectl` already installed locally.
 
-        >cat inventory
-        
-        [freeswitch]
-        192.168.131.98
-        192.84.16.128
+1. Provision Helm
 
-     2) run the playbook
+   ```bash
+   helm init --upgrade
+   kubectl create serviceaccount --namespace kube-system tiller
+   kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+   kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+   ```
 
-       >ansible-playbook -i inventory deploy_telegraf.yml -e "index=freeswitch app_name=freeswitch"
+2. Install Ingress controller and configure dns.
 
-       Playbook takes these extra variables with -e (or will prompt for): 
+   You need install nginx ingress controller and get External-IP-Address from ingress.
 
-       index            - name of dashbase index to send logs to 
-       app_name         - name(s) of the applications (multiple app names can be given as a comma separated values)
- 
+   ```bash
+   helm install stable/nginx-ingress --name {your_ingress_name}
+   kubectl --namespace default get services -o wide -w {your_ingress_name}-nginx-ingress-controller
+   ```
 
-##### TO DEPLOY FILEBEAT #####
+   Bind all your ingress services into aws route-53
 
-     Filebeat deployment is almost identical to telegraf's. Please refer to examples above for inventory file
-     and ansible-playbook extra variables
+   If you have a domian `k8s.yourcompany.com` and you got an external-IP `acec462704f65d0ab332d-86962061.us-west-2.elb.amazonaws.com` you should bind `*.k8s.yourcompany.com` to `acec462704f65d0ab332d-86962061.us-west-2.elb.amazonaws.com` using `alias`. And then, wait the DNS taking effect.
 
-     0) update value of "table_url" in deploy_filebeat.yml with correct host:port(port is default to `9200`).
+3. Prepare the values.yml
 
-     1) populate the inventory file
+   Change the username/license fields to your dashbase username/license and change `dashbase.ingress.host` to the domain you bind.(e.g. `k8s.yourcompany.com` in the above example).
 
-     2) run the playbook
+   ```bash
+   dashbase:
+     ingress:
+       enabled: true
+       host: k8s.yourcompany.com
+     username: username
+     license: license
+   ```
 
-       >ansible-playbook -i inventory deploy_filebeat.yml -e "index=freeswitch app_name=freeswitch"
+4. Install Dashbase
+
+   ```bash
+   helm repo add chartmuseum https://charts.dashbase.io
+   helm upgrade dashcomm chartmuseum/dashcomm -f dashcomm.yml -i
+   ```
+
+#### Configure FreeSWITCH
+
+Configure FreeSWITCH machines' default user have permission to use `sudo` and can access FreeSWITCH's log dir.
+
+#### Deploy Ansible & Filebeat 
+
+Go ahead to [Deploy Ansible & Filebeat](ansible/README.md)
