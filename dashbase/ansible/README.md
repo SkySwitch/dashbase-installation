@@ -1,58 +1,25 @@
-# Ansible Playbooks to deploy filebeat and telegraf
+# Ansible Playbooks to deploy Dashbase agent
 
-####### TO DEPLOY TELEGRAF ######
+##### TO CONFIGURE DASHBASE AGNET #####
 
-     0) update value of "pushgateway_url" in deploy_telegraf.yml with correct value
+     0) Update value of "pushgateway_url" in deploy.yml with correct value.
 
-     1) populate the inventory file
-        Example:
+     1) Update value of "proxy_url" in deploy.yml with correct host:port(port is default to `9200`).
 
-        >cat inventory_syslog
+     2) Create app specific "app_name_nw.yml" file and place it under roles/telegraf/templates/configs/<app_name_nw.yml>.
 
-
-        [syslog_hosts]
-        192.168.131.98
-        192.84.16.128
-
-
-     2) create app specific "app_name_nw.yml" file and place it under roles/telegraf/templates/configs/<app_name_nw.yml>
-  
-       multiple paths can be specified in the same app_name_nw.yml file
-       Example with two paths:
+        Multiple paths can be specified in the same app_name.yml file:
 
        >cat roles/telegraf/templates/configs/syslog_nw.yml
 
-
-        - paths: ["/var/log/syslog"]        # path to the logs, can be glob pattern
+        - paths: ["/var/log/syslog"]                          # path to the logs, can be glob pattern
           java_format: "yyyy-MM-dd HH:mm:ss"                  # format of the date of log entries - java_format
           zone: Local                                         # time zone, if Local, then machine time zone will be detected automatically
           exclude_files: ['_']                                # pattern to use to exclude files (optional parameter)
-         
 
-     3) run the playbook
+     3) Create app specific filebeat "yml" file and place it under roles/filebeat/templates/configs/<app_name.yml>
 
-       >ansible-playbook -i inventory_syslog deploy_telegraf.yml -e "index=applogs app_name=syslog"
-
-       Playbook takes these extra variables with -e (or will prompt for): 
-
-       index            - name of dashbase index to send logs to 
-       app_name         - name(s) of the applications (multiple app names can be given as a comma separated values)
- 
-
-
-
-###### TO DEPLOY FILEBEAT ######
-
-     Filebeat deployment is almost identical to telegraf's. Please refer to examples above for inventory file
-     and ansible-playbook extra variables
-
-     0) update value of "proxy_url" in deploy_filebeat.yml with correct value
-
-     1) populate the inventory file
-
-     2) create app specific filebeat "yml" file and place it under roles/filebeat/templates/configs/<app_name.yml>
-        Example of filebeat "yml" file with two paths:
-
+       >cat roles/filebeat/templates/configs/syslog.yml
 
         - type: log
           paths:
@@ -71,6 +38,25 @@
           symlinks: true
           clean_removed: true
 
-     3) run the playbook
+##### TO DEPLOY DASHBASE AGENT #####
 
-       >ansible-playbook -i inventory_syslog deploy_filebeat.yml -e "index=applogs app_name=syslog"
+     0) Populate the inventory file, example:
+
+       >cat inventory_syslog
+
+        [syslog_hosts]
+        192.168.131.98
+        192.84.16.128
+
+        ; See further configurations in https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+        ; [syslog_hosts:vars]
+        ; ansible_user=admin
+
+     1) Run the playbook
+
+       >ansible-playbook -i inventory_syslog deploy.yml -e "index=applogs app_name=syslog"
+
+        Playbook takes these extra variables with -e (or will prompt for):
+
+        index            - name of dashbase index to send logs to
+        app_name         - name(s) of the applications (multiple app names can be given as a comma separated values)

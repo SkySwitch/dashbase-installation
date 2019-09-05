@@ -1,37 +1,25 @@
-# Ansible Playbooks to deploy filebeat and telegraf
+# Ansible Playbooks to deploy Dashcomm Agent for FreeSWITCH (DAFS)
 
-##### TO DEPLOY TELEGRAF #####
+##### TO CONFIGURE DASHCOMM AGENT #####
 
-     0) update value of "pushgateway_url" in deploy_telegraf.yml with correct value
+     0) Update value of "pushgateway_url" in deploy.yml with correct value.
 
-     1) populate the inventory file
-        Example:
+     1) Update value of "table_url" in deploy.yml with correct host:port(port is default to `9200`).
+
+##### TO DEPLOY DASHCOMM AGENT #####
+
+     0) Populate the inventory file, example:
 
         >cat inventory
-        
+
         [freeswitch]
         192.168.131.98
         192.84.16.128
 
-     2) run the playbook
+        ; See further configurations in https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+        ; [freeswitch:vars]
+        ; ansible_user=admin
 
-       >ansible-playbook -i inventory deploy_telegraf.yml -e "index=freeswitch app_name=freeswitch"
+     1) Run the playbook.
 
-       Playbook takes these extra variables with -e (or will prompt for): 
-
-       index            - name of dashbase index to send logs to 
-       app_name         - name(s) of the applications (multiple app names can be given as a comma separated values)
- 
-
-##### TO DEPLOY FILEBEAT #####
-
-     Filebeat deployment is almost identical to telegraf's. Please refer to examples above for inventory file
-     and ansible-playbook extra variables
-
-     0) update value of "table_url" in deploy_filebeat.yml with correct host:port(port is default to `9200`).
-
-     1) populate the inventory file
-
-     2) run the playbook
-
-       >ansible-playbook -i inventory deploy_filebeat.yml -e "index=freeswitch app_name=freeswitch"
+       >ansible-playbook -i inventory deploy.yml -e "index=freeswitch app_name=freeswitch"
