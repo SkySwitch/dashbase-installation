@@ -1,0 +1,6 @@
+[freeswitch]
+freeswitch-0.freeswitch
+freeswitch-1.freeswitch
+[freeswitch:vars]
+ansible_user=root
+ansible_ssh_pass=root
