@@ -4,7 +4,7 @@ filebeat.prospectors:
 - paths:
    - /var/log/freeswitch/freeswitch.log
   input_type: log
-  multiline.pattern: '^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12} 20|^20|^recv|^send'
+  multiline.pattern: '^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?\d{4}-\d{2}-\d{2}|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?EXECUTE|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?Dialplan|^recv|^send'
   multiline.negate: true
   multiline.match: after
   close_inactive: 90s
@@ -16,12 +16,18 @@ filebeat.prospectors:
     hostname: ${HOSTNAME}
     _message_parser:
       type: multi
-      parsers:
-        freeswitch:
+      parsers_list:
+      - name: freeswitch
+        config:
           type: grok
           pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
-        sip:
+      - name: sip
+        config:
           type: sip
+      - name: universal
+        config:
+          type: grok
+          pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
 
 queue.mem:
   events: 180000

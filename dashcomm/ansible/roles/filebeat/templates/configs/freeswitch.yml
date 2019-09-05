@@ -14,12 +14,15 @@
     hostname: {{ ansible_hostname }}
     _message_parser:
       type: multi
-      parsers:
-        freeswitch:
+      parsers_list:
+      - name: freeswitch
+        config:
           type: grok
           pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
-        sip:
+      - name: sip
+        config:
           type: sip
-        universal:
+      - name: universal
+        config:
           type: grok
           pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
