@@ -12,19 +12,6 @@
   hostname = ""
   omit_hostname = false
   logfile = "/var/log/telegraf/telegraf.log"
-[[inputs.cpu]]
-  percpu = false
-  totalcpu = true
-  fielddrop = ["time_*"]
-  fieldpass = ["usage_system*","usage_user*","usage_iowait*","usage_idle*"]
-[[inputs.diskio]]
-[[inputs.disk]]
-  ignore_fs = ["tmpfs", "devtmpfs", "devfs", "overlay", "aufs", "squashfs"]
-[[inputs.kernel]]
-  fieldpass = ["interrupts*","context_switches*"]
-[[inputs.mem]]
-[[inputs.processes]]
-[[inputs.net]]
-  fieldpass = ["bytes*","drop*","packets*","err*"]
+
 [global_tags]
   table = "{{ index }}"
