@@ -8,5 +8,4 @@ filebeat.inputs:
 setup.template.enabled: false
 
 output.elasticsearch:
-  hosts: ["http://proxy.127.0.0.1.xip.io:80"]
-  index: "logs"
+  hosts: ["http://table-logs.127.0.0.1.xip.io:80"]
