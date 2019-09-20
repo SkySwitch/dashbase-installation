@@ -32,6 +32,8 @@ processors:
      fields:
       - from: "beat.timezone"
         to: "fields._message_parser.defaultTimeZone"
+      - from: "beat.hostname"
+        to: "hostname"
   - drop_fields:
       fields: ["offset", "beat", "prospector", "host", "offset", "input"]
 
