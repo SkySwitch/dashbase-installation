@@ -57,3 +57,11 @@ spec:
             severity: critical
           for: 5m
           alert: missing_telegraf_metrics 
+        - expr:  http_filebeat_harvester_running == 0 and on(host) rate(nightwatch_metric_file_append_total_size[5m]) > 0
+          annotations:
+            summary: "Filebeat on '{{ $labels.host }}' is not harvesting logs"
+            description: "Filebeat on '{{ $labels.host }}' is not harvesting logs. Check the Filebeat logs for more information and restart the process."
+          labels:
+            severity: critical
+          for: 5m
+          alert: filebeat_not_harvesting
