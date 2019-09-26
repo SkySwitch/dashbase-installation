@@ -28,7 +28,6 @@
             _message_parser:
               type: grok
               pattern: '%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
-            hostname: {{ ansible_hostname }}
           multiline.pattern: ^\[
           multiline.negate: true
           multiline.match: after

@@ -13,7 +13,6 @@ filebeat.prospectors:
   symlinks: true
   clean_removed: true
   fields:
-    hostname: ${HOSTNAME}
     _message_parser:
       type: multi
       parsers_list:
