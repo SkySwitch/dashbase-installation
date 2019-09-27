@@ -17,10 +17,10 @@
 
   vars:
     filebeat_version: "6.6.2"
-    dashbase_url: "proxy_url"
+    dashbase_url: <YOUR DASHBASE TABLE URL>
     prometheus_pushgateway_enable: True
     prometheus_local_exporter_url: http://localhost:29273/metrics
-    pushgateway_url: "pushgateway_url"
+    pushgateway_url: <YOUR PUSHGATEWAY URL>
     prometheus_pushgateway_url: https://{{ pushgateway_url }}/metrics/job/filebeat/instance/{{ ansible_hostname }}
     nightwatch_version: 1.1.1
     nightwatch_configs: ""
