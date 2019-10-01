@@ -34,7 +34,6 @@ setup.template.enabled: false
 
 output.elasticsearch:
   hosts: ["/TO/CHANGE/YOUR/DASHBASE/(TABLE/PROXY)/HOST/WITH/PORT"]
-  index: "/TO/CHANGE/YOUR/DASHBASE/TABLE/NAME"
   bulk_max_size: 3000
   worker: 30
   compression_level: 5
