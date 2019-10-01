@@ -22,7 +22,15 @@ filebeat.prospectors:
           pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
       - name: sip
         config:
-          type: sip
+          type: multi
+          applyAll: 'true'
+          parsers:
+            sip_timestamp:
+              type: timestamp
+              scan: 'true'
+              format: HH:mm:ss.SSS
+            sip_sip:
+              type: sip
       - name: universal
         config:
           type: grok
