@@ -1,3 +1,5 @@
+commonLabels:
+  deployment: dashbase
 defaultRules:
   create: false
 kubelet:
@@ -35,3 +37,6 @@ prometheus:
     ruleSelector:
       matchLabels:
         app: prometheus-operator
+    serviceMonitorSelector:
+      matchLabels:
+        deployment: dashbase
