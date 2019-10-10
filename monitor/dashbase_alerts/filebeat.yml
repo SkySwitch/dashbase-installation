@@ -1,0 +1,110 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  annotations:
+    clusterName: '{{ $labels.clusterName }}'
+    regionName: '{{ $labels.regionName }}'
+  labels:
+    app: prometheus-operator
+    role: dashbase-filebeat
+  name: dashbase-filebeat
+spec:
+  groups:
+    - name: filebeat
+      rules:
+  #      - expr: http_system_load_norm_5 > 0.9
+  #        annotations:
+  #          summary: "Filebeat Instance {{ $labels.host }} CPU Too High"
+  #          description: "The instance {{ $labels.host }} which Filebeat on CPU Load over {{ $value }}(total 1)"
+  #        for: 5m
+  #        alert: filebeat_cpu
+  #      - expr: http_beat_memstats_memory_alloc > 300 * 1024 * 1024
+  #        annotations:
+  #          summary: "Filebeat Memory Alloc Too High on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} memory over 300MB. (current value is {{ $value }} bytes)"
+  #        alert: filebeat_memory_alloc
+  #      - expr: http_beat_memstats_rss > 1024 * 1024 * 1024
+  #        annotations:
+  #          summary: "Filebeat Memory RSS Too High on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} memory over 1GB. (current value is {{ $value }} bytes)"
+  #        for: 5m
+  #        alert: filebeat_memory_rss
+  #      - expr: rate(http_libbeat_output_write_bytes[5m]) < 0.001
+  #        annotations:
+  #          summary: "Filebeat Output Rate Too Low on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} outputs logs per second below .1 (current value is {{ $value }} bytes)"
+  #        for: 5m
+  #        alert: filebeat_output
+        - expr: http_filebeat_harvester_running > 3000
+          annotations:
+            summary: "Filebeat Harvesters greater than 3000 on {{ $labels.host }}"
+            description: "Filebeat on {{ $labels.host }} has more than 3000 harvesters and is backed up. Check Dashbase for any ingest issues."
+          for: 5m
+          alert: filebeat_harvester_running
+  #      - expr: rate(http_libbeat_output_events_failed[5m])/rate(http_libbeat_output_events_total[5m]) > 0.01
+  #        annotations:
+  #          summary: "Filebeat Too Many Events Failed on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} is seeing too much failed events. Check the status of Proxy and also Filebeat's configuration."
+  #        labels:
+  #          severity: critical
+  #        for: 5m
+  #        alert: filebeat_events_failed
+        - expr: rate(http_libbeat_output_events_dropped[5m])/rate(http_libbeat_output_events_total[5m]) > 0.01
+          annotations:
+            summary: "Filebeat on {{ $labels.host }} is dropping events"
+            description: "Filebeat on {{ $labels.host }} is dropping events. Check the Filebeat logs for more information."
+          labels:
+            severity: critical
+          for: 5m
+          alert: filebeat_events_dropped
+  #      - expr: rate(http_libbeat_output_read_errors[5m]) > 0
+  #        annotations:
+  #          summary: "Filebeat Met Read Errors on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} is seeing read errors."
+  #        for: 5m
+  #        alert: filebeat_read_error
+  #      - expr: rate(http_libbeat_output_write_errors[5m]) > 0
+  #        annotations:
+  #          summary: "Filebeat Met Write Errors on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} is seeing write errors."
+  #        for: 5m
+  #        alert: filebeat_write_error
+  #      - expr: rate(http_filebeat_input_log_files_truncated[5m]) > 0
+  #        annotations:
+  #          summary: "Filebeat Log Files Truncated on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} found file truncated."
+  #        for: 5m
+  #        alert: filebeat_input_files_truncated
+  #      #        backwards compatibility
+  #      - expr: rate(http_filebeat_prospector_log_files_truncated[5m]) > 0
+  #        annotations:
+  #          summary: "Filebeat Log Files Truncated on {{ $labels.host }}"
+  #          description: "Filebeat on {{ $labels.host }} found file truncated."
+  #        for: 5m
+  #        alert: filebeat_prospector_files_truncated
+
+        - expr: rate(http_filebeat_harvester_skipped[5m]) > 0
+          annotations:
+            summary: "Filebeat backed up on {{ $labels.host }}"
+            description: "Filebeat on {{ $labels.host }} is backed up and skipping log files. Check Dashbase for any ingest issues."
+          labels:
+            severity: critical
+          for: 5m
+          alert: filebeat_harvester_skipped
+
+        # - expr: filebeat:original_bytes_received:sum / on(host, table) rate(nightwatch_metric_file_append_total_size[5m]) * 100 < 80
+        #   annotations:
+        #     summary: "CQ/Proxy bytes received are lower than 80% of locally produced data on '{{ $labels.host }}'"
+        #     description: "CQ/Proxy only received {{ $value }}% of locally produced data on '{{ $labels.host }}'. Check Filebeat's Config or total amounts of CQ/Proxy instance."
+        #   labels:
+        #     severity: critical
+        #   for: 5m
+        #   alert: CQ/Proxy_received_bytes_percentage_too_low
+        - expr: rate(http_beat_info_uptime_ms[15m]) == 0
+          annotations:
+            summary: "Missing Filebeat metrics from '{{ $labels.host }}'"
+            description: "No Filebeat metrics received from '{{ $labels.host }}' in the last 15 minutes. Please check the Filebeat running on this host or if this was intentional, delete the corresponding group from Pushgateway."
+          labels:
+            severity: critical
+          for: 5m
+          alert: missing_filebeat_metrics

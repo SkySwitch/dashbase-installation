@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  annotations:
+    clusterName: '{{ $labels.clusterName }}'
+    regionName: '{{ $labels.regionName }}'
+  labels:
+    app: prometheus-operator
+    role: dashbase-prometheus
+  name: dashbase-prometheus
+spec:
+  groups:
+  - name: prometheus
+    rules:
+    - expr: rate(prometheus_rule_evaluation_failures_total[10m]) > 0
+      annotations:
+        description: "Prometheus rule evaluation failures {{$value}} times."
+      labels:
+        severity: warning
+      for: 10m
+      alert: prometheus_rule_evaluation_failures

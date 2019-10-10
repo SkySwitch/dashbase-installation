@@ -1,0 +1,56 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  annotations:
+    clusterName: '{{ $labels.clusterName }}'
+    regionName: '{{ $labels.regionName }}'
+  labels:
+    app: prometheus-operator
+    role: dashbase-nightwatch
+  name: dashbase-nightwatch
+spec:
+  groups:
+    - name: nightwatch
+      rules:
+        # - expr: count((nightwatch_verify_dashbase_count + 1) / (nightwatch_verify_local_count + 1 ) < 0.9) / count(nightwatch_verify_local_count) > 0.50
+        #   annotations:
+        #     summary: "More Than 50% of Hosts (which having verified count percentile < 90%) Are Unhealthy Detected by Night Watch"
+        #     description: "[Night Watch] More than 50% of hosts having verified counts percentile < 90%)"
+        #   labels:
+        #     severity: critical
+        #   for: 5m
+        #   alert: nightwatch_healthy_host_percentile
+        - expr: rate(nightwatch_metric_run_spent_time_nanosecond[15m]) == 0
+          annotations:
+            summary: "Missing NightWatch metrics from '{{ $labels.host }}'"
+            description: "No NightWatch metrics received from '{{ $labels.host }}' in the last 15 minutes. Please check NightWatch on this host or if this was intentional, delete the corresponding group from Pushgateway."
+          labels:
+            severity: critical
+          for: 5m
+          alert: missing_nightwatch_metrics
+        #      - expr: rate(nightwatch_metric_file_append_total_size[5m]) < 1
+        #        annotations:
+        #          summary: "File generate rate too low detected by Night Watch on {{ $labels.host }}"
+        #          description: "[Night Watch] File append rate on {{ $labels.host }} below 1B/s. (current value is {{ $value }}B/s)"
+        #        for: 5m
+        #        alert: nightwatch_filebeat_append_rate
+  #      - expr: nightwatch_verify_local_used_nanosecond > 10 * 1000 * 1000 * 1000
+  #        annotations:
+  #          summary: "Night Watch on {{ $labels.host }} takes too much time verifying local file"
+  #          description: "[Night Watch] Takes too much time verifying local files on {{ $labels.host }}. (current value is {{ $value }} nanoseconds)"
+  #        labels:
+  #          severity: warning
+  #        for: 5m
+  #        alert: nightwatch_verify_local_nanosecond
+  #      - expr: nightwatch_verify_dashbase_query_used_nanosecond > 10 * 1000 * 1000 * 1000
+  #        annotations:
+  #          summary: "Night Watch on {{ $labels.host }} takes too much time verifying Dashbase file"
+  #          description: "[Night Watch] Takes too much time verify Dashbase files on {{ $labels.host }}. (current value is {{ $value }} nanoseconds)"
+  #        for: 5m
+  #        alert: nightwatch_verify_dashbase_nanosecond
+  #      - expr: max_over_time(nightwatch_metric_scan_file_count[5m]) < 1
+  #        annotations:
+  #          summary: "No files updated detected by Night Watch on {{ $labels.host }}"
+  #          description: "[Night Watch] There're no file updated on {{ $labels.host }} over 5 min"
+  #        for: 5m
+  #        alert: nightwatch_file_count
