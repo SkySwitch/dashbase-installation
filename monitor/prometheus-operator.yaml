@@ -1,0 +1,37 @@
+defaultRules:
+  create: false
+kubelet:
+  enabled: false
+prometheusOperator:
+  enabled: true
+  createCustomResource: false
+  kubeletService:
+    enabled: false
+grafana:
+  enabled: true
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.staging.zbtest.dashbase.io
+    paths:
+      - /
+alertmanager:
+  enabled: true
+  ingress:
+    enabled: true
+    hosts:
+      - alertmanager.staging.zbtest.dashbase.io
+    paths:
+      - /
+prometheus:
+  enabled: true
+  ingress:
+    enabled: true
+    hosts:
+      - prometheus.staging.zbtest.dashbase.io
+    paths:
+      - /
+  prometheusSpec:
+    ruleSelector:
+      matchLabels:
+        app: prometheus-operator
