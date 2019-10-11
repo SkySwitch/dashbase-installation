@@ -118,7 +118,7 @@ data:
     # ##################################################################################################################
     http.enabled: true
     http.host: 127.0.0.1
-    http.port: 5066
+    http.port: 1050
 
     # ##############################################
     # Set your elsticsearch host and protocol here.
@@ -170,16 +170,11 @@ data:
         commands = ["night-watch watch-append -p '/var/lib/docker/containers/*/*.log'"]
         timeout = "10s"
         data_format = "influx"
-    # [[inputs.exec]]
-    #     commands = ["night-watch verify --api http://proxy:9200 --column 'host.name' --value $HOSTNAME --table kubernetes-logs -p '/var/lib/docker/containers/*/*.log' -f '2006-01-02T15:04:05.999999999Z07:00' -o 1800 -d 30"]
-    #     timeout = "1800s"
-    #     interval = "3600s"
-    #     data_format = "influx"
     # ##################################################################################################################
 
     # scrape Filebeat metrics
     [[inputs.http]]
-        urls = ["http://localhost:5066/stats"]
+        urls = ["http://localhost:1050/stats"]
         data_format = "json"
 ---
 apiVersion: apps/v1
