@@ -6,7 +6,7 @@
   multiline.negate: true
   multiline.match: after
   close_inactive: 90s
-  harvester_limit: 5000
+  harvester_limit: 1000
   scan_frequency: 1s
   symlinks: true
   clean_removed: true
@@ -42,7 +42,7 @@
   json.keys_under_root: true
   json.add_error_key: true
   close_inactive: 90s
-  harvester_limit: 5000
+  harvester_limit: 1000
   scan_frequency: 1s
   symlinks: true
   clean_removed: true
