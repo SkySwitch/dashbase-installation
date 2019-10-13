@@ -1,0 +1,64 @@
+# To view all the he prometheus-operator chart and their default values, visit https://github.com/helm/charts/tree/master/stable/prometheus-operator
+# Set commonLabels for all Prometheus Operator resources, so that default rule/serviceMonitor can be macthed by label Selectors.
+# For example:
+# commonLabels:
+#  deployment: dashbase
+# prometheus:
+#   prometheusSpec:
+#     ruleSelector:
+#       matchLabels:
+#         deployment: dashbase
+#     serviceMonitorSelector:
+#       matchLabels:
+#         deployment: dashbase
+commonLabels:
+  deployment: dashbase
+# Set defaultRules true to enable create defaultRules of Prometheus Operator, we set false by default.
+defaultRules:
+  create: false
+kubelet:
+  # Set kubelet enabled true, to enable component scraping the kubelet and kubelet-hosted cAdvisor, we set false here.
+  enabled: false
+prometheusOperator:
+  enabled: true
+  # Set createCustomResource false, to disable prometheusOperator create CRDs, work around the problem:https://github.com/helm/charts/tree/master/stable/prometheus-operator#helm-fails-to-create-crds
+  createCustomResource: false
+  kubeletService:
+    # Set kubeletService enabled true, let the operator will create and maintain a service for scraping kubelets, we set false here.
+    enabled: false
+grafana:
+  enabled: true
+  ingress:
+    enabled: true
+    hosts:
+      # Set your domain with Grafana secondary domain.
+      - grafana.yourdomain
+    paths:
+      - /
+alertmanager:
+  enabled: true
+  ingress:
+    enabled: true
+    hosts:
+      # Set your domain with Alertmanager secondary domain.
+      - alertmanager.yourdomain
+    paths:
+      - /
+prometheus:
+  enabled: true
+  ingress:
+    enabled: true
+    hosts:
+      # Set your domain with prometheus secondary domain.
+      - prometheus.yourdomain
+    paths:
+      - /
+  prometheusSpec:
+    ruleSelector:
+      matchLabels:
+        # matchLabels should be define as same as label in dashbase_alerts rules.
+        app: prometheus-operator
+    serviceMonitorSelector:
+      matchLabels:
+        # matchLabels should be define as same as our serviceMonitor lable "deployment: dashbase".
+        deployment: dashbase
