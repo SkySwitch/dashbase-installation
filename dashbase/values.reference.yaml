@@ -252,7 +252,7 @@ services:
 
   # Alertmanager
   # Preconfigured Alertmanager useful for managing Dashbase packaged Prometheus
-  # dashbase-alerts. Creates a Kubernetes StatefulSet resource.
+  # alerts. Creates a Kubernetes StatefulSet resource.
   alertmanager:
     enabled: false
 
