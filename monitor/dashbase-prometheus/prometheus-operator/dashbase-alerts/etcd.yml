@@ -8,7 +8,7 @@ metadata:
   labels:
     app: prometheus-operator
     role: dashbase-etcd
-  name: dashbase-etcd
+  name: dashbase-alerts-etcd
 spec:
   groups:
     - name: etcd

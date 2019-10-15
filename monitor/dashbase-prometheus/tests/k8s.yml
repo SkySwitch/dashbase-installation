@@ -1,0 +1,45 @@
+rule_files:
+  - dashbase-alerts/k8s.yml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: kube_deployment_labels{label_dashbase_io="true",deployment="api",exported_namespace="staging"}
+        values: 1+0x5
+      - series: kube_deployment_status_replicas_available{deployment="api",exported_namespace="staging"}
+        values: 3+0x5
+      - series: kube_deployment_spec_replicas{deployment="api",exported_namespace="staging"}
+        values: 5+0x5
+
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: k8s_deployment_unhealthy
+        exp_alerts:
+          - exp_labels:
+              deployment: api
+              exported_namespace: staging
+              severity: critical
+            exp_annotations:
+              summary: "Deployment 'api' in 'staging' is Unhealthy"
+              description: "Deployment 'api' in 'staging' is failing to start some PODs. Check the status of the deployment and/or of the failing PODs."
+
+  - interval: 1m
+    input_series:
+      - series: kube_statefulset_labels{label_dashbase_io="true",statefulset="etcd",exported_namespace="staging"}
+        values: 1+0x5
+      - series: kube_statefulset_status_replicas_ready{statefulset="etcd",exported_namespace="staging"}
+        values: 3+0x5
+      - series: kube_statefulset_replicas{statefulset="etcd",exported_namespace="staging"}
+        values: 5+0x5
+
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: k8s_statefulset_unhealthy
+        exp_alerts:
+          - exp_labels:
+              statefulset: etcd
+              exported_namespace: staging
+              severity: critical
+            exp_annotations:
+              summary: "StatefulSet 'etcd' in 'staging' is Unhealthy"
+              description: "StatefulSet 'etcd' in 'staging' is failing to start some PODs. Check the status of the StatefulSet and/or of the failing PODs."

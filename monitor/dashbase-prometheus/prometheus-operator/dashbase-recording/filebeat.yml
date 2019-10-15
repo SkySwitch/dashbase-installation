@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus-operator
+    role: dashbase-dashbase-recording-filebeat
+  name: dashbase-dashbase-recording-filebeat
+spec:
+  groups:
+    - name: filebeat
+      rules:
+        - record: filebeat:events_received:sum
+          expr: sum(rate(dashbase_filebeat_parser_message_received[5m])) by (app, table, host)
+        - record: filebeat:original_bytes_received:increase:sum
+          expr: sum(increase(dashbase_filebeat_parser_message_bytes_received[24h])) by (app, table, host)
+        - record: filebeat:original_bytes_received:sum
+          expr: sum(rate(dashbase_filebeat_parser_message_bytes_received[5m])) by (app, table, host)
+        - record: filebeat:parser_misconfigured:sum
+          expr: sum(rate(dashbase_filebeat_message_parser_misconfigured[5m])) by (app, table)
+        - record: filebeat:parser_failure:sum
+          expr: sum(rate(dashbase_filebeat_message_parser_failure[5m])) by (app, table)
+        - record: overflow_message:sum
+          expr: sum(rate(dashbase_overflow_message[5m])) by (app)

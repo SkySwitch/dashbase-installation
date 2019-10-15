@@ -7,7 +7,7 @@ metadata:
   labels:
     app: prometheus-operator
     role: dashbase-api
-  name: dashbase-api
+  name: dashbase-alerts-api
 spec:
   groups:
   - name: api

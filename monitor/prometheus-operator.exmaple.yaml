@@ -56,7 +56,7 @@ prometheus:
   prometheusSpec:
     ruleSelector:
       matchLabels:
-        # matchLabels should be define as same as label in dashbase_alerts rules.
+        # matchLabels should be define as same as label in dashbase-prometheus rules.
         app: prometheus-operator
     serviceMonitorSelector:
       matchLabels:

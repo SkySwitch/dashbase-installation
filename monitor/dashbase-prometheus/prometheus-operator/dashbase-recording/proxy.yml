@@ -1,0 +1,81 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus-operator
+    role: dashbase-recording-proxy
+  name: dashbase-recording-proxy
+spec:
+  groups:
+    - name: proxy
+      rules:
+        - record: proxy:events_received:sum
+          expr: sum(rate(dashbase_proxy_events_received[5m])) by (app,topic)
+        - record: proxy:bytes_received:sum
+          expr: sum(rate(dashbase_proxy_bytes_received[5m])) by (app,topic)
+        - record: proxy:events_sent:sum
+          expr: sum(rate(dashbase_proxy_events_sent[5m])) by (app,topic)
+        - record: proxy:bytes_sent:sum
+          expr: sum(rate(dashbase_proxy_bytes_sent[5m])) by (app,topic)
+        - record: proxy:bulk_post_count:sum
+          expr: sum(rate(io_dashbase_esproxy_api_IndexAPI_bulkPost_count[5m])) by (app)
+        - record: proxy:bulk_post_exception:sum
+          expr: sum(rate(io_dashbase_esproxy_api_IndexAPI_bulkPost_exceptions_total[5m])) by (app)
+        - record: proxy:bulk_post_latency:avg
+          expr: avg(io_dashbase_esproxy_api_IndexAPI_bulkPost) by (quantile, app)
+        - record: proxy:duplicated_request_count:sum
+          expr: sum(rate(dashbase_proxy_duplicated_request_count[5m])) by (app, code, result)
+        - record: proxy:event_delay:avg
+          expr: avg(rate(dashbase_proxy_event_delay_sum[5m])/rate(dashbase_proxy_event_delay_count[5m])) by (app, topic)
+        - record: proxy:event_delay:ratio
+          expr: 1 - avg(rate(dashbase_proxy_event_delay_bucket{le="60.0"}[5m])/ignoring(le) rate(dashbase_proxy_event_delay_count[5m])) by (app, topic)
+          labels:
+            greater_than: 1m
+        - record: proxy:event_delay:ratio
+          expr: 1 - avg(rate(dashbase_proxy_event_delay_bucket{le="3600.0"}[5m])/ignoring(le) rate(dashbase_proxy_event_delay_count[5m])) by (app, topic)
+          labels:
+            greater_than: 1h
+        - record: proxy:event_size:avg
+          expr: floor(avg(rate(dashbase_proxy_event_size_sum[5m])/rate(dashbase_proxy_event_size_count[5m])) by (app, topic))
+        - record: proxy:event_size:ratio
+          expr: 1 - avg(rate(dashbase_proxy_event_size_bucket{le="1048576.0"}[5m])/ignoring(le) rate(dashbase_proxy_event_size_count[5m])) by (app, topic)
+          labels:
+            greater_than: 1MB
+        - record: proxy:event_size:ratio
+          expr: 1 - avg(rate(dashbase_proxy_event_size_bucket{le="1.048576E7"}[5m])/ignoring(le) rate(dashbase_proxy_event_size_count[5m])) by (app, topic)
+          labels:
+            greater_than: 10MB
+        - record: proxy:kafka_failure:sum
+          expr: sum(rate(dashbase_kafka_failure[5m])) by (app, exception)
+        - record: proxy:internal_queue_size:max
+          expr: max(dashbase_kafka_producer_internal_queue_size_proxy_sink) by (app)
+        - record: proxy:instance_count
+          expr: sum(up{component='proxy'}) by (app, component)
+        - record: proxy:cpu:max
+          expr: max(jvm_cpu_usage_percent{component='proxy'}) by (app)
+        - record: proxy:cpu:avg
+          expr: avg(jvm_cpu_usage_percent{component='proxy'}) by (app)
+        - record: proxy:cpu:min
+          expr: min(jvm_cpu_usage_percent{component='proxy'}) by (app)
+        - record: proxy:uptime:max
+          expr:  max(jvm_attribute_uptime{component='proxy'}) by (app)
+        - record: proxy:uptime:avg
+          expr:  min(jvm_attribute_uptime{component='proxy'}) by (app)
+        - record: proxy:uptime:min
+          expr: min(jvm_attribute_uptime{component='proxy'}) by (app)
+        - record: proxy:gc_young:max
+          expr: max(rate(jvm_gc_G1_Young_Generation_time{component='proxy'}[5m])) by (app)
+        - record: proxy:gc_old:max
+          expr: max(rate(jvm_gc_G1_Old_Generation_time{component='proxy'}[5m])) by (app)
+        - record: proxy:mark_sweep:max
+          expr: max(rate(jvm_gc_MarkSweepCompact_time{component='proxy'}[5m])) by (app)
+        - record: proxy:heap_usage:max
+          expr: max(jvm_memory_heap_usage{component='proxy'}) by (app)
+        - record: proxy:heap_used:max
+          expr: max(jvm_memory_heap_used{component='proxy'}) by (app)
+        - record: proxy:heap_used:avg
+          expr: avg(jvm_memory_heap_used{component='proxy'}) by (app)
+        - record: proxy:heap_max:max
+          expr: max(jvm_memory_heap_max{component='proxy'}) by (app)
+        - record: proxy:heap_max:min
+          expr: min(jvm_memory_heap_max{component='proxy'}) by (app)

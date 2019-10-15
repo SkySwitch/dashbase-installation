@@ -1,0 +1,46 @@
+rule_files:
+  - dashbase-alerts/nightwatch.yml
+
+tests:
+  # - interval: 1m
+  #   input_series:
+  #     - series: nightwatch_verify_local_count{host='vm-1'}
+  #       values: 0+100x9
+  #     - series: nightwatch_verify_dashbase_count{host='vm-2'}
+  #       values: 0+80x9
+  #     - series: nightwatch_verify_local_count{host='vm-2'}
+  #       values: 0+100x9
+  #     - series: nightwatch_verify_dashbase_count{host='vm-3'}
+  #       values: 0+80x9
+  #     - series: nightwatch_verify_local_count{host='vm-3'}
+  #       values: 0+100x9
+
+
+  #   alert_rule_test:
+  #     - eval_time: 10m
+  #       alertname: nightwatch_healthy_host_percentile
+  #       exp_alerts:
+  #         - exp_labels:
+  #             severity: critical
+  #           exp_annotations:
+  #             summary: "More Than 50% of Hosts (which having verified count percentile < 90%) Are Unhealthy Detected by Night Watch"
+  #             description: "[Night Watch] More than 50% of hosts having verified counts percentile < 90%)"
+
+  - interval: 1m
+    input_series:
+      - series: nightwatch_metric_run_spent_time_nanosecond{host='vm-1'}
+        values: 100+0x15
+      - series: nightwatch_metric_run_spent_time_nanosecond{host='vm-2'}
+        values: 0+100x15
+
+
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: missing_nightwatch_metrics
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              host: vm-1
+            exp_annotations:
+              summary: "Missing NightWatch metrics from 'vm-1'"
+              description: "No NightWatch metrics received from 'vm-1' in the last 15 minutes. Please check NightWatch on this host or if this was intentional, delete the corresponding group from Pushgateway."

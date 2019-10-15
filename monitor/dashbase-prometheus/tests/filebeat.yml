@@ -1,0 +1,79 @@
+rule_files:
+  - dashbase-alerts/filebeat.yml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: http_libbeat_output_events_dropped{host='vm-2',table='filebeat'}
+        values: 0+90x9
+      - series: http_libbeat_output_events_total{host='vm-2',table='filebeat'}
+        values: 0+100x9
+
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: filebeat_events_dropped
+        exp_alerts:
+          - exp_labels:
+              host: vm-2
+              table: filebeat
+              severity: critical
+            exp_annotations:
+              summary: "Filebeat ingesting table filebeat on vm-2 is dropping events"
+              description: "Filebeat ingesting table filebeat on vm-2 is dropping events. Check the Filebeat logs for more information."
+
+  - interval: 1m
+    input_series:
+      # filebeat harvester running but no more logs produced.
+      - series: http_filebeat_harvester_running{host='vm-1',table='filebeat'}
+        values: 1+0x9
+      - series: nightwatch_metric_file_append_total_size{host='vm-1',table='filebeat'}
+        values: 100+0x9
+
+      # filebeat harvester increases but only have empty files produced.
+      - series: http_filebeat_harvester_running{host='vm-2',table='filebeat'}
+        values: 1+1x9
+      - series: nightwatch_metric_file_append_total_size{host='vm-2',table='filebeat'}
+        values: 100+0x9
+
+      # filebeat harvester not running but have new logs produced.
+      - series: http_filebeat_harvester_running{host='vm-3',table='filebeat'}
+        values: 0+0x9
+      - series: nightwatch_metric_file_append_total_size{host='vm-3',table='filebeat'}
+        values: 0+10x9
+
+      # filebeat harvester not running but no new logs produced.
+      - series: http_filebeat_harvester_running{host='vm-4',table='filebeat'}
+        values: 0+0x9
+      - series: nightwatch_metric_file_append_total_size{host='vm-4',table='filebeat'}
+        values: 100+0x9
+
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: filebeat_not_harvesting
+        exp_alerts:
+          - exp_labels:
+              host: vm-3
+              table: filebeat
+              severity: critical
+            exp_annotations:
+              summary: "Filebeat ingesting table filebeat on 'vm-3' is not harvesting logs"
+              description: "Filebeat ingesting table filebeat on 'vm-3' is not harvesting logs. Check the Filebeat logs for more information and restart the process."
+
+  # - interval: 1m
+  #   input_series:
+  #     - series: nightwatch_metric_file_append_total_size{host='vm-1',table='vm-logs'}
+  #       values: 0+600x10
+  #     - series: filebeat:original_bytes_received:sum{host='vm-1',table='vm-logs'}
+  #       values: "1 1 1 1 1 1 1 1 1 1 1"
+
+  #   alert_rule_test:
+  #     - eval_time: 10m
+  #       alertname: CQ/Proxy_received_bytes_percentage_too_low
+  #       exp_alerts:
+  #         - exp_labels:
+  #             host: vm-1
+  #             severity: critical
+  #             table: vm-logs
+  #           exp_annotations:
+  #             summary: "CQ/Proxy bytes received are lower than 80% of locally produced data on 'vm-1'"
+  #             description: "CQ/Proxy only received 10% of locally produced data on 'vm-1'. Check Filebeat's Config or total amounts of CQ/Proxy instance."
