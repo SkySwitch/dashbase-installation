@@ -2,7 +2,6 @@
 
 Here're there configuration files needed for DAFS.
 * [filebeat.yml](filebeat.yml) Filebeat configuration for collecting logs on your hosts.
-* [freeswitch-nw.yml](freeswitch-nw.yml) Night-Watch configuration for log stats on your hosts.
 * [telegraf.conf](telegraf.conf) Telegraf configuration for gathering night-watch and Filebeat metrics on your hosts.
 
 ### Filebeat
@@ -30,12 +29,8 @@ Filebeat is required to collect logs, you can set it up with the following steps
 Night-Watch is required to logs stats, you can set it up with the following steps:
 1. Get the night-watch installation package [deb](../ansible/roles/telegraf/files/night-watch_1.1.1-rc4_Linux_64-bit.deb) and [rpm](../ansible/roles/telegraf/files/night-watch_1.1.1-rc4_Linux_64-bit.rpm) in this repo.
 2. Install night-watch on your host. (Verify by executing `night-watch` command)
-3. Copy the [freeswitch-nw.yml](freeswitch-nw.yml) to `/etc/telegraf/configs/freeswitch_nw.yml` on your host.
 
 **Night-Watch is directly used by Telegraf, you can regard the installation as done when you can use `night-watch` command and the config file is present.**
-
-#### Advanced Configure in [freeswitch-nw.yml](freeswitch-nw.yml)
-* You can change `paths` if you have a custom path storing FreeSWITCH logs.
 
 ### Telegraf
 Telegraf is required to gather metrics from night-watch and Filebeat, you can set it up with the following steps:

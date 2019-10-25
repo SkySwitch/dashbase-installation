@@ -17,7 +17,6 @@
     mode: 0755
   with_items:
     - /opt/scripts
-    - /etc/telegraf/configs
     - /var/run/telegraf
 
 - name: Copy telegraf package
@@ -47,19 +46,9 @@
 
 - name: Create nightwatch command
   set_fact:
-     nightwatch_configs: "{{ nightwatch_configs }} --config /etc/telegraf/configs/{{ item }}_nw.yml"
+     nightwatch_configs: "{{ nightwatch_configs }} --config /etc/filebeat/configs/{{ item }}.yml"
   with_items:
       "{{ app_name_list }}"
-
-- name: Copy Telegraf App Config Files
-  template:
-    src: "configs/{{ item }}_nw.yml"
-    dest: "/etc/telegraf/configs/"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    "{{ app_name_list }}"
 
 - name: Copy telegraf.yml  and 20-dashbase.yml files
   template: src={{ item.src }} dest={{ item.dest }}

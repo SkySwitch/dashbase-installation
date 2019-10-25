@@ -6,18 +6,7 @@
 
      1) Update value of "proxy_url" in deploy.yml with correct host:port(port is default to `9200`).
 
-     2) Create app specific "app_name_nw.yml" file and place it under roles/telegraf/templates/configs/<app_name_nw.yml>.
-
-        Multiple paths can be specified in the same app_name.yml file:
-
-       >cat roles/telegraf/templates/configs/syslog_nw.yml
-
-        - paths: ["/var/log/syslog"]                          # path to the logs, can be glob pattern
-          java_format: "yyyy-MM-dd HH:mm:ss"                  # format of the date of log entries - java_format
-          zone: Local                                         # time zone, if Local, then machine time zone will be detected automatically
-          exclude_files: ['_']                                # pattern to use to exclude files (optional parameter)
-
-     3) Create app specific filebeat "yml" file and place it under roles/filebeat/templates/configs/<app_name.yml>
+     2) Create app specific filebeat "yml" file and place it under roles/filebeat/templates/configs/<app_name.yml>
 
        >cat roles/filebeat/templates/configs/syslog.yml
 
