@@ -41,8 +41,8 @@ processors:
 # Multiple outputs may be used.
 
 setup.template:
-  name: "{{ index }}"
-  pattern: "{{ index }}"
+  name: "{{ table }}"
+  pattern: "{{ table }}"
 
 #-------------------------- Elasticsearch output ------------------------------
 
@@ -51,7 +51,7 @@ output.elasticsearch:
   worker: 30
   compression_level: 5
   hosts: "{{ dashbase_url }}"
-  index: "{{ index }}"
+  index: "{{ table }}"
   protocol: "http"
 
 #================================ Logging =====================================

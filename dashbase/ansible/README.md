@@ -1,12 +1,8 @@
 # Ansible Playbooks to deploy Dashbase agent
 
-##### TO CONFIGURE DASHBASE AGNET #####
+##### TO CONFIGURE DASHBASE AGENT #####
 
-     0) Update value of "pushgateway_url" in deploy.yml with correct value.
-
-     1) Update value of "proxy_url" in deploy.yml with correct host:port(port is default to `9200`).
-
-     2) Create app specific filebeat "yml" file and place it under roles/filebeat/templates/configs/<app_name.yml>
+     1) Create app specific filebeat "yml" file and place it under roles/filebeat/templates/configs>
 
        >cat roles/filebeat/templates/configs/syslog.yml
 
@@ -28,11 +24,11 @@
 
 ##### TO DEPLOY DASHBASE AGENT #####
 
-     0) Populate the inventory file, example:
+     1) Populate the inventory file, example:
 
-       >cat inventory_syslog
+       >cat inventory
 
-        [syslog_hosts]
+        [filebeat_hosts]
         192.168.131.98
         192.84.16.128
 
@@ -40,11 +36,11 @@
         ; [syslog_hosts:vars]
         ; ansible_user=admin
 
-     1) Run the playbook
+     2) Run the playbook
 
-       >ansible-playbook -i inventory_syslog deploy.yml -e "index=applogs app_name=syslog"
+       >ansible-playbook -i inventory deploy.yml -e "dashbase_url=table-freeswitch.cluster1.dashbase.io configs=syslog"
 
         Playbook takes these extra variables with -e (or will prompt for):
 
-        index            - name of dashbase index to send logs to
-        app_name         - name(s) of the applications (multiple app names can be given as a comma separated values)
+        dashbase_url     - URL of the dashbase table to send logs to
+        configs          - name(s) of the filebeat "yml" files without ".yml" (multiple values can be given as a comma separated list)

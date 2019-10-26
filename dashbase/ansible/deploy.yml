@@ -1,6 +1,6 @@
 ---
 - name: Transfer and execute a script.
-  hosts: "filebeat"
+  hosts: "filebeat_hosts"
   become: yes
   become_method: sudo
   roles:
@@ -8,19 +8,20 @@
     - filebeat
 
   vars_prompt:
-    - name: "index"
-      prompt: "Enter index name"
+    - name: "dashbase_url"
+      prompt: "Enter Dashbase Table URL"
       private: no
-    - name: "app_name"
-      prompt: "Enter comma separated list of app names"
+    - name: "configs"
+      prompt: "Enter comma separated list of filebeat configs without .yml (for example: freeswitch,syslog)"
       private: no
 
   vars:
     filebeat_version: "6.6.2"
-    dashbase_url: <YOUR DASHBASE TABLE URL>
     prometheus_pushgateway_enable: True
+    configs_list: "{{ configs.split(',') }}"
+    table: "{{ dashbase_url.strip('http://').strip('https://').split('.')[0].strip('table-') }}"
+    pushgateway_url: "pushgateway.{{ dashbase_url.split('.')[1:] | join('.')}}"
     prometheus_local_exporter_url: http://localhost:29273/metrics
-    pushgateway_url: <YOUR PUSHGATEWAY URL>
     prometheus_pushgateway_url: https://{{ pushgateway_url }}/metrics/job/filebeat/instance/{{ ansible_hostname }}
     nightwatch_version: 1.1.1
     nightwatch_configs: ""
