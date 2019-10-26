@@ -1,8 +1,4 @@
 ---
-- name: Generate app list
-  set_fact:
-    app_name_list: "{{ app_name.split(',') }}"
-
 - name: Install cURL
   apt: pkg=curl state=latest
     
@@ -42,7 +38,7 @@
   set_fact:
      nightwatch_configs: "{{ nightwatch_configs }} --config /etc/filebeat/configs/{{ item }}.yml"
   with_items:
-      "{{ app_name_list }}"
+      "{{ configs_list }}"
 
 - name: Copy telegraf.yml  and 20-dashbase.yml files
   template: src={{ item.src }} dest={{ item.dest }}

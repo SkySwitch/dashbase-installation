@@ -12,7 +12,7 @@
     src: "configs/{{ item }}.yml"
     dest: "/etc/filebeat/configs/"
   with_items:
-    "{{ app_name_list }}"
+    "{{ configs_list }}"
 
 ##copy filebeat fields.yml
 - name: Copy fields file

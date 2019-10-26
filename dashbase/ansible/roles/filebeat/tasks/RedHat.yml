@@ -1,8 +1,4 @@
 ---
-- name: Generate app list
-  set_fact:
-    app_name_list: "{{ app_name.split(',') }}"
-
 - name: Create Directories
   file:
     path: "{{ item }}"
