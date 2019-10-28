@@ -33,14 +33,14 @@
         192.84.16.128
 
         ; See further configurations in https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
-        ; [syslog_hosts:vars]
+        ; [filebeat_hosts:vars]
         ; ansible_user=admin
 
      2) Run the playbook
 
-       >ansible-playbook -i inventory deploy.yml -e "dashbase_url=table-freeswitch.cluster1.dashbase.io configs=syslog"
+       >ansible-playbook -i inventory deploy.yml -e "dashbase_url=http://table-freeswitch.cluster1.dashbase.io:80 configs=syslog"
 
         Playbook takes these extra variables with -e (or will prompt for):
 
-        dashbase_url     - URL of the dashbase table to send logs to
+        dashbase_url     - URL of the dashbase table to send logs to (the http protocol and port are required)
         configs          - name(s) of the filebeat "yml" files without ".yml" (multiple values can be given as a comma separated list)

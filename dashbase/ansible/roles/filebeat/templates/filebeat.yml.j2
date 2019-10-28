@@ -29,13 +29,17 @@ queue.mem:
 processors:
   - add_locale: ~
   - rename:
-     fields:
-      - from: "beat.timezone"
-        to: "fields._message_parser.defaultTimeZone"
-      - from: "beat.hostname"
-        to: "hostname"
+      when:
+        has_fields: ['fields._message_parser']
+      fields:
+        - from: "beat.timezone"
+          to: "fields._message_parser.defaultTimeZone"
+  - rename:
+      fields:
+        - from: "beat.hostname"
+          to: "hostname"
   - drop_fields:
-      fields: ["offset", "beat", "prospector", "host", "offset", "input"]
+      fields: ["offset", "beat", "prospector", "host", "input"]
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
@@ -52,7 +56,6 @@ output.elasticsearch:
   compression_level: 5
   hosts: "{{ dashbase_url }}"
   index: "{{ table }}"
-  protocol: "http"
 
 #================================ Logging =====================================
 
