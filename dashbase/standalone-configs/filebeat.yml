@@ -21,9 +21,13 @@ queue.mem:
 processors:
   - add_locale: ~
   - rename:
+      when:
+        has_fields: ['fields._message_parser']
       fields:
         - from: "beat.timezone"
           to: "fields._message_parser.defaultTimeZone"
+  - rename:
+      fields:
         - from: "beat.hostname"
           to: "hostname"
   - drop_fields:
@@ -37,7 +41,6 @@ output.elasticsearch:
   bulk_max_size: 3000
   worker: 30
   compression_level: 5
-  protocol: "/TO/CHANGE/YOUR/DASHBASE/(TABLE/PROXY)/PROTOCOL"
 
 http.enabled: true
 http.host: 127.0.0.1

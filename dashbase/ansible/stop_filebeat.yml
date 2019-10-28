@@ -1,6 +1,6 @@
 ---
 - name: Transfer and execute a script.
-  hosts: filebeat
+  hosts: filebeat_hosts
   become: yes
   become_method: sudo
   tasks:
