@@ -1,9 +1,10 @@
-username:
-license:
+# License information
+username: "your-dashbase-username"
+license: "your-dashbase-license"
 
 ingress:
   enabled: true
-  host:
+  host: "your-cluster-name.your-domain"
 
 https: false
 
@@ -79,5 +80,5 @@ services:
     enabled: true
 
 tables:
-  freeswitch:
+  your-table-name:
     replicas: 1
