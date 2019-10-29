@@ -1,0 +1,89 @@
+---
+# Source: alerts-template/templates/alerts.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus-operator
+    role: dashbase-etcd
+  name: dashbase-alerts-etcd
+spec:
+    # Prometheus alert rules of dashbase etcd cluster
+  # copied and modified from https://github.com/etcd-io/etcd/blob/master/Documentation/op-guide/etcd3_alert.rules.yml
+  groups:
+    - name: etcd
+      rules:
+  # disable cluster-related alerts
+  #      - alert: etcdInsufficientMembers
+  #        annotations:
+  #          message: 'etcd cluster "{{ $labels.app }}": insufficient members ({{ $value }}).'
+  #        expr: |
+  #          sum(up{component="etcd"} == bool 1) by (app) < ((count(up{component="etcd"}) by (app) + 1) / 2)
+  #        for: 3m
+  #        labels:
+  #          severity: critical
+  #      - alert: etcdNoLeader
+  #        annotations:
+  #          message: 'etcd cluster "{{ $labels.app }}": member {{ $labels.instance }} has no leader.'
+  #        expr: |
+  #          etcd_server_has_leader{component="etcd"} == 0
+  #        for: 1m
+  #        labels:
+  #          severity: critical
+  #      - alert: etcdHighNumberOfLeaderChanges
+  #        annotations:
+  #          message: 'etcd cluster "{{ $labels.app }}": instance {{ $labels.instance }} has seen {{ $value }} leader changes within the last hour.'
+  #        expr: |
+  #          rate(etcd_server_leader_changes_seen_total{component="etcd"}[15m]) > 3
+  #        for: 15m
+  #        labels:
+  #          severity: warning
+        - alert: etcdHighNumberOfFailedGRPCRequests
+          annotations:
+            message: 'etcd cluster "{{ $labels.dashbase_io_app }}": {{ $value }}% of requests for {{ $labels.grpc_method }} failed on etcd instance {{ $labels.instance }}.'
+          expr: |
+            100 * sum(rate(grpc_server_handled_total{component="etcd", grpc_code!="OK"}[5m])) BY (dashbase_io_app, instance, grpc_service, grpc_method)
+              /
+            sum(rate(grpc_server_handled_total{component="etcd"}[5m])) BY (dashbase_io_app, instance, grpc_service, grpc_method)
+              > 1
+          for: 10m
+          labels:
+            severity: warning
+        - alert: etcdHighNumberOfFailedGRPCRequests
+          annotations:
+            message: 'etcd cluster "{{ $labels.dashbase_io_app }}": {{ $value }}% of requests for {{ $labels.grpc_method }} failed on etcd instance {{ $labels.instance }}.'
+          expr: |
+            100 * sum(rate(grpc_server_handled_total{component="etcd", grpc_code!="OK"}[5m])) BY (dashbase_io_app, instance, grpc_service, grpc_method)
+              /
+            sum(rate(grpc_server_handled_total{component="etcd"}[5m])) BY (dashbase_io_app, instance, grpc_service, grpc_method)
+              > 5
+          for: 10m
+          labels:
+            severity: critical
+        - alert: etcdHighNumberOfFailedProposals
+          annotations:
+            message: 'etcd cluster "{{ $labels.dashbase_io_app }}": {{ $value }} proposal failures within the last hour on etcd instance {{ $labels.instance }}.'
+          expr: |
+            rate(etcd_server_proposals_failed_total{component="etcd"}[15m]) > 5
+          for: 15m
+          labels:
+            severity: warning
+        - alert: etcdHighFsyncDurations
+          annotations:
+            message: 'etcd cluster "{{ $labels.dashbase_io_app }}": 99th percentile fync durations are {{ $value }}s on etcd instance {{ $labels.instance }}.'
+          expr: |
+            histogram_quantile(0.99, rate(etcd_disk_wal_fsync_duration_seconds_bucket{component="etcd"}[5m]))
+            > 0.5
+          for: 10m
+          labels:
+            severity: warning
+        - alert: etcdHighCommitDurations
+          annotations:
+            message: 'etcd cluster "{{ $labels.dashbase_io_app }}": 99th percentile commit durations {{ $value }}s on etcd instance {{ $labels.instance }}.'
+          expr: |
+            histogram_quantile(0.99, rate(etcd_disk_backend_commit_duration_seconds_bucket{component="etcd"}[5m]))
+            > 0.25
+          for: 10m
+          labels:
+            severity: warning
+  

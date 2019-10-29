@@ -1,0 +1,71 @@
+---
+# Source: alerts-template/templates/alerts.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus-operator
+    role: dashbase-proxy
+  name: dashbase-alerts-proxy
+spec:
+    # Prometheus alert rules of dashbase proxy
+  groups:
+  - name: proxy
+    rules:
+    - expr: avg(jvm_cpu_usage_percent{component='proxy'}) by (app) > 75
+      annotations:
+        summary: "Proxy CPU Usage Too High in '{{ $labels.app }}'"
+        description: "Average Proxy CPU usage in '{{ $labels.app }}' is over 75%. Consider scaling up Proxy."
+      labels:
+        severity: warning
+      for: 5m
+      alert: proxy_cpu
+    - expr: avg(jvm_memory_heap_usage{component='proxy'}) by (app) > 0.8
+      annotations:
+        summary: "Proxy Memory Usage Too High in '{{ $labels.app }}'"
+        description: "Average Proxy Memory usage in '{{ $labels.app }}' is over 80%. Consider scaling up Proxy."
+      labels:
+        severity: warning
+      for: 5m
+      alert: proxy_memory
+    - expr: avg(rate(dashbase_proxy_events_parse_error[5m]) / rate(dashbase_proxy_events_received[5m])) by (app, topic) >= 0.01
+      annotations:
+        summary: "Proxy Too Many Parse Errors for topic '{{ $labels.topic }}'"
+        description: "Proxy failed to parse more than 1% of the incoming messages for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check Parser's Config."
+      labels:
+        severity: critical
+      for: 5m
+      alert: proxy_parse_error
+    - expr: avg(1 - (rate(dashbase_proxy_event_delay_bucket{le="3600.0"}[5m]) / ignoring(le) rate(dashbase_proxy_event_delay_count[5m]))) by (app, topic) > 0.5
+      annotations:
+        summary: "Proxy Too Many Old Messages for topic '{{ $labels.topic }}'"
+        description: "More than 50% of messages received by Proxy are more than 1 hour old for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of message producer."
+      labels:
+        severity: warning
+      for: 5m
+      alert: proxy_too_many_old_message
+    - expr: avg(1 - (rate(dashbase_proxy_event_size_bucket{le="1.048576E7"}[5m]) / ignoring(le) rate(dashbase_proxy_event_size_count[5m]))) by (app, topic) > 0.01
+      annotations:
+        summary: "Proxy Too Large Messages for topic '{{ $labels.topic }}'"
+        description: "More than 1% of messages received by Proxy are bigger than 10MB for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the configuration of message producer."
+      labels:
+        severity: warning
+      for: 5m
+      alert: proxy_too_many_large_message
+    - expr: sum(rate(dashbase_kafka_failure[5m])) by (app, exception) / ignoring (exception) group_left sum(rate(dashbase_kafka_success[5m])) by (app) > 0.01
+      annotations:
+        summary: "Proxy Too Many Kafka Errors"
+        description: "Proxy are seeing too many errors sending messages to kafka with exception '{{ $labels.exception }}' in '{{ $labels.app }}'. Check the status of kafka and also Proxy's configuration for Kafka."
+      labels:
+        severity: critical
+      for: 5m
+      alert: proxy_kafka_error
+    - expr: proxy:event_delay:avg > 1 * 60 * 60 # 1 hour
+      annotations:
+        summary: "Proxy Delay Too Much for topic '{{ $labels.topic }}'"
+        description: "Proxy incoming messages delayed more than 1 hour({{ $value }} seconds) for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check Parser's Config."
+      labels:
+        severity: warning
+      for: 5m
+      alert: proxy_events_delay
+  
