@@ -124,9 +124,8 @@ data:
     # Set your elsticsearch host and protocol here.
     # ##############################################
     output.elasticsearch:
-      hosts: ['proxy:9200']
+      hosts: ['http://proxy:9200']
       index: "filebeat"  # change it to your dashbase table name
-      protocol: "http"
       ssl.verification_mode: "none"
 ---
 apiVersion: v1

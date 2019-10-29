@@ -88,9 +88,8 @@ data:
     setup.template.enabled: false
 
     output.elasticsearch:
-      hosts: ['proxy:9200']
+      hosts: ['http://proxy:9200']
       index: "filebeat"
-      protocol: "http"
       ssl.verification_mode: "none"
 ---
 apiVersion: v1
