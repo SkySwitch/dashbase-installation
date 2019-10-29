@@ -193,44 +193,13 @@ services:
   web:
     enabled: true
 
-  # Dashbase Proxy Service
-  # Disabled by default; stateless service to parse events from Filebeat and send to
-  # a commit queue (Kafka) for tables to ingest from.
-  # Creates a Kubernetes Deployment resource.
-  proxy:
-    enabled: true
-    # Increase the number of replicas to handle .
-    replicas: 1
-  
-  # Kafka Service
-  # Disabled by default; deploys Kafka broker(s) used by Dashbase as a commit queue.
-  # Creates a Kubernetes StatefulSet resource.
-  kafka:
-    enabled: true
-    # Replicas in this case control the number of brokers.
-    replicas: 1
-    # List of example environment variables that can be set for the Kafka image.
-    #environment:
-      #KAFKA_LOG_RETENTION_HOURS: "1"
-      #KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "3"
-      #KAFKA_DEFAULT_REPLICATION_FACTOR: "1"
-      #KAFKA_LOG_RETENTION_BYTES: "1000000000000"
-      #KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092
-      #KAFKA_HEAP_OPTS: "-Xmx4g -Xms4g -XX:NewSize=2g"
-
-  # ZooKeeper
-  # Disabled by default; deploys a ZooKeeper used by Kafka. Creates a Kubernetes
-  # StatefulSet resource.
-  zookeeper:
-    enabled: true
-
   #----------------------------- Optional Services -----------------------------
   # Prometheus
   # Internal Prometheus pre-configured to scrape metrics from all Dashbase services
   # and tables. Creates a Kubernetes StatefulSet resource.
   # Recommended for production deployment.
   prometheus:
-    enabled: false
+    enabled: true
     # Uncomment the following if the default account has permission issues.
     # You will also need the 'prometheus' account enabled.
     #podConfig:
@@ -242,25 +211,13 @@ services:
   # Recommended for production deployment. Creates a Kubernetes StatefulSet 
   # resource.
   grafana:
-    enabled: false
+    enabled: true
   
   # Pushgateway
   # Internal Pushgateway for Dashbase log collectors to push metrics from production
   # for Prometheus to scrape. Creates a Kubernetes Deployment resource.
   pushgateway:
-    enabled: false
-
-  # Alertmanager
-  # Preconfigured Alertmanager useful for managing Dashbase packaged Prometheus
-  # alerts. Creates a Kubernetes StatefulSet resource.
-  alertmanager:
-    enabled: false
-
-  # Influxdb
-  # Optional InfluxDB for Prometheus to use as remote read/write database in a
-  # remote monitoring setup. Creates a Kubernetes StatefulSet resource.
-  influxdb:
-    enabled: false
+    enabled: true
 
 #------------------------------- Dashbase Tables -------------------------------
 # List of Tables

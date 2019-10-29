@@ -1,0 +1,83 @@
+username:
+license:
+
+ingress:
+  enabled: true
+  host:
+
+https: false
+
+default_storageclass_provider:
+  platform: aws
+  parameters:
+    encrypted: "true"
+
+enablePodPriority: true
+
+accounts:
+  prometheus: true
+
+kube-state-metrics:
+  enabled: true
+
+default:
+  priorityClassName: dashbase-normal-priority
+  storage:
+    class: dashbase-meta
+  containerConfig:
+    resources:
+      requests:
+        cpu: 1
+        memory: 2G
+      limits:
+        cpu: 2
+        memory: 2G
+  table:
+    priorityClassName: dashbase-high-priority
+    storage:
+      class: dashbase-data
+      size: 4000Gi
+    containerConfig:
+      resources:
+          requests:
+            cpu: 7.5
+            memory: 60G
+          limits:
+            cpu: 7.5
+            memory: 60G
+    environment:
+      JAVA_OPTS: -Xmx36g -Xms8g
+      BLOOM_FILTER_SIZE: 400
+      MAX_BUFFER_DELAY_IN_SEC: 90
+      RETENTION_NUM_DAYS: 7
+      RETENTION_SIZE_GB: 3400
+      IN_MEMORY_BUFFER: true
+      READER_CACHE_MEM_PERCENT: 60
+      NUM_INDEXING_THREADS: 2
+      MIN_BUFFER_SIZE_MB: 2000
+
+
+services:
+  etcd:
+    enabled: true
+
+  api:
+    enabled: true
+
+  web:
+    enabled: true
+
+  grafana:
+    enabled: true
+
+  prometheus:
+    enabled: true
+    storage:
+      size: 100Gi
+
+  pushgateway:
+    enabled: true
+
+tables:
+  freeswitch:
+    replicas: 1
