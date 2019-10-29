@@ -88,7 +88,7 @@ data:
     setup.template.enabled: false
 
     output.elasticsearch:
-      hosts: ['http://proxy:9200']
+      hosts: []
       index: "filebeat"
       ssl.verification_mode: "none"
 ---
@@ -199,7 +199,7 @@ spec:
             memory: 500Mi
         env:
           - name: GATEWAY_URL
-            value: "http://pushgateway:9091/metrics/job/filebeat/instance/$HOSTNAME"
+            value: ""
         volumeMounts:
         - name: telegraf-config
           mountPath: /etc/telegraf.conf
