@@ -106,17 +106,18 @@ filebeat:
   enabled: false
   elasticsearch_url:
 
-# Prometheus ServiceAccount
-# Enable this setting to create a ClusterRole and ServiceAccount required by the
-# provided Prometheus service to scrape metrics from all Dashbase Pods. 
+# ServiceAccount
+# Enable this setting to create ClusterRole(s) and ServiceAccount(s) required by the Dashbase services
+# or the provided Prometheus service to scrape metrics from all Dashbase Pods.
 accounts:
-  prometheus: false
+  prometheus: true
+  dashbase: true
 
 # Kube State Metrics
 # Deploy a pre-configured https://github.com/kubernetes/kube-state-metrics
 # Recommended for production deployment only.
 kube-state-metrics:
-  enabled: false
+  enabled: true
   # Specify available collectors below.
   #collectors:
 
