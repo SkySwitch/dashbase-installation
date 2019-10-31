@@ -5,7 +5,7 @@
     _message_parser:
       type: grok
       pattern: '%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
-  multiline.pattern: ^\n
+  multiline.pattern: ^.
   multiline.negate: true
   multiline.match: after
   close_inactive: 90s
