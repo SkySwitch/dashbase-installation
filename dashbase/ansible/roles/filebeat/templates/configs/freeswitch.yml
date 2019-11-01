@@ -11,46 +11,28 @@
   symlinks: true
   clean_removed: true
   fields:
-    _message_parser:
-      type: multi
-      parsers:
-        freeswitch:
-          type: grok
-          pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
-        sip:
-          type: multi
-          applyAll: 'true'
-          parsers:
-            sip_timestamp:
-              type: timestamp
-              scan: 'true'
-              format: HH:mm:ss.SSS
-            sip_sip:
-              type: sip
-
-#    TODO: After 1.0 is released, remove _message_parser section above and put the one below:
-#    _message_parser:
-#      type: multi
-#      parsers_list:
-#      - name: freeswitch
-#        config:
-#          type: grok
-#          pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
-#      - name: sip
-#        config:
-#          type: multi
-#          applyAll: 'true'
-#          parsers:
-#            sip_timestamp:
-#              type: timestamp
-#              scan: 'true'
-#              format: HH:mm:ss.SSS
-#            sip_sip:
-#              type: sip
-#      - name: universal
-#        config:
-#          type: grok
-#          pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
+   _message_parser:
+     type: multi
+     parsers_list:
+     - name: freeswitch
+       config:
+         type: grok
+         pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
+     - name: sip
+       config:
+         type: multi
+         applyAll: 'true'
+         parsers:
+           sip_timestamp:
+             type: timestamp
+             scan: 'true'
+             format: HH:mm:ss.SSS
+           sip_sip:
+             type: sip
+     - name: universal
+       config:
+         type: grok
+         pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
 
 - paths:
    - /var/log/freeswitch/json_cdr/*/*.cdr.json
