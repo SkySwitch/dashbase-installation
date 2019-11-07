@@ -3,8 +3,14 @@
     - /var/log/syslog
   fields:
     _message_parser:
-      type: grok
-      pattern: '%{SYSLOGTIMESTAMP:syslogtimestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
+      type: multi
+      parsers:
+        kamailio:
+          type: grok
+          pattern: '%{DATA:timestamp:datetime:MMM ppd HH:mm:ss} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: (%{DATA:pid}) %{LOGLEVEL:level:meta}: %{DATA:script}: \[%{DATA:route}\] \*New request %{DATA:method:meta}\* rU=%{DATA:request-uri.user}/tU=%{DATA:to}/fU=%{DATA:from.sip-uri.user}/rd=%{DATA:request-uri.host}/si=%{DATA:source-ip-address}/sp=%{GREEDYDATA:source-port}'
+        syslog:
+          type: grok
+          pattern: '%{DATA:timestamp:datetime:MMM ppd HH:mm:ss} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta} %{SYSLOGPROG}: %{GREEDYDATA:message}'
   multiline.pattern: ^.
   multiline.negate: true
   multiline.match: after
