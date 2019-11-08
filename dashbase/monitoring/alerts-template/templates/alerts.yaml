@@ -1,0 +1,9 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus-operator
+    role: dashbase-{{ .Values.alert_name }}
+  name: dashbase-alerts-{{ .Values.alert_name }}
+spec:
+  {{ .Files.Get .Values.alert_path | indent 2 }}

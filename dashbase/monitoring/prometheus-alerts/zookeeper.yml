@@ -1,31 +1,20 @@
----
-# Source: alerts-template/templates/alerts.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: prometheus-operator
-    role: dashbase-zookeeper
-  name: dashbase-alerts-zookeeper
-spec:
-    # Prometheus alert rules of zookeeper
-  groups:
-    - name: zookeeper
-      rules:
-      - expr: avg(jvm_memory_bytes_used{area='heap', component='zookeeper'} / jvm_memory_bytes_max{area='heap', component='zookeeper'}) by (app) > 0.9
-        annotations:
-          summary: "ZooKeeper Memory Usage Too High In '{{ $labels.app }}'"
-          description: "ZooKeeper in '{{ $labels.app }}' is using +90% of available heap memory. Consider assigning more heap."
-        labels:
-          severity: warning
-        for: 5m
-        alert: zookeeper_memory
-      - expr: sum(rate(zookeeper_OutstandingRequests[5m])) by (app) > 0
-        annotations:
-          summary: "ZooKeeper Outstanding Requests In '{{ $labels.app }}'"
-          description: "There are too many requests to ZooKeeper in '{{ $labels.app }}'. Check the status of Dashbase API and Table."
-        labels:
-          severity: warning
-        for: 5m
-        alert: zookeeper_outstanding_requests
-  
+# Prometheus alert rules of zookeeper
+groups:
+  - name: zookeeper
+    rules:
+    - expr: avg(jvm_memory_bytes_used{area='heap', component='zookeeper'} / jvm_memory_bytes_max{area='heap', component='zookeeper'}) by (app) > 0.9
+      annotations:
+        summary: "ZooKeeper Memory Usage Too High In '{{ $labels.app }}'"
+        description: "ZooKeeper in '{{ $labels.app }}' is using +90% of available heap memory. Consider assigning more heap."
+      labels:
+        severity: warning
+      for: 5m
+      alert: zookeeper_memory
+    - expr: sum(rate(zookeeper_OutstandingRequests[5m])) by (app) > 0
+      annotations:
+        summary: "ZooKeeper Outstanding Requests In '{{ $labels.app }}'"
+        description: "There are too many requests to ZooKeeper in '{{ $labels.app }}'. Check the status of Dashbase API and Table."
+      labels:
+        severity: warning
+      for: 5m
+      alert: zookeeper_outstanding_requests

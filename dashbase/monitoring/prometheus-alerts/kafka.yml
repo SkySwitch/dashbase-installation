@@ -1,66 +1,55 @@
----
-# Source: alerts-template/templates/alerts.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: prometheus-operator
-    role: dashbase-kafka
-  name: dashbase-alerts-kafka
-spec:
-    # Prometheus alert rules of kafka
-  groups:
-  - name: kafka
-    rules:
-    - expr: avg(jvm_memory_bytes_used{area='heap', component='kafka'} / jvm_memory_bytes_max{area='heap', component='kafka'}) by (app,instance) > 0.9
-      annotations:
-        summary: "Kafka Memory Usage Too High In '{{ $labels.app }}'"
-        description: "Kafka instance '{{ $labels.instance }}' in '{{ $labels.app }}' is using +90% of available heap memory. Consider assigning more heap or scaling up Kafka."
-      labels:
-        severity: warning
-      for: 5m
-      alert: kafka_memory
-    - expr: |
-        sum(kafka_log_log_size) by (app, instance)
-          /
-        on(app, instance)
+# Prometheus alert rules of kafka
+groups:
+- name: kafka
+  rules:
+  - expr: avg(jvm_memory_bytes_used{area='heap', component='kafka'} / jvm_memory_bytes_max{area='heap', component='kafka'}) by (app,instance) > 0.9
+    annotations:
+      summary: "Kafka Memory Usage Too High In '{{ $labels.app }}'"
+      description: "Kafka instance '{{ $labels.instance }}' in '{{ $labels.app }}' is using +90% of available heap memory. Consider assigning more heap or scaling up Kafka."
+    labels:
+      severity: warning
+    for: 5m
+    alert: kafka_memory
+  - expr: |
+      sum(kafka_log_log_size) by (app, instance)
+        /
+      on(app, instance)
+        label_replace(
           label_replace(
-            label_replace(
-              kube_persistentvolumeclaim_resource_requests_storage_bytes{persistentvolumeclaim=~"^kafka.*"},
-              "instance", "$1", "persistentvolumeclaim", "kafka-data-(.+)"),
-            "app", "$1", "exported_namespace", "(.+)")
-          > 0.9
-      annotations:
-        summary: "Kafka Running Out of Disk on '{{ $labels.instance }}' in '{{ $labels.app }}'"
-        description: "Kafka instance '{{ $labels.instance }}' in '{{ $labels.app }}' is using +90% of available disk space. Consider reducing Kafka retention period or increase disk size."
-      labels:
-        severity: critical
-      for: 5m
-      alert: kafka_disk
-    - expr: sum(rate(kafka_server_brokertopicmetrics_bytesrejected_total[5m])) by (app, topic) > 0
-      annotations:
-        summary: "Kafka Too Many Bytes Rejected In '{{ $labels.app }}'"
-        description: "Kafka is rejecting bytes for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of the producer and broker."
-      labels:
-        severity: critical
-      for: 5m
-      alert: kafka_bytes_rejected
-    - expr: sum(rate(kafka_server_brokertopicmetrics_failedfetchrequests_total[5m])) by (app, topic) > 0
-      annotations:
-        summary: "Kafka Too Many Failed Fetch Requests In '{{ $labels.app }}'"
-        description: "Kafka is receiving too many failed fetch requests for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of the consumer and broker."
-      labels:
-        severity: critical
-      for: 5m
-      alert: kafka_failed_fetch_requests
-    - expr: sum(rate(kafka_server_brokertopicmetrics_failedproducerequests_total[5m])) by (app, topic) > 0
-      annotations:
-        summary: "Kafka Too Many Failed Produce Requests In '{{ $labels.app }}'"
-        description: "Kafka is receiving too many failed produce requests for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of the producer and broker."
-      labels:
-        severity: critical
-      for: 5m
-      alert: kafka_failed_produce_requests
-  
-  # alert on kafka retention
-  
+            kube_persistentvolumeclaim_resource_requests_storage_bytes{persistentvolumeclaim=~"^kafka.*"},
+            "instance", "$1", "persistentvolumeclaim", "kafka-data-(.+)"),
+          "app", "$1", "exported_namespace", "(.+)")
+        > 0.9
+    annotations:
+      summary: "Kafka Running Out of Disk on '{{ $labels.instance }}' in '{{ $labels.app }}'"
+      description: "Kafka instance '{{ $labels.instance }}' in '{{ $labels.app }}' is using +90% of available disk space. Consider reducing Kafka retention period or increase disk size."
+    labels:
+      severity: critical
+    for: 5m
+    alert: kafka_disk
+  - expr: sum(rate(kafka_server_brokertopicmetrics_bytesrejected_total[5m])) by (app, topic) > 0
+    annotations:
+      summary: "Kafka Too Many Bytes Rejected In '{{ $labels.app }}'"
+      description: "Kafka is rejecting bytes for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of the producer and broker."
+    labels:
+      severity: critical
+    for: 5m
+    alert: kafka_bytes_rejected
+  - expr: sum(rate(kafka_server_brokertopicmetrics_failedfetchrequests_total[5m])) by (app, topic) > 0
+    annotations:
+      summary: "Kafka Too Many Failed Fetch Requests In '{{ $labels.app }}'"
+      description: "Kafka is receiving too many failed fetch requests for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of the consumer and broker."
+    labels:
+      severity: critical
+    for: 5m
+    alert: kafka_failed_fetch_requests
+  - expr: sum(rate(kafka_server_brokertopicmetrics_failedproducerequests_total[5m])) by (app, topic) > 0
+    annotations:
+      summary: "Kafka Too Many Failed Produce Requests In '{{ $labels.app }}'"
+      description: "Kafka is receiving too many failed produce requests for topic '{{ $labels.topic }}' in '{{ $labels.app }}'. Check the status of the producer and broker."
+    labels:
+      severity: critical
+    for: 5m
+    alert: kafka_failed_produce_requests
+
+# alert on kafka retention

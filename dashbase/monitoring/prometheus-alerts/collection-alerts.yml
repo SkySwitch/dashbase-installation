@@ -1,68 +1,58 @@
----
-# Source: alerts-template/templates/alerts.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: prometheus-operator
-    role: dashbase-collection-alerts
-  name: dashbase-alerts-collection-alerts
-spec:
-    # Prometheus alert rules of dashbase collection, include filebeat telegraf night-watch
-  groups:
-  - name: dashbase-collection
-    rules:
-    - expr: http_filebeat_harvester_running > 3000
-      annotations:
-        summary: Filebeat harvesters of table {{ $labels.table }}  greater than 3000 on {{ $labels.host }}
-        description: Filebeat on {{ $labels.host }} has more than 3000 harvesters and is backed up. Check Dashbase for table {{ $labels.table }} ingest issues.
-      for: 5m
-      alert: filebeat_harvester_running
-    - expr: rate(http_libbeat_output_events_dropped[5m])/rate(http_libbeat_output_events_total[5m]) > 0.01
-      annotations:
-        summary: Filebeat ingesting table {{ $labels.table }} on {{ $labels.host }} is dropping events
-        description: Filebeat ingesting table {{ $labels.table }} on {{ $labels.host }} is dropping events. Check the Filebeat logs for more information.
-      labels:
-        severity: critical
-      for: 5m
-      alert: filebeat_events_dropped
-    - expr: rate(http_filebeat_harvester_skipped[5m])  > 0
-      annotations:
-        summary: Filebeat ingesting table {{ $labels.table }} is backed up on {{ $labels.host }}
-        description: Filebeat on {{ $labels.host }} is backed up and skipping log files. Check Dashbase for table {{ $labels.table }} ingest issues.
-      labels:
-        severity: critical
-      for: 5m
-      alert: filebeat_harvester_skipped
-    - expr: rate(http_beat_info_uptime_ms[15m]) == 0
-      annotations:
-        summary: Missing Filebeat metrics of table {{ $labels.table }} from '{{ $labels.host }}'
-        description: No Filebeat metrics of table {{ $labels.table }} received from '{{ $labels.host }}' in the last 15 minutes. Please check the Filebeat running on this host or if this was intentional, delete the corresponding group from Pushgateway.
-      labels:
-        severity: critical
-      for: 5m
-      alert: missing_filebeat_metrics
-    - expr: rate(nightwatch_metric_run_spent_time_nanosecond[15m]) == 0
-      annotations:
-        summary: Missing NightWatch metrics from '{{ $labels.host }}'
-        description: No NightWatch metrics received from '{{ $labels.host }}' in the last 15 minutes. Please check NightWatch on this host or if this was intentional, delete the corresponding group from Pushgateway.
-      labels:
-        severity: critical
-      for: 5m
-      alert: missing_nightwatch_metrics
-    - expr: rate(push_time_seconds[15m]) == 0
-      annotations:
-        summary: Missing Telegraf metrics from '{{ $labels.exported_instance }}'
-        description: No Telegraf metrics received from '{{ $labels.exported_instance }}' in the last 15 minutes. Please check Telegraf on this host or if this was intentional, delete the corresponding group from Pushgateway.
-      labels:
-        severity: critical
-      for: 5m
-      alert: missing_telegraf_metrics
-    - expr: http_filebeat_harvester_running == 0 and on(host) rate(nightwatch_metric_file_append_total_size[5m]) > 0
-      annotations:
-        summary: Filebeat ingesting table {{ $labels.table }} on '{{ $labels.host }}' is not harvesting logs
-        description: Filebeat ingesting table {{ $labels.table }} on '{{ $labels.host }}' is not harvesting logs. Check the Filebeat logs for more information and restart the process.
-      labels:
-        severity: critical
-      for: 5m
-      alert: filebeat_not_harvesting
+# Prometheus alert rules of dashbase collection, include filebeat telegraf night-watch
+groups:
+- name: dashbase-collection
+  rules:
+  - expr: http_filebeat_harvester_running > 3000
+    annotations:
+      summary: The '{{ $labels.table }}' table ingestion is falling behind
+      description: Filebeat harvester count is greater than 3000 on '{{ $labels.host }}'. Check whether the '{{ $labels.table }}' table needs to be scaled up or is unhealthy.
+    for: 5m
+    alert: growing_harvester_count
+  # - expr: rate(http_libbeat_output_events_dropped[5m])/rate(http_libbeat_output_events_total[5m]) > 0.01
+  #   annotations:
+  #     summary: Filebeat for '{{ $labels.table }}' table on '{{ $labels.host }}' is dropping events
+  #     description: Check the Filebeat logs on '{{ $labels.host}}' for any errors or warnings indicating Filebeat dropping events.
+  #   labels:
+  #     severity: critical
+  #   for: 5m
+  #   alert: filebeat_events_dropped
+  - expr: rate(http_filebeat_harvester_skipped[5m]) > 0
+    annotations:
+      summary: The '{{ $labels.table }}' table is backed up and may be losing data
+      description: Filebeat on '{{ $labels.host }}' is backed up and skipping log files. There will be data loss if this is not addressed immediately. Scale the '{{ $labels.table }}' table up and ensure the rest of the ingest pipeline is healthy.
+    labels:
+      severity: critical
+    for: 5m
+    alert: filebeat_harvester_skipped
+  - expr: rate(http_beat_info_uptime_ms[15m]) == 0
+    annotations:
+      summary: Filebeat may not be running on '{{ $labels.host }}'
+      description: No Filebeat heartbeat metrics received from '{{ $labels.host }}' for '{{ $labels.table }}' table in the last 15 minutes. If Filebeat is down, please restart it or you will lose data. If the Filebeat was stopped intentionally, ensure Telegraf is stopped on the host and delete the corresponding metric group from Pushgateway.
+    labels:
+      severity: critical
+    for: 5m
+    alert: filebeat_failed_heartbeat
+  - expr: rate(nightwatch_metric_run_spent_time_nanosecond[15m]) == 0
+    annotations:
+      summary: NightWatch may not be running on '{{ $labels.host }}'
+      description: No NightWatch heartbeat metrics received from '{{ $labels.host }}' in the last 15 minutes. Please check the NightWatch logs or that Telegraf is running. If the process was stopped intentionally, ensure Telegraf is stopped on the host and delete the corresponding metric group from Pushgateway.
+    labels:
+      severity: critical
+    for: 5m
+    alert: nightwatch_failed_heartbeat
+  - expr: rate(push_time_seconds[15m]) == 0
+    annotations:
+      summary: Telegraf may not be running on '{{ $labels.exported_instance }}'
+      description: No Telegraf heartbeat metrics received from '{{ $labels.exported_instance }}' in the last 15 minutes. Please restart Telegraf to restore monitoring of Filebeat. If the process was stopped intentionally, ensure Filebeat is also stopped on the host and delete the corresponding metric group from Pushgateway.
+    labels:
+      severity: critical
+    for: 5m
+    alert: telegraf_failed_heartbeat
+  - expr: (rate(http_libbeat_output_events_total[5m]) == 0 and http_filebeat_harvester_running == 0) and on(host) rate(nightwatch_metric_file_append_total_size[5m]) > 0
+    annotations:
+      summary: Filebeat for the '{{ $labels.table }}' table on '{{ $labels.host }}' is not harvesting
+      description: Filebeat for the '{{ $labels.table }}' table on '{{ $labels.host }}' is not harvesting logs. Capture the error within the Filebeat logs and restart the process or you will lose data.
+    labels:
+      severity: critical
+    for: 5m
+    alert: filebeat_not_harvesting

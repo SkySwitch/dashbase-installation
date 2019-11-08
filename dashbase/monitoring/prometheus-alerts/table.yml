@@ -1,108 +1,97 @@
----
-# Source: alerts-template/templates/alerts.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: prometheus-operator
-    role: dashbase-table
-  name: dashbase-alerts-table
-spec:
-    # Prometheus alert rules of dashbase tables
-  groups:
-  - name: table
-    rules:
-    - expr: avg(jvm_cpu_usage_percent{component='table'}) by (app,instance) > 90
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' is using {{ $value }}% of CPU. Check if traffic is too high or unbalanced."
-      labels:
-        severity: warning
-      for: 10m
-      alert: table_cpu_high
-  
-    - expr: dashbase_disk_available_bytes * 100 / on(app, instance) dashbase_disk_total_bytes < 5
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has only {{$value}}% free disk space. Check if retention parameters are correct."
-      for: 5m
-      labels:
-        severity: critical
-      alert: table_free_disk_low
-  
-    - expr: rate(dashbase_index_event_parse_error[5m]) > 0
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has request parse errors. Check if log harvester's configuration is correct."
-      for: 10m
-      labels:
-        severity: critical
-      alert: table_request_parse_errors_high
-  
-    - expr: rate(dashbase_parse_error_total[5m]) * 100 / on(app, instance) rate(dashbase_ingestion_events_total[5m]) >= 1
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has {{ $value }}% parse errors. Check if parser configuration is correct."
-      for: 15m
-      labels:
-        severity: critical
-      alert: table_ingest_parse_errors_high
-  
-    - expr: rate(dashbase_parse_skipped_total[5m]) * 100 / on(app, instance) rate(dashbase_ingestion_events_total[5m]) >= 1
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has {{ $value }}% timestamp errors. Check if timestamp parser configuration is correct."
-      for: 15m
-      labels:
-        severity: critical
-      alert: table_ingest_parse_skipped_high
-  
-    - expr: rate(dashbase_invalid_timeslice_count[5m]) > 0
-      for: 5m
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' is producing invalid segments. Check the log and segment info files to figure out why."
-      labels:
-        severity: critical
-      alert: table_invalid_segments
-  
-    - expr: rate(dashbase_indexer_time_slice_range_secs_sum[10m]) / on(app, instance, type) rate(dashbase_indexer_time_slice_range_secs_count[10m]) > 3600
-      for: 15m
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has timeslice(s) whose range is larger than 1 hour. Is there misconfigured filebeat or indexing is lagging behind?"
-      labels:
-        severity: warning
-      alert: table_time_slice_range_high
-  
-    - expr: sum(rate(dashbase_schema_change_total[5m])) by (app,instance) > 0
-      for: 10m
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' is changing its schema. Is this expected? search 'schema changed' in logs for details."
-      labels:
-        severity: warning
-      alert: table_schema_changed
-  
-    # compare # of total partitions and # of partitions with no traffic.
-    - expr: |
-        count by (app, table) (sum(dashbase_ingestion_bytes_total) by (app, table, instance))
-          !=
-        count by (app, table) (count by (app, table, instance) (sum(dashbase_ingestion_bytes_total) by (app, table, instance) == 0))
-      for: 10m
-      annotations:
-        description: "One or more partitions in Table '{{$labels.table}}' in '{{ $labels.app }}' is not ingesting any data. Please check the status of each partition in the table."
-      labels:
-        severity: critical
-      alert: table_partition_no_ingestion
-  
-  
-  #  - expr: time() - dashbase_indexer_latest_event_time > 1800
-  #    annotations:
-  #      description: "{{ $labels.app }} {{ $labels.instance }} indexing lags behind by {{ $value }} seconds"
-  #    labels:
-  #      severity: warning
-  #    for: 15m
-  #    alert: table_indexing_lag_high
-  
-    - expr: rate(dashbase_indexer_full_latency_secs_sum[5m]) / on(app, table, instance, type) rate(dashbase_indexer_full_latency_secs_count[5m]) > 1 * 60 * 60 # 1 hour
-      annotations:
-        description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has ingestion delayed for more than 1 hour({{ $value }} seconds). Check if indexing is working well."
-      for: 15m
-      labels:
-        severity: warning
-      alert: table_ingestion_delay_high
-  
-  
+# Prometheus alert rules of dashbase tables
+groups:
+- name: table
+  rules:
+  - expr: avg(jvm_cpu_usage_percent{component='table'}) by (app,instance) > 90
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' is using {{ $value }}% of CPU. Check if traffic is too high or unbalanced."
+    labels:
+      severity: warning
+    for: 10m
+    alert: table_cpu_high
+
+  - expr: dashbase_disk_available_bytes * 100 / on(app, instance) dashbase_disk_total_bytes < 5
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has only {{$value}}% free disk space. Check if retention parameters are correct."
+    for: 5m
+    labels:
+      severity: critical
+    alert: table_free_disk_low
+
+  - expr: rate(dashbase_index_event_parse_error[5m]) > 0
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has request parse errors. Check if log harvester's configuration is correct."
+    for: 10m
+    labels:
+      severity: critical
+    alert: table_request_parse_errors_high
+
+  - expr: rate(dashbase_parse_error_total[5m]) * 100 / on(app, instance) rate(dashbase_ingestion_events_total[5m]) >= 1
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has {{ $value }}% parse errors. Check if parser configuration is correct."
+    for: 15m
+    labels:
+      severity: critical
+    alert: table_ingest_parse_errors_high
+
+  - expr: rate(dashbase_parse_skipped_total[5m]) * 100 / on(app, instance) rate(dashbase_ingestion_events_total[5m]) >= 1
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has {{ $value }}% timestamp errors. Check if timestamp parser configuration is correct."
+    for: 15m
+    labels:
+      severity: critical
+    alert: table_ingest_parse_skipped_high
+
+  - expr: rate(dashbase_invalid_timeslice_count[5m]) > 0
+    for: 5m
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' is producing invalid segments. Check the log and segment info files to figure out why."
+    labels:
+      severity: critical
+    alert: table_invalid_segments
+
+  - expr: rate(dashbase_indexer_time_slice_range_secs_sum[10m]) / on(app, instance, type) rate(dashbase_indexer_time_slice_range_secs_count[10m]) > 3600
+    for: 15m
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has timeslice(s) whose range is larger than 1 hour. Is there misconfigured filebeat or indexing is lagging behind?"
+    labels:
+      severity: warning
+    alert: table_time_slice_range_high
+
+  - expr: sum(rate(dashbase_schema_change_total[5m])) by (app,instance) > 0
+    for: 10m
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' is changing its schema. Is this expected? search 'schema changed' in logs for details."
+    labels:
+      severity: warning
+    alert: table_schema_changed
+
+  # compare # of total partitions and # of partitions with no traffic.
+  - expr: |
+      count by (app, table) (sum(dashbase_ingestion_bytes_total) by (app, table, instance))
+        !=
+      count by (app, table) (count by (app, table, instance) (sum(dashbase_ingestion_bytes_total) by (app, table, instance) == 0))
+    for: 10m
+    annotations:
+      description: "One or more partitions in Table '{{$labels.table}}' in '{{ $labels.app }}' is not ingesting any data. Please check the status of each partition in the table."
+    labels:
+      severity: critical
+    alert: table_partition_no_ingestion
+
+
+#  - expr: time() - dashbase_indexer_latest_event_time > 1800
+#    annotations:
+#      description: "{{ $labels.app }} {{ $labels.instance }} indexing lags behind by {{ $value }} seconds"
+#    labels:
+#      severity: warning
+#    for: 15m
+#    alert: table_indexing_lag_high
+
+  - expr: rate(dashbase_indexer_full_latency_secs_sum[5m]) / on(app, table, instance, type) rate(dashbase_indexer_full_latency_secs_count[5m]) > 1 * 60 * 60 # 1 hour
+    annotations:
+      description: "Table '{{$labels.instance}}' in '{{ $labels.app }}' has ingestion delayed for more than 1 hour({{ $value }} seconds). Check if indexing is working well."
+    for: 15m
+    labels:
+      severity: warning
+    alert: table_ingestion_delay_high
+

@@ -1,0 +1,31 @@
+---
+# Source: alerts-template/templates/alerts.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: prometheus-operator
+    role: dashbase-k8s
+  name: dashbase-alerts-k8s
+spec:
+    # Prometheus alert rules of dashbase k8s deployment and statefulset
+  groups:
+    - name: k8s
+      rules:
+        - expr: (kube_deployment_labels{label_dashbase_io="true"} * on(exported_namespace,deployment) group_right kube_deployment_status_replicas_available) == bool on(deployment, exported_namespace) (kube_deployment_labels{label_dashbase_io="true"} * on(exported_namespace,deployment) group_right kube_deployment_spec_replicas) == 0
+          annotations:
+            summary: "Deployment '{{ $labels.deployment}}' in '{{ $labels.exported_namespace }}' is Unhealthy"
+            description: "Deployment '{{ $labels.deployment }}' in '{{ $labels.exported_namespace }}' is failing to start some PODs. Check the status of the deployment and/or of the failing PODs."
+          labels:
+            severity: critical
+          for: 5m
+          alert: k8s_deployment_unhealthy
+        - expr: (kube_statefulset_labels{label_dashbase_io="true"} * on(exported_namespace,statefulset) group_right kube_statefulset_status_replicas_ready) == bool on(statefulset, exported_namespace) (kube_statefulset_labels{label_dashbase_io="true"} * on(exported_namespace,statefulset) group_right kube_statefulset_replicas) ==0
+          annotations:
+            summary: "StatefulSet '{{ $labels.statefulset}}' in '{{ $labels.exported_namespace }}' is Unhealthy"
+            description: "StatefulSet '{{ $labels.statefulset }}' in '{{ $labels.exported_namespace }}' is failing to start some PODs. Check the status of the StatefulSet and/or of the failing PODs."
+          labels:
+            severity: critical
+          for: 5m
+          alert: k8s_statefulset_unhealthy
+  

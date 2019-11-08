@@ -1,62 +1,51 @@
----
-# Source: alerts-template/templates/alerts.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: prometheus-operator
-    role: dashbase-api
-  name: dashbase-alerts-api
-spec:
-    # Prometheus alert rules of dashbase api
-  groups:
-  - name: api
-    rules:
-    - expr: avg(jvm_cpu_usage_percent{component='api'}) by (app,instance) > 40
-      annotations:
-        description: "{{ $labels.app }} API instance {{$labels.instance}} CPU usage high: {{$value}}%"
-      labels:
-        severity: warning
-      for: 10m
-      alert: api_cpu_high
-  
-    - expr: avg(jvm_memory_heap_usage{component='api'}) by (app,instance) > 70
-      annotations:
-        description: "{{ $labels.app }} API instance {{ $labels.instance }} heap usage high: {{$value}}. Are there lots of queries?"
-      labels:
-        severity: warning
-      for: 10m
-      alert: api_memory_high
-  
-    - expr: rate(dashbase_api_partition_timeouts_total[5m]) / on(app, root, partition) rate(dashbase_api_partition_latency_secs_count[5m]) > 0.05
-      annotations:
-        description: "{{ $labels.app }} table {{ $labels.root }} partition {{ $labels.partition }} timeout fraction high: {{ $value }}. Check the partition to see if it is under heavy load"
-      labels:
-        severity: critical
-      for: 30m
-      alert: api_partition_timeouts_high
-  
-    - expr: rate(dashbase_api_partition_errors_total[5m]) / on(app, root, partition) rate(dashbase_api_partition_latency_secs_count[5m]) > 0.05
-      annotations:
-        description: "{{ $labels.app }} table {{ $labels.root }} partition {{ $labels.partition }} error fraction high: {{ $value }}. Check the logs of the partition to see if there are lots of exceptions"
-      labels:
-        severity: critical
-      for: 30m
-      alert: api_partition_errors_high
-  
-    - expr: rate(dashbase_api_root_timeouts_total[5m]) / on(app, root, partition) rate(dashbase_api_root_latency_secs_count[5m]) > 0.05
-      annotations:
-        description: "{{ $labels.app }} table {{ $labels.root }} root timeout fraction high: {{ $value }}. Check the cpu/memory of the root."
-      labels:
-        severity: critical
-      for: 30m
-      alert: api_root_timeouts_high
-  
-    - expr: rate(dashbase_api_root_errors_total[5m]) / on(app, root, partition) rate(dashbase_api_root_latency_secs_count[5m]) > 0.05
-      annotations:
-        description: "{{ $labels.app }} table {{ $labels.root }} root error fraction high: {{ $value }}. Check the logs of the root for exceptions"
-      labels:
-        severity: critical
-      for: 30m
-      alert: api_root_errors_high
-  
+# Prometheus alert rules of dashbase api
+groups:
+- name: api
+  rules:
+  - expr: avg(jvm_cpu_usage_percent{component='api'}) by (app,instance) > 40
+    annotations:
+      description: "{{ $labels.app }} API instance {{$labels.instance}} CPU usage high: {{$value}}%"
+    labels:
+      severity: warning
+    for: 10m
+    alert: api_cpu_high
+
+  - expr: avg(jvm_memory_heap_usage{component='api'}) by (app,instance) > 70
+    annotations:
+      description: "{{ $labels.app }} API instance {{ $labels.instance }} heap usage high: {{$value}}. Are there lots of queries?"
+    labels:
+      severity: warning
+    for: 10m
+    alert: api_memory_high
+
+  - expr: rate(dashbase_api_partition_timeouts_total[5m]) / on(app, root, partition) rate(dashbase_api_partition_latency_secs_count[5m]) > 0.05
+    annotations:
+      description: "{{ $labels.app }} table {{ $labels.root }} partition {{ $labels.partition }} timeout fraction high: {{ $value }}. Check the partition to see if it is under heavy load"
+    labels:
+      severity: critical
+    for: 30m
+    alert: api_partition_timeouts_high
+
+  - expr: rate(dashbase_api_partition_errors_total[5m]) / on(app, root, partition) rate(dashbase_api_partition_latency_secs_count[5m]) > 0.05
+    annotations:
+      description: "{{ $labels.app }} table {{ $labels.root }} partition {{ $labels.partition }} error fraction high: {{ $value }}. Check the logs of the partition to see if there are lots of exceptions"
+    labels:
+      severity: critical
+    for: 30m
+    alert: api_partition_errors_high
+
+  - expr: rate(dashbase_api_root_timeouts_total[5m]) / on(app, root, partition) rate(dashbase_api_root_latency_secs_count[5m]) > 0.05
+    annotations:
+      description: "{{ $labels.app }} table {{ $labels.root }} root timeout fraction high: {{ $value }}. Check the cpu/memory of the root."
+    labels:
+      severity: critical
+    for: 30m
+    alert: api_root_timeouts_high
+
+  - expr: rate(dashbase_api_root_errors_total[5m]) / on(app, root, partition) rate(dashbase_api_root_latency_secs_count[5m]) > 0.05
+    annotations:
+      description: "{{ $labels.app }} table {{ $labels.root }} root error fraction high: {{ $value }}. Check the logs of the root for exceptions"
+    labels:
+      severity: critical
+    for: 30m
+    alert: api_root_errors_high

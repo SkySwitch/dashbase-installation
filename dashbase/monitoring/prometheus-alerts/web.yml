@@ -1,22 +1,12 @@
----
-# Source: alerts-template/templates/alerts.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  labels:
-    app: prometheus-operator
-    role: dashbase-web
-  name: dashbase-alerts-web
-spec:
-    # Prometheus alert rules of dashbase web
-  groups:
-  - name: web
-    rules:
-    - expr: sum(rate(dashbase_web_backend_call_error[5m])) by (app) / sum(rate(dashbase_web_backend_calls[5m])) by (app) > 0.1
-      annotations:
-        description: "Dashbase Web backend call errors"
-      labels:
-        severity: critical
-      for: 5m
-      alert: error_web_backend_calls
-    
+# Prometheus alert rules of dashbase web
+groups:
+- name: web
+  rules:
+  - expr: sum(rate(dashbase_web_backend_call_error[5m])) by (app) / sum(rate(dashbase_web_backend_calls[5m])) by (app) > 0.1
+    annotations:
+      description: "Dashbase Web backend call errors"
+    labels:
+      severity: critical
+    for: 5m
+    alert: error_web_backend_calls
+  
