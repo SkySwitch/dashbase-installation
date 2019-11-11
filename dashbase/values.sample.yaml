@@ -9,9 +9,9 @@ ingress:
 https: false
 
 default_storageclass_provider:
-  platform: aws
-  parameters:
-    encrypted: "true"
+  platform: "your-platform (aws, gce, azure)"
+#  parameter:  Uncomment for the platforms that support encrypted
+#    encrypted: "true"
 
 enablePodPriority: true
 
@@ -42,12 +42,12 @@ default:
       resources:
           requests:
             cpu: 7.5
-            memory: 60G
+            memory: 50G
           limits:
             cpu: 7.5
-            memory: 60G
+            memory: 50G
     environment:
-      JAVA_OPTS: -Xmx36g -Xms8g
+      JAVA_OPTS: -Xmx32g -Xms8g
       BLOOM_FILTER_SIZE: 400
       MAX_BUFFER_DELAY_IN_SEC: 90
       RETENTION_NUM_DAYS: 7
