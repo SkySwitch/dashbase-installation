@@ -1,12 +1,25 @@
 #!/bin/bash
 {
-FILEBEAT_PS=`ps -ef |grep filebeat |grep pid |wc -l`
+
+echo "Node: $(hostname -f)  Timestamp: $(date +%Z_%H:%M:%S-%d-%m-%Y)" 
+pidof systemd && export PSYSMD="SYSTEMD" || export PSYSMD="SYSVINIT"
+echo "$PSYSMD is detected"
+
+if [ "$PSYSMD" == "SYSVINIT" ]; then
+  FILEBEAT_PS=`ps -ef |grep filebeat |grep pid |wc -l`
+  TELEGRAF_PS=`ps -ef |grep telegraf |grep pid |wc -l`
+elif [ "$PSYSMD" == "SYSTEMD" ]; then
+  FILEBEAT_PS=`ps -ef |grep filebeat |grep -iv grep |wc -l`
+  TELEGRAF_PS=`ps -ef |grep telegraf |grep -iv grep |wc -l`
+else
+  echo "no able to determine system manager" && exit
+fi
+  
 FILEBEAT_CMD=`ps -ef |grep filebeat |grep -iv pid |grep -iv grep |wc -l`
-TELEGRAF_PS=`ps -ef |grep telegraf |grep pid |wc -l`
 FILEBEAT_PID_FILE="/var/run/filebeat.pid"
 TELEGRAF_PID_FILE="/var/run/telegraf/telegraf.pid"
-FILEBEAT_PID=`cat $FILEBEAT_PID_FILE`
-TELEGRAF_PID=`cat $TELEGRAF_PID_FILE`
+#FILEBEAT_PID=`cat $FILEBEAT_PID_FILE`
+#TELEGRAF_PID=`cat $TELEGRAF_PID_FILE`
 FILEBEAT_PORT=`cat /etc/filebeat/filebeat.yml |grep "http.port:" |awk '{print $2}'`
 PROXY_HOST=`cat /etc/filebeat/filebeat.yml |grep "hosts:" |awk '{print $2}' |sed -e 's/\"//g'`
 PROXY_PROTOCOL=`cat /etc/filebeat/filebeat.yml  |grep "protocol:" |awk '{print $2}' |sed -e 's/\"//g'`
@@ -25,7 +38,6 @@ tpfun () {
    fi
 }
 
-echo "Node: $(hostname -f)  Timestamp: $(date +%Z_%H:%M:%S-%d-%m-%Y)" 
 
 #check crontab  to extract telegraf URL and pushgateway URL
 if [ $(ps -ef |grep cron |grep -iv grep |wc -l) -eq 1 ]; then
@@ -47,16 +59,18 @@ fi
 # Check filebeat PID file
 if [ -f $FILEBEAT_PID_FILE ]; then
    echo " -- filebeat pid file exists"
-   echo " -- filebeat process id  = $FILEBEAT_PID"
+   echo " -- filebeat process id = `cat $FILEBEAT_PID_FILE`"
 else
    echo " -- filebeat pid file doesn't exist"
+   FILEBEAT_PID_NOFILE=`ps -ef |grep filebeat |grep -iv grep |awk '{ print $2}'`
+   echo " -- filebeat process id = $FILEBEAT_PID_NOFILE" 
 fi
 
 # Check filebeat cmd
 if (( $FILEBEAT_CMD >= 1 )); then
-   echo " -- $FILEBEAT_CMD filebeat command and $FILEBEAT_PS filebeat daemon are running"
+   echo " -- $FILEBEAT_CMD filebeat command is running"
 else
-   echo " -- no filebeat command is not running"
+   echo " -- no filebeat command is running"
 fi
 
 # Check number of errors in filebeat
@@ -85,9 +99,11 @@ fi
 # Check telegraf PID file
 if [ -f $TELEGRAF_PID_FILE ]; then
    echo " -- telegraf pid file exists"
-   echo " -- telegraf process id  = $TELEGRAF_PID"
+   echo " -- telegraf process id  = `cat $TELEGRAF_PID_FILE`"
 else
    echo " -- telegraf pid file doesn't exist"
+   TELEGRAF_PID_NOFILE=`ps -ef |grep telegraf |grep -iv grep |awk '{ print $2}'`
+   echo " -- telegraf process id = $TELEGRAF_PID_NOFILE"
 fi
 
 # Check number of errors in telegraf log file
