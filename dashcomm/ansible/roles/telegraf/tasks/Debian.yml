@@ -79,6 +79,11 @@
     name: telegraf
     state: restarted
 
+- name: Retart cron Service
+  service:
+    name: cron
+    state: restarted
+
 - name: Create Prometheus pushgateway crontab
   cron:
     name: "telegraf pushgateway"
