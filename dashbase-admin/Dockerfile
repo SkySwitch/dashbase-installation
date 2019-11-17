@@ -3,9 +3,12 @@ FROM python:3.6-alpine
 # Note: Latest version of kubectl may be found at:
 # https://github.com/kubernetes/kubernetes/releases
 ENV KUBE_LATEST_VERSION="v1.16.3"
+
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
 ENV HELM_VERSION="v3.0.0"
+
+# Default timezone: UTC
 ENV TZ=UTC
 
 RUN apk update && apk upgrade
@@ -18,12 +21,12 @@ RUN apk add --no-cache ca-certificates bash git openssh curl \
 
 RUN pip install --upgrade pip
 
-RUN pip install awscli --upgrade
+# RUN pip install awscli --upgrade
 
-RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /usr/local/bin
-RUN curl -sSL https://sdk.cloud.google.com | bash
+# RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /usr/local/bin
+# RUN curl -sSL https://sdk.cloud.google.com | bash
 
-ENV PATH $PATH:/root/google-cloud-sdk/bin
+# ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 RUN mkdir -p /dashbase
 
