@@ -16,8 +16,27 @@ RUN apk add --no-cache ca-certificates bash git openssh curl \
     && wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
     && chmod +x /usr/local/bin/helm
 
-ADD .bash_profile /
-ADD docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
+RUN pip install --upgrade pip
+
+RUN pip install awscli --upgrade
+
+RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /usr/local/bin
+RUN curl -sSL https://sdk.cloud.google.com | bash
+
+ENV PATH $PATH:/root/google-cloud-sdk/bin
+
+RUN mkdir -p /dashbase
+
+ADD .bash_profile /dashbase
+ADD docker-entrypoint.sh /dashbase
+RUN chmod +x /dashbase/docker-entrypoint.sh
 RUN mkdir -p /usr/local/lib/dashbase
-ENTRYPOINT ["/docker-entrypoint.sh"]
+
+ADD validate-license.py /dashbase
+RUN chmod +x /dashbase/validate-license.py
+
+COPY requirements.txt /dashbase
+RUN pip install -r /dashbase/requirements.txt
+
+WORKDIR /dashbase
+ENTRYPOINT ["/dashbase/docker-entrypoint.sh"]
