@@ -1,5 +1,20 @@
 # Dashbase Installation
 
-1. curl https://raw.githubusercontent.com/dashbase/dashbase-installation/admin_installer/dashbase-installer.sh > dashbase-installer.sh
-2. chmod +x dashbase-installer.sh
-3. ./dashbase-installer.sh
+### Setup the installer
+
+Download
+
+```
+curl https://raw.githubusercontent.com/dashbase/dashbase-installation/admin_installer/dashbase-installer.sh > dashbase-
+```
+
+Give the installer permission
+```
+chmod +x dashbase-installer.sh
+```
+
+Run the installer
+
+```
+./dashbase-installer.sh
+```
