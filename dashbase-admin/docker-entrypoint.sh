@@ -1,5 +1,13 @@
 #!/bin/bash
 source /dashbase/.bash_profile
+
+export KUBE_HOME=~/.kube/
+export KUBE_CONF=$KUBE_HOME/config
+
 mkdir -p ~/.kube
-cp /usr/local/lib/dashbase/config ~/.kube/config
+
+if [[ ! -f "$KUBE_CONF" ]]; then
+    cp $DASHBASE_HOME/config $KUBE_CONF
+fi
+
 /bin/bash
