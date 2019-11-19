@@ -25,5 +25,19 @@ else
     echo "Kubernetes config exists"    
 fi
 
+# copy aws configuration including credentials
+if [[ ! -d "$DASHBASE_HOME/.aws" ]]; then
+    if [[ ! -d "~/.aws" ]]; then
+        echo "Copying existing AWS config and credential on parent host"
+        cp -r ~/.aws $DASHBASE_HOME/
+    else
+        echo "No existing AWS  config (~/.aws)! Please do aws configure on parent host"
+    fi
+else
+    echo "AWS config exists"    
+fi
+
+
 # run the dashbase admin docker image
-docker run -it -v "$DASHBASE_HOME":"/usr/local/lib/dashbase/" dashbase/dashbase-admin
+#docker run -it -v "$DASHBASE_HOME":"/usr/local/lib/dashbase/" dashbase/dashbase-admin
+docker run -it -v "$DASHBASE_HOME":"/usr/local/lib/dashbase/" rluiarch/dashbase-admin:0.5
