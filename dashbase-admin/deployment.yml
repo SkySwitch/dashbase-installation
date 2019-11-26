@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashbase-installer
+  namespace: dashbase
+  labels:
+    app: dashbase
+    component: installer
+spec:
+  strategy:
+    type: RollingUpdate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashbase
+      component: installer
+  template:
+    metadata:
+      labels:
+        app: dashbase
+        component: installer
+    spec:
+      serviceAccountName: dashbase-admin
+      containers:
+        - name: installer
+          imagePullPolicy: Always
+          image: sincejune/dashbase-admin
+          command: ["tail"]
+          args: ["-f", "/dev/null"]

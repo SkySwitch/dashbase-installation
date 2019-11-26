@@ -6,7 +6,7 @@ ENV KUBE_LATEST_VERSION="v1.16.3"
 
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
-ENV HELM_VERSION="v3.0.0"
+ENV HELM_VERSION="v2.15.2"
 
 # Default timezone: UTC
 ENV TZ=UTC
@@ -33,13 +33,14 @@ RUN mkdir -p /dashbase
 ADD .bash_profile /dashbase
 ADD docker-entrypoint.sh /dashbase
 RUN chmod +x /dashbase/docker-entrypoint.sh
-RUN mkdir -p /usr/local/lib/dashbase
 
 ADD validate-license.py /dashbase
 RUN chmod +x /dashbase/validate-license.py
 
 COPY requirements.txt /dashbase
 RUN pip install -r /dashbase/requirements.txt
+
+ADD bin/ /dashbase/bin/
 
 WORKDIR /dashbase
 ENTRYPOINT ["/dashbase/docker-entrypoint.sh"]

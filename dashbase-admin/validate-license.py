@@ -15,9 +15,9 @@ if not license_file.exists():
     sys.exit("License file not found!")
 
 license = yaml.load(open(license_file.absolute().as_posix(), 'r'))
-print ('License file found')
-print ("user: {}".format(license["username"]))
-print ("license: {}".format(license["license"]))
+print('License file found')
+print("user: {}".format(license["username"]))
+print("license: {}".format(license["license"]))
 
 # TODO call license endpoint to validate license
 # print out if license if valid

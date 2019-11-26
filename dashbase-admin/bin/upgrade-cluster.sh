@@ -1,0 +1,1 @@
+helm --tiller-namespace dashbase upgrade dashbase dashbase/dashbase -f https://raw.githubusercontent.com/dashbase/dashbase-installation/remove-kubeconfig-in-installer/configs/dashcomm/values.yml -i

@@ -1,2 +1,3 @@
 #!/bin/bash
-docker build -t dashbase/dashbase-admin .
+docker build -t sincejune/dashbase-admin .
+docker push sincejune/dashbase-admin
