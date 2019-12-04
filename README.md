@@ -13,8 +13,9 @@ Give the installer permission
 chmod +x dashbase-installer.sh
 ```
 
-Run the installer
+Run the installer, requires two arguments "submain" and optional "http"
+example below
 
 ```
-./dashbase-installer.sh
+./dashbase-installer.sh raytest.dashbase.io http
 ```
