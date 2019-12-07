@@ -5,7 +5,7 @@
 #=============================== Global Settings ==================================
 
 # Dashbase Version
-# All Dashbase deployed services will use Docker images with the dashbase_version 
+# All Dashbase deployed services will use Docker images with the dashbase_version
 # as the version tag.
 # See https://dashbase.atlassian.net/wiki/spaces/DK/pages/17039399/Release+Notes
 # for information regarding available versions and release notes.
@@ -17,7 +17,7 @@ license:
 
 # HTTPS
 # Enable HTTPS between Dashbase services.
-# Setting this setting to true requires creation of self-signed keystore 
+# Setting this setting to true requires creation of self-signed keystore
 # secret files. Generate with the following command:
 # 'docker run -v $PWD/config/init:/config/init dashbase/k8s-helper --https'
 # then 'kubectl apply -f config/init' to create the resources.
@@ -49,7 +49,7 @@ default_storageclass_provider:
   #metadata:
 
 # Kubernetes Ingress
-# Enabling this creates an Kubernetes ingress resource with rules for all 
+# Enabling this creates an Kubernetes ingress resource with rules for all
 # Dashbase services. Rules are created with the host: <SERVICE.HOST>
 # Example: web.dashbase.io
 ingress:
@@ -58,11 +58,11 @@ ingress:
   host:
   # Enabling the certmanager setting will automatically create an Issuer
   # resource using Let's Encrypt and additional signed Certificate resources
-  certmanager: false 
+  certmanager: false
 
 # etcd Cluster
 # https://github.com/helm/charts/tree/master/stable/etcd-operator
-# Dashbase services use etcd for service discovery and syncing. 
+# Dashbase services use etcd for service discovery and syncing.
 # Recommended for production deployment only.
 # If enabled, first deploy an etcd cluster using the etcd-operator.
 # Install etcd-operator onto the same namespace as Dashbase:
@@ -91,7 +91,7 @@ default: {}
     # your requirements.
 
 # Filebeat Log Monitoring
-# Enable this setting to collect logs from all Dashbase Pods for a remote 
+# Enable this setting to collect logs from all Dashbase Pods for a remote
 # monitoring setup via a Kubernetes DaemonSet resource.
 # Recommended for production deployment only.
 # If enabled, configure the 'elasticsearch_url' to point to a Dashbase monitoring
@@ -173,7 +173,7 @@ services:
   # Add any additional metadata labels for the Kubernetes Pod resources that the
   # service creates.
   #labels:
-  
+
   #----------------------------- General Services -----------------------------
   # etcd
   # Enabled by default; deploy a single instance etcd useful for development or
@@ -183,13 +183,13 @@ services:
     enabled: true
 
   # Dashbase API Service
-  # Enabled by default; handles queries to the tables. Creates a Kubernetes 
+  # Enabled by default; handles queries to the tables. Creates a Kubernetes
   # Deployment resource.
   api:
     enabled: true
 
   # Dashbase Web Service
-  # Enabled by default; the UI to use for querying Dashbase tables. Creates a 
+  # Enabled by default; the UI to use for querying Dashbase tables. Creates a
   # Kubernetes StatefulSet resource.
   web:
     enabled: true
@@ -205,15 +205,15 @@ services:
     # You will also need the 'prometheus' account enabled.
     #podConfig:
       #serviceAccountName: prometheus
-  
+
   # Grafana
   # Internal Grafana that contains packaged Dashbase dashboards for better
   # observability of Dashbase services and table(s) health and performance.
-  # Recommended for production deployment. Creates a Kubernetes StatefulSet 
+  # Recommended for production deployment. Creates a Kubernetes StatefulSet
   # resource.
   grafana:
     enabled: true
-  
+
   # Pushgateway
   # Internal Pushgateway for Dashbase log collectors to push metrics from production
   # for Prometheus to scrape. Creates a Kubernetes Deployment resource.
@@ -233,7 +233,7 @@ tables:
     #partitions:
       #0: "0"
       #1: "1"
-    
+
     # Set the storage size in Gi for the disk allocated per partition.
     #storage:
       #size: 1000Gi
@@ -250,13 +250,13 @@ tables:
 
     #environment:
       # Retention
-      # Set the log retention for the table. We recommend setting this to 80% of 
+      # Set the log retention for the table. We recommend setting this to 80% of
       # available disk. The retention of logs in days that this translate to
       # depends on the data.
       #RETENTION_SIZE_GB: 800
 
       # Number of Indexing Threads
-      # Set this to increase number of threads allocated for indexing. Recommended 
+      # Set this to increase number of threads allocated for indexing. Recommended
       # to set to half of the requested CPU cores. Defaults to 2 if not specified.
       #NUM_INDEXING_THREADS: 2
 
@@ -265,7 +265,14 @@ tables:
       # half of the requested memory.
       #JAVA_OPTS: -Xmx14g -Xms10g -XX:NewSize=2g
 
-      # Buffer Settings
-      # Set the maximum delay in seconds for the indexer to flush a segment. This
-      # setting directly affects how quickly data can be searchable after ingestion.
-      #MAX_BUFFER_DELAY_IN_SEC: 90
+      # Full Segment Settings
+      # The indexer builds a full segment (and deletes realtime segments) when
+      # the total size of buffered events is more than MAX_BUFFER_SIZE_MB or
+      # MAX_BUFFER_DELAY_IN_SEC has passed after the last full segment built.
+      #MAX_BUFFER_SIZE_MB: 800
+      #MAX_BUFFER_DELAY_IN_SEC: 300
+
+      # Realtime Segment Settings
+      # Set the delay in seconds for the indexer to flush a realtime segment.
+      # This setting affects how quickly data can be searchable after ingestion.
+      #REALTIME_FREQUENCY_IN_SEC: 10
