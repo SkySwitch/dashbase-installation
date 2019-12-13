@@ -112,8 +112,8 @@ elif [[ "$OSTYPE" == "linux-gnu" ]]; then
         ;;
       esac
     done
-    sed -i "s|USERNAME|$USERNAME|" $VALUES_YAML
-    sed -i "s|LICENSE|$LICENSE|" $VALUES_YAML
+    sed -i "s|username:.*|username: $USERNAME|" $VALUES_YAML
+    sed -i "s|license:.*|license: $LICENSE|" $VALUES_YAML
 else
    echo "OSTYPE is not supported"
    exit
