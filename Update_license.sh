@@ -26,21 +26,45 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
     case $PARAM in
       "--username" )
+       if [ -n $VALUE  ]; then
+         echo "$PARAM is empty"
+        exit
+       fi
         USERNAME=$VALUE
         ;;
       "--license" )
+       if [ -n $VALUE  ]; then
+         echo "$PARAM is empty"
+        exit
+       fi
         LICENSE=$VALUE
         ;;
       "--namespace" )
+       if [ -n $VALUE  ]; then
+         echo "$PARAM is empty"
+        exit
+       fi
         NAMESPACE=$VALUE
         ;;
       "--file" )
+       if [ -n $VALUE  ]; then
+         echo "$PARAM is empty"
+        exit
+       fi
         VALUES_YAML=$VALUE
         ;;
       "--name" )
-      RELEASE=$VALUE
+       if [ -n $VALUE  ]; then
+         echo "$PARAM is empty"
+        exit
+       fi
+        RELEASE=$VALUE
         ;;
       "--version" )
+       if [ -n $VALUE  ]; then
+         echo "$PARAM is empty"
+        exit
+       fi
         VERSION=$VALUE
         ;;
       *)
