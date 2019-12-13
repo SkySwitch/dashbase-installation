@@ -16,7 +16,7 @@
       private: no
 
   vars:
-    filebeat_version: "6.6.2"
+    filebeat_version: "oss-6.8.5"
     prometheus_pushgateway_enable: True
     configs_list: "{{ configs.split(',') }}"
     table: "{{ dashbase_url.strip('http://').strip('https://').split('.')[0].strip('table-') }}"
