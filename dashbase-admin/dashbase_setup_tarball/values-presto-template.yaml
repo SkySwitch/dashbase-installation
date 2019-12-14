@@ -1,0 +1,152 @@
+# value.yaml for presto helm chart (https://github.com/wiwdata/presto-chart)
+# To deploy, run 'helm install --name presto --namespace staging --values values.yaml https://github.com/wiwdata/presto-chart/raw/master/charts/presto-1.tgz'
+
+presto:
+  # environment is the name given to the presto environment within all presto nodes
+  # (containers). This value can be used to more easily distinguish colocated
+  # installations. This value isn't as useful in kubernetes where installs are
+  # already distinguished by kubernetes and helm. The most useful place for this
+  # is in the presto web UI to identify the installation.
+  environment: "production"
+
+  # workers specifies the number of worker nodes (containers) to launch during
+  # installation. This can be scaled later if desired.
+  workers: 1
+
+  # logLevel is the logging level for the presto service on each node. Should be
+  # one of "DEBUG", "INFO", "WARN", or "ERROR".
+  logLevel: "DEBUG"
+
+  discoveryUri: "presto-coordinator-0.presto-coordinator.NAMESPACE.svc.cluster.local"
+
+  servicePort: 8443
+
+  keystorePassword: "PRESTO_KEYSTORE_PASSWORD"
+
+image:
+  # repository is the name of the docker image that will be used in the Presto
+  # coordinator and worker deployments.
+  repository: "rluiarch/presto-wiwdata" 
+
+  # tag of the docker image that will be used by the coordinator and worker
+  # deployments.
+  tag: "0.218-16"
+
+  # pullPolicy specifies the image pull policy for both the worker and
+  # coordinator deployment containers.
+  pullPolicy: "Always"
+
+# containerSpec allows for adding arbitrary yaml to the spec under which the
+# coordinator and worker definitions reside. This can be useful in cases where
+# private registry credentials are necessary pulling images.
+containerSpec:
+  # this cannot be empty, so putting some harmless parameter here (keita)
+  terminationGracePeriodSeconds: 30
+
+service:
+  type: ClusterIP
+
+# catalog defines the connectors available within the presto environment.
+# Specify each value as a NAME.properties key and the values as the desired
+# contents of that catalog file. These will be loaded into the image as the
+# connector files. Prior to loading them in as connectors, they will be
+# rendered by Jinja2 using any supplied environment variables in the container
+# that begin with the prefixes USER_ or SECRET_. This can be used to
+# include secrets in catalog files at runtime using standard kubernetes
+# secret mapping techniques.
+catalog:
+  thrift.properties: |
+    connector.name=presto-thrift
+    presto.thrift.client.addresses=api:9090
+    presto.thrift.client.transport=FRAMED
+    presto.thrift.client.protocol=COMPACT
+    presto.thrift.client.max-retry-time=10m
+    presto.thrift.client.ssl.enabled=true
+    presto.thrift.client.ssl.key=/presto/dashbase-key/key.pem
+    presto.thrift.client.ssl.key-password=DASHBASE_KEYSTORE_PASSWORD
+    presto.thrift.client.ssl.trust-certificate=/presto/dashbase-cert/cert.pem
+
+#  hive.properties: |
+#    connector.name=hive-hadoop2
+#    hive.metastore-cache-ttl=20m
+#    hive.non-managed-table-writes-enabled=false
+#    hive.s3-file-system-type=PRESTO
+#    hive.hdfs.impersonation.enabled=true
+#    hive.metastore=glue
+
+# coordinatorConfigs are configuration file values applied to the coordinator
+# container. Required and recommended defaults will be applied where any of
+# these are missing. For more details on files and options see:
+# https://prestodb.github.io/docs/current/installation/deployment.html
+#
+# If a jvm.config is specified here it will fully override the default
+# jvm.config bcause unlike the other properties independent settings are
+# not necessarily compatible and could lead to unstable behavior.
+#
+# These values are rendered with Jinja2 just like the catalog values above
+# to allow for greater flexibility in runtime configuration.
+coordinatorConfigs:
+  config.properties: |
+    http-server.log.max-size=10MB
+    http-server.log.max-history=5
+  jvm.config: |
+    -Xmx512m -Xms512m
+
+# workerConfigs are configuration file values applied to the worker containers.
+# This has the same behaviors as the coordinatorConfigs defined above.
+#workerConfigs:
+  #config.properties: |
+    #query.max-memory-per-node=1GB
+    #query.max-memory=1GB
+  #jvm.config: |
+    #-server -Xmx1G
+
+# Additional environment variables to include in the containers.
+environmentVariables:
+  # this cannot be empty, so putting some harmless parameter here (keita)
+  - name: DUMMY
+    value: ""
+  - name: KEYSTORE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: dashbase-keystore-password
+        key: keystore_password
+  - name: PRESTO_KEY_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: presto-keystore-password
+        key: presto-keystore_password
+
+
+coordinatorResources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+
+#workerResources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  #limits:
+   #cpu: 1
+   # memory: 1Gi
+   #requests:
+    #cpu: 1
+    #memory: 1Gi
+
+coordinatorNodeSelector: {}
+#workerNodeSelector: {}
+
+coordinatorTolerations: []
+#workerTolerations: {}
+
+coordinatorAffinity: {}
+#workerAffinity: {}

@@ -6,7 +6,8 @@ ENV KUBE_LATEST_VERSION="v1.16.3"
 
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
-ENV HELM_VERSION="v3.0.0"
+#ENV HELM_VERSION="v3.0.0"
+ENV HELM_VERSION="v2.14.3"
 
 # Default timezone: UTC
 ENV TZ=UTC
@@ -29,17 +30,27 @@ RUN pip install --upgrade pip
 # ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 RUN mkdir -p /dashbase
+RUN mkdir -p /usr/local/lib/dashbase
 
 ADD .bash_profile /dashbase
 ADD docker-entrypoint.sh /dashbase
 RUN chmod +x /dashbase/docker-entrypoint.sh
-RUN mkdir -p /usr/local/lib/dashbase
+RUN apk add --no-cache su-exec
+RUN apk add --update util-linux
+RUN apk add --update openssh && rm -rf /tmp/* /var/cache/apk/*
+RUN apk add --update openjdk8-jre
+RUN apk add --update openssl
+RUN apk add --update coreutils
 
 ADD validate-license.py /dashbase
 RUN chmod +x /dashbase/validate-license.py
 
 COPY requirements.txt /dashbase
+COPY dashbase-values.yaml /dashbase
+
 RUN pip install -r /dashbase/requirements.txt
 
 WORKDIR /dashbase
 ENTRYPOINT ["/dashbase/docker-entrypoint.sh"]
+EXPOSE 22
+CMD ["/usr/sbin/sshd","-D"]

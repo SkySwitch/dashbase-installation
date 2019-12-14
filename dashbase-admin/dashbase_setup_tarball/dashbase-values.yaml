@@ -1,0 +1,46 @@
+dashbase_version: nightly
+
+username: "ray"
+license:  "X70zX7ciLKoqh6ln28nK2dPn1sJJuxeX9t60R4jvEiY/hIUVyCKYfD5qSezBxmm1ev4Hmf1zkyayLS/RPV+WBilNWIpEGt5qxfgMQFFzE5GvbyP6XIKME95X5MdabRAUpecDpg7yZJ4="
+
+https: true
+
+default_storageclass_provider:
+  platform: "aws"
+
+default:
+  labels: {}
+  storage:
+    class: dashbase-meta
+    size: 10Gi
+
+ingress:
+  enabled: true
+  certmanager: false
+  host: test.dashbase.io
+
+tables:
+  logs:
+      replicas: 1
+      storage:
+         class: dashbase-data
+         size: 1000Gi
+      environment:
+         JAVA_OPTS: "-Xmx4g -Xms2g"
+
+services:
+  etcd:
+    enabled: true
+  api:
+    enabled: true
+  web:
+    enabled: true
+  prometheus:
+    enabled: true
+    image: "dashbase/prometheus:nightly"
+  grafana:
+    enabled: true
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: true
