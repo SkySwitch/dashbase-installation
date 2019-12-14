@@ -144,11 +144,11 @@ check_k8s_permission() {
 check_node_cpu() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 7600 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 1800 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 8 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 2 ]]; then
       return 0
     fi
   else
@@ -159,15 +159,15 @@ check_node_cpu() {
 
 check_node_memory() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 3000000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 3000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 3 ]]; then
       return 0
     fi
   else
