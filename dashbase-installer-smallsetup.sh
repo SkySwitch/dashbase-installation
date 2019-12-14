@@ -300,8 +300,8 @@ create_storageclass() {
 download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from S3 bucket"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup.tar"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf dashbase_setup.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup_small.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf dashbase_setup_small.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /dashbase/*.sh"
 }
 
