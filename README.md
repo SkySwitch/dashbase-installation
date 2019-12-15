@@ -2,15 +2,11 @@
 
 ### Setup the installer
 
-Download
-
-```
-curl https://raw.githubusercontent.com/dashbase/dashbase-installation/admin_installer/dashbase-installer.sh > dashbase-installer.sh
-```
+Download the dashbase-installer.sh script from this repo
 
 Give the installer permission
 ```
-chmod +x dashbase-installer.sh
+chmod a+x dashbase-installer.sh
 ```
 
 Run the installer, the only required input is platform flag
@@ -38,3 +34,21 @@ install script options
 examples of using ingress, nopresto, nossl on AWS platform
 
     ./dashbase-installer.sh --subdomain=raytest.dashbase.io --ingress --nopresto --nossl --platform=aws
+
+The standard installation requires minium 2 nodes with 8 CPU, and 32 GB Ram per node.
+For smaller setup such as 3 X t3.medium ( 3 X  2cpu + 4GB ram), use the dashbase-installer-smallsetup.sh
+
+```
+./dashbase-installer-smallsetup.sh --platform=aws
+```
+
+
+To undo the dashbase installation on K8s cluster
+
+```
+Downlod the script uninstall_dashbase.sh 
+
+chmod a+x uninstall_dashbase.sh
+
+./uninstall_dashbase.sh
+```
