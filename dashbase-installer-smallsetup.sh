@@ -349,7 +349,6 @@ update_dashbase_valuefile() {
     if [ "$CHKDSECRETS" -eq "4" ]; then
       log_info "dashbase SSL cert, key, keystore and keystore password are created"
       log_info "setup secure dashbase"
-      #kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f dashbase-values.yaml --name dashbase --namespace dashbase --devel --debug --no-hooks"
     else
       log_fatal "Error to create presto SSL cert, key, keystore, and keystore password"
     fi
@@ -359,7 +358,7 @@ update_dashbase_valuefile() {
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f $DASHVALUEFILE --name dashbase --namespace dashbase --debug --no-hooks > /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f $DASHVALUEFILE --name dashbase --namespace dashbase --debug --devel --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
