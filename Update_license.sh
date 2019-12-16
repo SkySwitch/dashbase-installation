@@ -25,10 +25,24 @@ function fail_if_empty() {
   return 0
 }
 
-CMDS="kubectl tar curl"
+
+
+# Check Running environment
+CMDS="kubectl helm curl"
 for x in $CMDS
    do  command -v $x > /dev/null && continue || { echo "This script requires $x command and is not found."; exit 1; }
 done
+
+RUNNING_RELEASE=$(helm ls  |grep install |awk '{print $1}')
+RUNNING_NAMESPACE=$(helm ls |grep install | awk '{print $11}')
+if [[ "$RUNNING_RELEASE" != "$RELEASE" ]]; then
+    log_fatal "Release named $RELEASE is not running, please check."
+    exit
+  if [ "$RUNNING_NAMESPACE" != "$NAMESPACE" ]; then
+    log_fatal "Namespace $NAMESPACE not match your release, please check."
+    exit
+  fi
+fi
 
 # Load user input PARAM
     while [[ $# -gt 0 ]]; do
@@ -68,20 +82,17 @@ done
     done
 
 # Update values.yaml file
-    sed -i "s|username:.*|username: $USERNAME|" $VALUES_YAML
-    sed -i "s|license:.*|license: $LICENSE|" $VALUES_YAML
-
-# Check Running environment
-RUNNING_RELEASE=$(helm ls  |grep install |awk '{print $1}')
-RUNNING_NAMESPACE=$(helm ls |grep install | awk '{print $11}')
-if [[ "$RUNNING_RELEASE" != "$RELEASE" ]]; then
-    log_fatal "Release named $RELEASE is not running, please check."
-    exit
-  if [ "$RUNNING_NAMESPACE" != "$NAMESPACE" ]; then
-    log_fatal "Namespace $NAMESPACE not match your release, please check."
-    exit
-  fi
+if [[ $(cat $VALUES_YAML |grep -e "^username:") == "" ]]; then
+  log_info "No username specified in values YAML file, creating"
+  echo -e 'username:' >> $VALUES_YAML
 fi
+if [[ $(cat $VALUES_YAML |grep -e "^license:") == "" ]]; then
+  log_info "No license specified in values YAML file, creating"
+  echo -e 'license:' >> $VALUES_YAML
+fi
+  log_info "Updating license in values.yaml"
+  sed -i "s|username:.*|username: $USERNAME|" $VALUES_YAML
+  sed -i "s|license:.*|license: $LICENSE|" $VALUES_YAML
 
 log_info "helm repo add chartmuseum https://charts.dashbase.io"
 helm repo add chartmuseum https://charts.dashbase.io
