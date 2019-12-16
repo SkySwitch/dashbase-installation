@@ -7,81 +7,35 @@ RELEASE="dashbase"
 VERSION="1.0.2"
 VALUES_YAML='./values.yml'
 
+function log_info() {
+  echo -e "INFO *** $*"
+}
 
-# Preflight checks
-echo "OS type running this script is $OSTYPE"
+function log_warning() {
+  echo -e "WARN *** $*"
+}
+
+function log_fatal() {
+  echo -e "FATAL *** $*"
+  exit 1
+}
+
+function fail_if_empty() {
+  [[ -z "$2" ]] && log_fatal "Parameter $1 must have a value."
+  return 0
+}
 
 CMDS="kubectl tar curl"
 for x in $CMDS
    do  command -v $x > /dev/null && continue || { echo "This script requires $x command and is not found."; exit 1; }
 done
 
-# Get PARAM from user input
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    while [[ $# -gt 0 ]]; do
-    PARAM=${1%%=*}
-    [[ "$1" == *"="* ]] && VALUE=${1#*=} || VALUE=""
-    #echo "Parsing ($1): $PARAM with ${VALUE:-no value}"
-    shift 1
-
-    case $PARAM in
-      "--username" )
-       if [ -n $VALUE  ]; then
-         echo "$PARAM is empty"
-        exit
-       fi
-        USERNAME=$VALUE
-        ;;
-      "--license" )
-       if [ -n $VALUE  ]; then
-         echo "$PARAM is empty"
-        exit
-       fi
-        LICENSE=$VALUE
-        ;;
-      "--namespace" )
-       if [ -n $VALUE  ]; then
-         echo "$PARAM is empty"
-        exit
-       fi
-        NAMESPACE=$VALUE
-        ;;
-      "--file" )
-       if [ -n $VALUE  ]; then
-         echo "$PARAM is empty"
-        exit
-       fi
-        VALUES_YAML=$VALUE
-        ;;
-      "--name" )
-       if [ -n $VALUE  ]; then
-         echo "$PARAM is empty"
-        exit
-       fi
-        RELEASE=$VALUE
-        ;;
-      "--version" )
-       if [ -n $VALUE  ]; then
-         echo "$PARAM is empty"
-        exit
-       fi
-        VERSION=$VALUE
-        ;;
-      *)
-        echo "Unknown parameter ($PARAM) with ${VALUE:-no value}"
-        exit
-        ;;
-      esac
-    done
-    sed -i .bak "s|username:.*|username: $USERNAME|" $VALUES_YAML
-    sed -i .bak "s|license:.*|license: $LICENSE|" $VALUES_YAML
-elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+# Load user input PARAM
     while [[ $# -gt 0 ]]; do
     PARAM=${1%%=*}
     [[ "$1" == *"="* ]] && VALUE=${1#*=} || VALUE=""
     log_info "Parsing ($1): $PARAM with ${VALUE:-no value}"
     shift 1
-
     case $PARAM in
       "--username" )
         fail_if_empty "$PARAM" "$VALUE"
@@ -112,34 +66,31 @@ elif [[ "$OSTYPE" == "linux-gnu" ]]; then
         ;;
       esac
     done
+
+# Update values.yaml file
     sed -i "s|username:.*|username: $USERNAME|" $VALUES_YAML
     sed -i "s|license:.*|license: $LICENSE|" $VALUES_YAML
-else
-   echo "OSTYPE is not supported"
-   exit
-fi
 
 # Check Running environment
 RUNNING_RELEASE=$(helm ls  |grep install |awk '{print $1}')
 RUNNING_NAMESPACE=$(helm ls |grep install | awk '{print $11}')
 if [[ "$RUNNING_RELEASE" != "$RELEASE" ]]; then
-    echo "Release named $RELEASE is not running, please check."
+    log_fatal "Release named $RELEASE is not running, please check."
     exit
   if [ "$RUNNING_NAMESPACE" != "$NAMESPACE" ]; then
-    echo "Namespace $NAMESPACE not match your release, please check."
+    log_fatal "Namespace $NAMESPACE not match your release, please check."
     exit
   fi
 fi
 
-
-echo "helm repo add chartmuseum https://charts.dashbase.io"
+log_info "helm repo add chartmuseum https://charts.dashbase.io"
 helm repo add chartmuseum https://charts.dashbase.io
-echo "helm upgrade $RELEASE chartmuseum/dashbase -f $VALUES_YAML --namespace $NAMESPACE -i  --version $VERSION"
+log_info "helm upgrade $RELEASE chartmuseum/dashbase -f $VALUES_YAML --namespace $NAMESPACE -i  --version $VERSION"
 helm upgrade $RELEASE chartmuseum/dashbase -f $VALUES_YAML --namespace $NAMESPACE -i  --version $VERSION &> /dev/null
 
-echo "kubectl delete pod $(kubectl get pod -n install | grep api | awk '{print $1}') -n $NAMESPACE"
+log_info "kubectl delete pod $(kubectl get pod -n install | grep api | awk '{print $1}') -n $NAMESPACE"
 kubectl delete pod $(kubectl get pod -n install | grep api | awk '{print $1}') -n $NAMESPACE
-echo "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n $NAMESPACE | grep api | awk '{print $1}') -n $NAMESPACE"
+log_info "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n $NAMESPACE | grep api | awk '{print $1}') -n $NAMESPACE"
 kubectl wait --for=condition=Ready pod/$(kubectl get pod -n $NAMESPACE | grep api | awk '{print $1}') -n $NAMESPACE
 
 
