@@ -1,9 +1,5 @@
 dashbase_version: 1.0.1-rc3
 
-username: hi@dashbase.io
-license: xxx
-
-
 #ingress:
 #  enabled: true
 #  host: "your-cluster-name.your-domain"
