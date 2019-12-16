@@ -423,7 +423,9 @@ expose_endpoints() {
 }
 
 # main processes executed below this line
-# pre-installation checks
+# pre-installation check
+
+{
 check_platform_input
 check_ingress_subdomain
 check_version
@@ -526,4 +528,4 @@ else
 
 fi
 
-
+} 2>&1 | tee -a dashbase_install_`date +%d-%m-%Y_%H-%M-%S`.log

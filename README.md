@@ -52,3 +52,8 @@ chmod a+x uninstall_dashbase.sh
 
 ./uninstall_dashbase.sh
 ```
+
+Install log file is saved in your current directory when running the script, the install log will capture all screen output and with filename like below:
+```
+ dashbase_install_`date +%d-%m-%Y_%H-%M-%S`.log
+```
