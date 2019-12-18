@@ -1,11 +1,7 @@
 #!/bin/bash
 
 # Set default environment values.
-PLATFORM="undefined"
-NAMESPACE="dashbase"
-RELEASE="dashbase"
-VERSION="1.0.2"
-VALUES_YAML='./values.yml'
+DEFAULT_VALUES_YAML='./dashbase_values.yaml'
 
 function log_info() {
   echo -e "INFO *** $*"
@@ -25,25 +21,6 @@ function fail_if_empty() {
   return 0
 }
 
-
-
-# Check Running environment
-CMDS="kubectl helm curl"
-for x in $CMDS
-   do  command -v $x > /dev/null && continue || { echo "This script requires $x command and is not found."; exit 1; }
-done
-
-RUNNING_RELEASE=$(helm ls  |grep install |awk '{print $1}')
-RUNNING_NAMESPACE=$(helm ls |grep install | awk '{print $11}')
-if [[ "$RUNNING_RELEASE" != "$RELEASE" ]]; then
-    log_fatal "Release named $RELEASE is not running, please check."
-    exit
-  if [ "$RUNNING_NAMESPACE" != "$NAMESPACE" ]; then
-    log_fatal "Namespace $NAMESPACE not match your release, please check."
-    exit
-  fi
-fi
-
 # Load user input PARAM
     while [[ $# -gt 0 ]]; do
     PARAM=${1%%=*}
@@ -59,21 +36,9 @@ fi
         fail_if_empty "$PARAM" "$VALUE"
         LICENSE=$VALUE
         ;;
-      "--namespace" )
-        fail_if_empty "$PARAM" "$VALUE"
-        NAMESPACE=$VALUE
-        ;;
-      "--file" )
+      "--values_file" )
         fail_if_empty "$PARAM" "$VALUE"
         VALUES_YAML=$VALUE
-        ;;
-      "--name" )
-        fail_if_empty "$PARAM" "$VALUE"
-        RELEASE=$VALUE
-        ;;
-      "--version" )
-        fail_if_empty "$PARAM" "$VALUE"
-        VERSION=$VALUE
         ;;
         *)
         echo "Unknown parameter ($PARAM) with ${VALUE:-no value}"
@@ -96,13 +61,13 @@ fi
 
 log_info "helm repo add chartmuseum https://charts.dashbase.io"
 helm repo add chartmuseum https://charts.dashbase.io
-log_info "helm upgrade $RELEASE chartmuseum/dashbase -f $VALUES_YAML --namespace $NAMESPACE -i  --version $VERSION"
-helm upgrade $RELEASE chartmuseum/dashbase -f $VALUES_YAML --namespace $NAMESPACE -i  --version $VERSION &> /dev/null
+log_info "helm upgrade dashbase chartmuseum/dashbase -f $VALUES_YAML --namespace dashbase -i  --version $VERSION"
+helm upgrade dashbase chartmuseum/dashbase -f $VALUES_YAML --namespace dashbase -i  --version $VERSION &> /dev/null
 
-log_info "kubectl delete pod $(kubectl get pod -n install | grep api | awk '{print $1}') -n $NAMESPACE"
-kubectl delete pod $(kubectl get pod -n install | grep api | awk '{print $1}') -n $NAMESPACE
-log_info "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n $NAMESPACE | grep api | awk '{print $1}') -n $NAMESPACE"
-kubectl wait --for=condition=Ready pod/$(kubectl get pod -n $NAMESPACE | grep api | awk '{print $1}') -n $NAMESPACE
+log_info "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
+kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
+log_info "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
+kubectl wait --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
 
 
 
