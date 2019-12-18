@@ -1,19 +1,17 @@
-dashbase_version: 1.0.1-rc3
+dashbase_version: 1.0.1-rc1
 
-username: hi@dashbase.io
-license: xxx
+# License information
+username: "natalie"
+license: "99hV7IdyuCxBuSouUh94nw8ZgNd8dKZngzo7CbVPvaSpcV+LjRHjfVGZjcYMgKZE3+i5jVuaBkaNBSbvbFiyEi9UsLnOxJPu5t9keO+YvHSmeEUlj2tLpvdK7CkkRkmBNet8LN0/3mc="
 
-
-#ingress:
-#  enabled: true
-#  host: "your-cluster-name.your-domain"
+ingress:
+  enabled: true
+  host: "democluster.dashbase.io"
 
 https: false
 
-#default_storageclass_provider:
-#  platform: "your-platform (aws, gce, azure)"
-#  parameter:  Uncomment for the platforms that support encrypted
-#    encrypted: "true"
+default_storageclass_provider:
+  platform: "gce"
 
 enablePodPriority: true
 
@@ -21,9 +19,6 @@ accounts:
   prometheus: true
 
 kube-state-metrics:
-  enabled: true
-
-presto:
   enabled: true
 
 default:
@@ -52,7 +47,7 @@ default:
             cpu: 7.5
             memory: 50G
     environment:
-      JAVA_OPTS: -Xmx32g -Xms8g
+      JAVA_OPTS: -Xmx36g -Xms8g
       BLOOM_FILTER_SIZE: 400
       MAX_BUFFER_DELAY_IN_SEC: 90
       RETENTION_NUM_DAYS: 7
@@ -81,9 +76,9 @@ services:
     storage:
       size: 100Gi
 
-  #pushgateway:
-  #  enabled: true
+  pushgateway:
+    enabled: true
 
 tables:
-  logs:
+  freeswitch:
     replicas: 1

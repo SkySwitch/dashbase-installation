@@ -1,0 +1,77 @@
+dashbase_version: 1.0.1-rc1
+
+# License information
+username: "your-dashbase-username"
+license: "your-dashbase-license"
+
+ingress:
+  enabled: true
+  host: "your-cluster-name.your-domain"
+
+https: false
+
+default_storageclass_provider:
+  platform: "your-platform (aws, gce, azure)"
+#  parameter:  Uncomment for the platforms that support encrypted
+#    encrypted: "true"
+
+enablePodPriority: true
+
+accounts:
+  prometheus: true
+
+kube-state-metrics:
+  enabled: true
+
+default:
+  priorityClassName: dashbase-normal-priority
+  storage:
+    class: dashbase-meta
+  table:
+    priorityClassName: dashbase-high-priority
+    storage:
+      class: dashbase-data
+      size: 500Gi
+    containerConfig:
+      resources:
+          requests:
+            cpu: 2
+            memory: 8G
+          limits:
+            cpu: 2
+            memory: 8G
+    environment:
+      JAVA_OPTS: -Xmx5g -Xms5g
+      BLOOM_FILTER_SIZE: 100
+      MAX_BUFFER_DELAY_IN_SEC: 10
+      RETENTION_NUM_DAYS: 7
+      RETENTION_SIZE_GB: 480
+      IN_MEMORY_BUFFER: true
+      READER_CACHE_MEM_PERCENT: 60
+      NUM_INDEXING_THREADS: 1
+      MIN_BUFFER_SIZE_MB: 100
+
+services:
+  etcd:
+    enabled: true
+
+  api:
+    enabled: true
+
+  web:
+    enabled: true
+
+  grafana:
+    enabled: true
+
+  prometheus:
+    enabled: true
+    storage:
+      size: 10Gi
+
+  pushgateway:
+    enabled: true
+
+tables:
+  your-table-name:
+    replicas: 1
