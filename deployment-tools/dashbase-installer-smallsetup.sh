@@ -278,7 +278,7 @@ adminpod_setup() {
     log_fatal "Previous admin pod admindash exists"
   else
     # Download and install installer helper statefulset yaml file
-    curl -k https://dashbase-public.s3-us-west-1.amazonaws.com/admindash-sts.yaml -o admindash-sts.yaml
+    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts.yaml -o admindash-sts.yaml
     kubectl apply -f admindash-sts.yaml -n dashbase
     kubectl wait --for=condition=Ready pods/admindash-0 --timeout=60s -n dashbase
     # Check to ensure admin pod is available else exit 1
@@ -324,7 +324,7 @@ create_storageclass() {
 download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from S3 bucket"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup_small_nolic.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase_setup_small_nolic.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf dashbase_setup_small_nolic.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /dashbase/*.sh"
 }
