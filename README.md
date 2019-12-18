@@ -29,14 +29,18 @@ install script options
     --exposemon    expose dashbase observibility tools: pushgateway, prometheus, grafana
     --valuefile    specify a custom dashbase value yaml file
                    e.g. --valuefile=/tmp/mydashbase_values.yaml
+    --username     username for license information 
+                   e.g. --username=scott
+    --license      dashbase license string 
+                   e.g. --license=Aertyujk8903HJKLBNMLOP34erTui
     
     
 examples of using ingress, nopresto, nossl on AWS platform
 
     ./dashbase-installer.sh --subdomain=raytest.dashbase.io --ingress --nopresto --nossl --platform=aws
 
-The standard installation requires minium 2 nodes with 8 CPU, and 32 GB Ram per node.
-For smaller setup such as 3 X t3.medium ( 3 X  2cpu + 4GB ram), use the dashbase-installer-smallsetup.sh
+The standard installation requires minium 3 nodes with 8 CPU, and 64 GB Ram per node.
+For smaller setup such as 3 X t3.medium ( 3 X  2cpu + 4GB ram), use the dashbase-installer-smallsetup.sh inside the deployment-tools folder
 
 ```
 ./dashbase-installer-smallsetup.sh --platform=aws

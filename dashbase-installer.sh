@@ -4,6 +4,8 @@ PLATFORM="undefined"
 INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 NOSSL_FLAG="false"
+USERNAME="undefined"
+LICENSE="undefined"
 
 # log functions and input flag setup
 function log_info() {
@@ -30,7 +32,7 @@ echo "$#" >no_arguments
 while [[ $# -gt 0 ]]; do
   PARAM=${1%%=*}
   [[ "$1" == *"="* ]] && VALUE=${1#*=} || VALUE=""
-  log_info "Parsing ($1): $PARAM with ${VALUE:-no value}"
+  log_info "Parsing ($1)"
   shift 1
 
   case $PARAM in
@@ -49,6 +51,14 @@ while [[ $# -gt 0 ]]; do
   --valuefile)
     fail_if_empty "$PARAM" "$VALUE"
     VALUEFILE=$VALUE
+    ;;
+  --username)
+    fail_if_empty "$PARAM" "$VALUE"
+    USERNAME=$VALUE
+    ;;
+  --license)
+    fail_if_empty "$PARAM" "$VALUE"
+    LICENSE=$VALUE
     ;;
   --ingress)
     INGRESS_FLAG="true"
@@ -108,6 +118,19 @@ check_ingress_subdomain() {
   fi
 }
 
+check_license() {
+  if [[ -z "$USERNAME" || -z "$LICENSE" ]]; then
+    log_fatal "either username or license string is missing"
+  elif [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
+    log_warning "No License information is entered, install without license"
+  elif [[ "$USERNAME" != "undefined" && "$LICENSE" != "undefined" ]]; then
+    log_info "Entered username is $USERNAME"
+    log_info "Entered license string is $LICENSE"
+  else
+     log_fatal "Please check entered username and license string"
+  fi
+}
+
 check_k8s_permission() {
   # check permission
   ## permissions required by dashbase charts
@@ -159,15 +182,15 @@ check_node_cpu() {
 
 check_node_memory() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 60000000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 60000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 60 ]]; then
       return 0
     fi
   else
@@ -182,7 +205,7 @@ check_node() {
     return 0
   fi
   if ! check_node_memory "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(32Gi at least)."
+    echo "Node($1) doesn't have enough memory resources(64Gi at least)."
     return 0
   fi
 
@@ -227,10 +250,10 @@ preflight_check() {
     check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
   done
   echo ""
-  if [ $AVAIILABLE_NODES -ge 2 ]; then
+  if [ $AVAIILABLE_NODES -ge 3 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 core and 32 Gi at least)."
+    log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 8 core and 64 Gi at least)."
   fi
 }
 
@@ -266,13 +289,14 @@ adminpod_setup() {
 
 setup_helm_tiller() {
   # create tiller service account in kube-system namespace
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://raw.githubusercontent.com/dashbase/dashbase-installation/master/dashbase/rbac-config.yaml"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/rbac-config.yaml"
+
+
   kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f rbac-config.yaml"
   # start tiller
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm init --service-account tiller"
   kubectl wait --for=condition=Available deployment/tiller-deploy -n kube-system
   # check helm
-  # kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls"
   # adding dashbase helm repo
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo add dashbase https://charts.dashbase.io"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo list"
@@ -300,8 +324,8 @@ create_storageclass() {
 download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from S3 bucket"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup.tar"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf dashbase_setup.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup_nolic.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf dashbase_setup_nolic.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /dashbase/*.sh"
 }
 
@@ -323,7 +347,16 @@ update_dashbase_valuefile() {
     log_info "update platform type azure in dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/azure/' dashbase-values.yaml
   fi
-
+  # update dashbase license information
+  if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
+    log_warning "No License information is entered, install without license, no change on default dashbase-values.yaml file"
+  else
+    log_info "update default dashbase-values.yaml file with entered license information"
+    echo "username: \"$USERNAME\"" > dashbase-license.txt
+    echo "license: \"$LICENSE\"" >> dashbase-license.txt
+    kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> dashbase-values.yaml"
+  fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
     log_info "use default nightly in dashbase_version on dashbase-values.yaml"
@@ -331,7 +364,6 @@ update_dashbase_valuefile() {
     log_info "use $VERSION in dashbase_version on dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $VERSION|" dashbase-values.yaml
   fi
-
   # check NOSSL flag input by user
   if [ "$NOSSL_FLAG" == "true" ]; then
     log_info "deploy dashbase with non secure connection, and this deployment will skip presto setup"
@@ -358,7 +390,7 @@ update_dashbase_valuefile() {
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f $DASHVALUEFILE --name dashbase --namespace dashbase --debug --devel --no-hooks > /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f $DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --debug --devel --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
@@ -423,12 +455,13 @@ expose_endpoints() {
 }
 
 # main processes executed below this line
-# pre-installation check
+# pre-installation checks
 
 {
 check_platform_input
 check_ingress_subdomain
 check_version
+check_license
 preflight_check
 
 # install admin pod
@@ -513,13 +546,13 @@ else
     echo "LoadBalancer($SERVICE_NAME): IP is not ready."
   fi
   done
-
+  
   for SERVICE_INFO in $(kubectl get service -o=jsonpath='{range .items[*]}{.metadata.name},{.spec.type},{.status.loadBalancer.ingress[0].ip},{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}' -n dashbase |grep -E 'prometheus|pushgateway'); do
   read -r SERVICE_NAME SERVICE_TYPE SERVICE_LB_IP SERVICE_LB_HOSTNAME <<<"$(echo "$SERVICE_INFO" | tr ',' ' ')"
   if [ "$SERVICE_TYPE" != "LoadBalancer" ]; then
      continue
   fi
-  if [[ -n "$SERVICE_LB_IP" ]]; then    
+  if [[ -n "$SERVICE_LB_IP" ]]; then
      echo "LoadBalancer($SERVICE_NAME): IP is ready and is http://$SERVICE_LB_IP"
   elif [[ -n "$SERVICE_LB_HOSTNAME" ]]; then
      echo "LoadBalancer($SERVICE_NAME): IP is ready and is http://$SERVICE_LB_HOSTNAME"
@@ -528,4 +561,4 @@ else
 
 fi
 
-} 2>&1 | tee -a dashbase_install_`date +%d-%m-%Y_%H-%M-%S`.log
+} 2>&1 | tee -a dashbase_install_"$(date +%d-%m-%Y_%H-%M-%S)".log
