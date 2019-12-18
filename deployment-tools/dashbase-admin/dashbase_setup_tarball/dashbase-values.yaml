@@ -12,7 +12,7 @@ default:
   containerConfig:
     resources:
       requests:
-        cpu: 1000m
+        cpu: 500m
         memory: 2G
       limits:
         cpu: 2
@@ -49,7 +49,7 @@ ingress:
 
 tables:
   logs:
-      replicas: 2
+      replicas: 1
 
 services:
   etcd:

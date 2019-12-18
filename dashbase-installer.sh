@@ -249,7 +249,7 @@ preflight_check() {
     check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
   done
   echo ""
-  if [ $AVAIILABLE_NODES -ge 3 ]; then
+  if [ $AVAIILABLE_NODES -ge 2 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
     log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 8 core and 64 Gi at least)."
