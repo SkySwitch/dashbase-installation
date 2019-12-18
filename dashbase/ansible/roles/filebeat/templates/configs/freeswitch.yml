@@ -17,7 +17,7 @@
      - name: freeswitch
        config:
          type: grok
-         pattern: "(?:%{UUID:uuid:id} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
+         pattern: "(?:%{UUID:uuid:key} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
      - name: sip
        config:
          type: multi
@@ -32,7 +32,7 @@
      - name: universal
        config:
          type: grok
-         pattern: "(?:%{UUID:uuid:id} |)%{GREEDYDATA:message}"
+         pattern: "(?:%{UUID:uuid:key} |)%{GREEDYDATA:message}"
 
 - paths:
    - /var/log/freeswitch/json_cdr/*/*.cdr.json
