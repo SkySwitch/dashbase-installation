@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Set default environment values.
-DEFAULT_VALUES_YAML='./dashbase_values.yaml'
-
 function log_info() {
   echo -e "INFO *** $*"
 }
