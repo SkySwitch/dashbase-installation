@@ -25,6 +25,19 @@ tables:
       environment:
          JAVA_OPTS: "-Xmx4g -Xms2g"
 
+presto:
+  enabled: true
+  presto:
+    prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
+    dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
+    coordinatorResources:
+      requests:
+        cpu: 1
+        memory: 1G
+      limits:
+        cpu: 1
+        momory: 1G
+
 services:
   etcd:
     enabled: true

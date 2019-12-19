@@ -3,7 +3,6 @@
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
-NOSSL_FLAG="false"
 USERNAME="undefined"
 LICENSE="undefined"
 
@@ -62,12 +61,6 @@ while [[ $# -gt 0 ]]; do
     ;;
   --ingress)
     INGRESS_FLAG="true"
-    ;;
-  --nopresto)
-    NOPRESTO_FLAG="true"
-    ;;
-  --nossl)
-    NOSSL_FLAG="true"
     ;;
   --exposemon)
     EXPOSEMON="--exposemon"
@@ -167,11 +160,11 @@ check_k8s_permission() {
 check_node_cpu() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 7600 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 1800 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 8 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 2 ]]; then
       return 0
     fi
   else
@@ -205,7 +198,7 @@ check_node() {
     return 0
   fi
   if ! check_node_memory "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(64Gi at least)."
+    echo "Node($1) doesn't have enough memory resources(32Gi at least)."
     return 0
   fi
 
@@ -243,16 +236,17 @@ preflight_check() {
   echo "Checking kubernetes nodes capacity..."
   AVAIILABLE_NODES=0
   # get comma separated nodes info
+  # gke-chao-debug-default-pool-a5df0776-588v,3920m,12699052Ki
   for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
     # replace comma with spaces.
     read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
     check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
   done
   echo ""
-  if [ $AVAIILABLE_NODES -ge 2 ]; then
+  if [ $AVAIILABLE_NODES -ge 3 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 8 core and 64 Gi at least)."
+    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 core and 32 Gi at least)."
   fi
 }
 
@@ -288,10 +282,8 @@ adminpod_setup() {
 
 setup_helm_tiller() {
   # create tiller service account in kube-system namespace
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/rbac-config.yaml"
-
-
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f rbac-config.yaml"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/rbac-config.yaml https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/rbac-config.yaml"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/rbac-config.yaml"
   # start tiller
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm init --service-account tiller"
   kubectl wait --for=condition=Available deployment/tiller-deploy -n kube-system
@@ -305,15 +297,15 @@ create_storageclass() {
   # create storageclass
   if [ "$PLATFORM" == "aws" ]; then
     log_info "create storageclass for AWS disk"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f dashbase-data-aws.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f dashbase-meta-aws.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-aws.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-aws.yaml -n dashbase"
   elif [ "$PLATFORM" == "gce" ]; then
     log_info "create storageclass for GCE disk"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f dashbase-data-gce.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f dashbase-meta-gce.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-gce.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-gce.yaml -n dashbase"
   elif [ "$PLATFORM" == "azure" ]; then
     log_info "create storageclass for Azure disk"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f dashbase-data-azure.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-azure.yaml -n dashbase"
   fi
   kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get storageclass |grep dashbase"
   STORECLASSCHK=$(kubectl get storageclass | grep -c dashbase)
@@ -322,17 +314,17 @@ create_storageclass() {
 
 download_dashbase() {
   # download and update the dashbase helm value yaml files
-  log_info "Downloading dashbase setup tar file from S3 bucket"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolic.tar"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf dashbase_setup_nolic.tar"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /dashbase/*.sh"
+  log_info "Downloading dashbase setup tar file from Github"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicx.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolic.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicx.tar -C /data/"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
 }
 
 update_dashbase_valuefile() {
   # update dashbase-values.yaml for platform choice and subdomain
   if [ -n "$SUBDOMAIN" ]; then
     log_info "update ingress subdomain in dashbase-values.yaml file"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i 's|test.dashbase.io|$SUBDOMAIN|' dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i 's|test.dashbase.io|$SUBDOMAIN|' /data/dashbase-values.yaml"
   elif [ -z "$SUBDOMAIN" ]; then
     log_info "no input on --subdomain will use default which is test.dashbase.io"
   fi
@@ -341,10 +333,10 @@ update_dashbase_valuefile() {
     log_info "use default platform type aws in dashbase-values.yaml"
   elif [ "$PLATFORM" == "gce" ]; then
     log_info "update platform type gce in dashbase-values.yaml"
-    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/gce/' dashbase-values.yaml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/gce/' /data/dashbase-values.yaml
   elif [ "$PLATFORM" == "azure" ]; then
     log_info "update platform type azure in dashbase-values.yaml"
-    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/azure/' dashbase-values.yaml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/azure/' /data/dashbase-values.yaml
   fi
   # update dashbase license information
   if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
@@ -353,83 +345,65 @@ update_dashbase_valuefile() {
     log_info "update default dashbase-values.yaml file with entered license information"
     echo "username: \"$USERNAME\"" > dashbase-license.txt
     echo "license: \"$LICENSE\"" >> dashbase-license.txt
-    kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> dashbase-values.yaml"
+    kubectl cp dashbase-license.txt dashbase/admindash-0:/data/
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/dashbase-license.txt >> /data/dashbase-values.yaml"
   fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
     log_info "use default nightly in dashbase_version on dashbase-values.yaml"
   else
     log_info "use $VERSION in dashbase_version on dashbase-values.yaml"
-    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $VERSION|" dashbase-values.yaml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $VERSION|" /data/dashbase-values.yaml
   fi
-  # check NOSSL flag input by user
-  if [ "$NOSSL_FLAG" == "true" ]; then
-    log_info "deploy dashbase with non secure connection, and this deployment will skip presto setup"
-    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|https: true|https: false|" dashbase-values.yaml
-    NOPRESTO_FLAG="true"
-    log_info "setup non-secure dashbase"
+  # update keystore passwords for both dashbase and presto
+  log_info "update dashbase and presto keystore password in dashbase-values.yaml"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd data ; /data/configure_presto.sh"
+}
+
+create_sslcert() {
+  # create dashbase SSL cert
+  log_info "deploy dashbase with secure connection internally"
+  log_info "creating dashbase internal SSL cert, key, keystore, keystore password"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/https_dashbase.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f  /data/https-dashbase.yaml -n dashbase"
+  kubectl get secrets -n dashbase | grep -E 'dashbase-cert|dashbase-key'
+  CHKDSECRETS=$(kubectl get secrets -n dashbase | grep -E -c 'dashbase-cert|dashbase-key')
+  if [ "$CHKDSECRETS" -eq "4" ]; then
+    log_info "dashbase SSL cert, key, keystore and keystore password are created"
   else
-    log_info "deploy dashbase with secure connection internally"
-    log_info "creating dashbase internal SSL cert, key, keystore, keystore password"
-    #kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /dashbase/https_dashbase.sh"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/https_dashbase.sh"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f  https-dashbase.yaml -n dashbase"
-    kubectl get secrets -n dashbase | grep -E 'dashbase-cert|dashbase-key'
-    CHKDSECRETS=$(kubectl get secrets -n dashbase | grep -E -c 'dashbase-cert|dashbase-key')
-    if [ "$CHKDSECRETS" -eq "4" ]; then
-      log_info "dashbase SSL cert, key, keystore and keystore password are created"
-      log_info "setup secure dashbase"
-    else
-      log_fatal "Error to create presto SSL cert, key, keystore, and keystore password"
-    fi
+    log_fatal "Error to create dashbase SSL cert, key, keystore, and keystore password"
+  fi
+
+  # create presto SSL cert
+  log_info "setup presto internal SSL cert, key, keystore, keystore password"
+  #kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/https_presto2.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/https_presto2.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/https-presto.yaml -n dashbase"
+  kubectl get secrets -n dashbase | grep -E 'presto-cert|presto-key'
+  CHKPSECRETS=$(kubectl get secrets -n dashbase | grep -c 'presto')
+  if [ "$CHKPSECRETS" -eq "4" ]; then
+    log_info "presto SSL cert, key, keystore and keystore password are created"
+  else
+    log_fatal "Error to create presto SSL cert, key, keystore, and keystore password"
   fi
 }
 
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f $DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --debug --devel --no-hooks > /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f /data/$DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --debug --devel --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
-  sleep 100 &
+  sleep 120 &
   show_spinner "$!"
   # check dashbase deployed resources success or not
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/check-dashbase-deploy.sh > >(tee check-dashbase-deploy-output.txt) 2>&1"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/check-dashbase-deploy.sh > >(tee check-dashbase-deploy-output.txt) 2>&1"
   CHKDEPLOYNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-dashbase-deploy-output.txt | grep -iv -c Checking)
   CHKSUCCEDNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-dashbase-deploy-output.txt | grep -c met)
   if [ "$CHKDEPLOYNUM" -eq "$CHKSUCCEDNUM" ]; then log_info "dashbase installation is completed"; else log_fatal "dashbase installation is failed"; fi
 }
 
-install_presto() {
-  #CHKPSECRETS=$(kubectl get secrets -n dashbase | grep -E -c 'presto-cert|presto-key')
-  if [ "$NOPRESTO_FLAG" == "true" ]; then
-    log_info "NOPRESTO_FLAG is set to true, presto is not installed"
-  else
-    log_info "setup presto internal SSL cert, key, keystore, keystore password"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /dashbase/https_presto.sh"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/https_presto.sh"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f  https-presto.yaml -n dashbase"
-    kubectl get secrets -n dashbase | grep -E 'presto-cert|presto-key'
-    CHKPSECRETS=$(kubectl get secrets -n dashbase | grep -c 'presto')
-    if [ "$CHKPSECRETS" -eq "4" ]; then
-      log_info "presto SSL cert, key, keystore and keystore password are created"
-      log_info "setup secure presto"
-      kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/install_presto.sh >/dev/null"
-      log_info "please wait a minute for presto resources be ready "
-      sleep 60 &
-      show_spinner "$!"
-      # check presto deployed resources success or not
-      kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/check-presto-deploy.sh > >(tee check-presto-deploy-output.txt) 2>&1"
-      CHKPDEPLOYNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-presto-deploy-output.txt | grep -iv -c Checking)
-      CHKPSUCCEDNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-presto-deploy-output.txt | grep -c met)
-      if [ "$CHKPDEPLOYNUM" -eq "$CHKPSUCCEDNUM" ]; then log_info "presto installation is completed"; else log_fatal "presto installation is failed"; fi
-    else
-      log_fatal "Error to create presto SSL cert, key, keystore, and keystore password"
-    fi
-  fi
-}
 
 # Expose endpoints via Ingress or LoadBalancer
 expose_endpoints() {
@@ -441,13 +415,8 @@ expose_endpoints() {
     EXTERNAL_IP=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get svc nginx-ingress-controller -n dashbase | tail -n +2 | awk '{ print $4}')
     log_info "the exposed IP address for web and tables endpoint is $EXTERNAL_IP"
   else
-    if [ "$NOSSL_FLAG" == "true" ]; then
-      log_info "setup LoadBalancer with http endpoints to expose services"
-      kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/create-lb.sh --http $EXPOSEMON"
-    else
-      log_info "setup LoadBalancer with https endpoints to expose services"
-      kubectl exec -it admindash-0 -n dashbase -- bash -c "/dashbase/create-lb.sh --https $EXPOSEMON"
-    fi
+    log_info "setup LoadBalancer with https endpoints to expose services"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/create-lb.sh --https $EXPOSEMON"
   fi
 }
 
@@ -485,6 +454,8 @@ else
   setup_helm_tiller
 fi
 
+create_sslcert
+
 # setup dashbase value yaml file and install dashbase
 if [ "$VALUEFILE" == "dashbase-values.yaml" ]; then
   log_info "dashbase value yaml file is using default $VALUEFILE"
@@ -492,12 +463,9 @@ if [ "$VALUEFILE" == "dashbase-values.yaml" ]; then
   install_dashbase
 else
   log_info "using custom dashbase value file $VALUEFILE"
-  kubectl cp "$VALUEFILE" dashbase/admindash-0:/dashbase/
+  kubectl cp "$VALUEFILE" dashbase/admindash-0:/data/
   install_dashbase
 fi
-
-# setup presto
-install_presto
 
 # expose services
 expose_endpoints
@@ -505,14 +473,7 @@ expose_endpoints
 # display endpoints
 echo "Exposed endpoints are below"
 
-if [[ "$INGRESS_FLAG" == "true" && "$NOSSL_FLAG" == "true" ]]; then
-   echo ""
-   echo "Update your DNS server with the following ingress controller IP to map with this name *.$SUBDOMAIN"
-   kubectl get svc -n dashbase |grep ingress-nginx-ingress-controller |awk '{print $1 "    " $4}'
-   echo "Access to dashbase web UI with http://web.$SUBDOMAIN"
-   echo "Access to dashbase table endpoint with http://table-logs.$SUBDOMAIN"
-   echo ""
-elif [[ "$INGRESS_FLAG" == "true" && "$NOSSL_FLAG" == "false" ]]; then
+if [[ "$INGRESS_FLAG" == "true"  ]]; then
    echo ""
    echo "Update your DNS server with the following ingress controller IP to map with this name *.$SUBDOMAIN"
    kubectl get svc -n dashbase |grep ingress-nginx-ingress-controller |awk '{print $1 "    " $4}'
@@ -531,14 +492,10 @@ else
     continue
   fi
 
-  if [[ -n "$SERVICE_LB_IP" && "$NOSSL_FLAG" == "false" ]]; then
+  if [[ -n "$SERVICE_LB_IP" ]]; then
     echo "LoadBalancer($SERVICE_NAME): IP is ready and is https://$SERVICE_LB_IP"
-  elif [[ -n "$SERVICE_LB_IP" && "$NOSSL_FLAG" == "true" ]]; then
-    echo "LoadBalancer($SERVICE_NAME): IP is ready and is http://$SERVICE_LB_IP"
-  elif [[ -n "$SERVICE_LB_HOSTNAME" && "$NOSSL_FLAG" == "false" ]]; then
+  elif [[ -n "$SERVICE_LB_HOSTNAME" ]]; then
     echo "LoadBalancer($SERVICE_NAME): IP is ready and is https://$SERVICE_LB_HOSTNAME"
-  elif [[ -n "$SERVICE_LB_HOSTNAME" && "$NOSSL_FLAG" == "true" ]]; then
-    echo "LoadBalancer($SERVICE_NAME): IP is ready and is http://$SERVICE_LB_HOSTNAME"
   else
     echo "LoadBalancer($SERVICE_NAME): IP is not ready."
   fi

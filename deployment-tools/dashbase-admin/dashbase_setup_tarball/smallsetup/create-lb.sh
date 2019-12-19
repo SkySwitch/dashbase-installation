@@ -86,7 +86,7 @@ for SERVICE_INFO in $(kubectl get service -l component=table -o=jsonpath='{range
 done
 
 
-expose_dashbase_mon() {
+expose_grafana() {
 # expose grafana service
 
 if kubectl get service grafana-lb -n dashbase &>/dev/null; then                                                                                                  
@@ -119,8 +119,11 @@ if kubectl get service grafana-lb -n dashbase &>/dev/null; then
       ((SECONDS_WAITED = SECONDS_WAITED + 15))                                                                                                                         
    done                                                                                                                                                               
 fi                   
+}
 
-# expose pushgateway prometheus and grafana
+
+expose_dashbase_mon() {
+# expose pushgateway prometheus 
 for MSVC in pushgateway,9091 prometheus,9090; do
   MSVCNAME=$(echo $MSVC |cut -d"," -f1)
   if kubectl get service "$MSVCNAME"-lb -n dashbase &>/dev/null; then
@@ -156,6 +159,8 @@ for MSVC in pushgateway,9091 prometheus,9090; do
   fi
 done
 }
+
+expose_grafana
 
 if [[ -n $2 && $2 == "--exposemon" ]]; then
    expose_dashbase_mon

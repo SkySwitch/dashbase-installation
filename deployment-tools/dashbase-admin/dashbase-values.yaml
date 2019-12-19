@@ -12,7 +12,7 @@ default:
   containerConfig:
     resources:
       requests:
-        cpu: 500m
+        cpu: 1
         memory: 2G
       limits:
         cpu: 2
@@ -41,6 +41,12 @@ default:
       READER_CACHE_MEM_PERCENT: "60"
       NUM_INDEXING_THREADS: "2"
       MIN_BUFFER_SIZE_MB: "200"
+
+presto:
+  enabled: true
+  presto:
+    prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
+    dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
 
 ingress:
   enabled: true
