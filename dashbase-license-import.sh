@@ -17,16 +17,15 @@ function log_fatal() {
 }
 
 # Check that the dashbase-license.txt is valid
-if [[ $(cat dashbase-license.txt |grep -e "^username:") == "" ]]; then
-  log_fatal "No username specified in dashbase-license.txt, please check again! "
+grep -e "^username: \".*\""  dashbase-license.txt > /dev/null  &&  grep -e "^license: \".*\"" dashbase-license.txt > /dev/null
+if [ $? -ne 0 ]; then
+  log_fatal "Username or license format is invaild, please check it ! "
   exit 1
-fi
-if [[ $(cat dashbase-license.txt |grep -e "^license:") == "" ]]; then
-  log_fatal "No license specified in dashbase-license.txt, please check again! "
-  exit 1
+else
+  log_info "dashbase-license.txt is valid, passed."
 fi
 
- # update dashbase license information
+#Update dashbase license information
 log_info "update default dashbase-values.yaml file with entered license information"
 kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
 kubectl exec -it admindash-0 -n dashbase -- bash -c "sed '/^username:/d;/^license:/d' dashbase_values.yaml > dashbase_values.yaml"
