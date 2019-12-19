@@ -24,8 +24,7 @@ install script options
     --version      specify a version if not nightly will be used
                    e.g. --version=1.0.1
     --ingress      use ingress to expose web/tables; while default is using LB
-    --nopresto     not include presto in the dashbase deployment
-    --nossl        nossl deployment of dashbase, this option will skip presto
+
     --exposemon    expose dashbase observibility tools: pushgateway, prometheus, grafana
     --valuefile    specify a custom dashbase value yaml file
                    e.g. --valuefile=/tmp/mydashbase_values.yaml
@@ -35,11 +34,13 @@ install script options
                    e.g. --license=Aertyujk8903HJKLBNMLOP34erTui
     
     
-examples of using ingress, nopresto, nossl on AWS platform
+examples of using ingress, on AWS platform
 
-    ./dashbase-installer.sh --subdomain=raytest.dashbase.io --ingress --nopresto --nossl --platform=aws
+    ./dashbase-installer.sh --subdomain=raytest.dashbase.io --ingress --platform=aws
 
 The standard installation requires minium 3 nodes with 8 CPU, and 64 GB Ram per node.
+
+For internal testing installation 
 For smaller setup such as 3 X t3.medium ( 3 X  2cpu + 4GB ram), use the dashbase-installer-smallsetup.sh inside the deployment-tools folder
 
 ```
