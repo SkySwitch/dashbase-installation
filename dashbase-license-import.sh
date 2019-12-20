@@ -78,11 +78,14 @@ log_info "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{pr
 kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
 
 log_info "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
-kubectl wait --timeout=-1s --for=condition=available deployment/api -n dashbase
-  if [[ $? = 0 ]]; then
-    log_info "Update successful, enjoy your dashbase."
-    rm -rf ./dashbase-license.txt
-  fi
+kubectl wait --timeout=180s --for=condition=available deployment/api -n dashbase
+# Check update status
+if [[ $? = 0 ]]; then
+  log_info "Update successful, enjoy your dashbase."
+  rm -rf ./dashbase-license.txt
+else
+  log_fatal "Update failed, Please check logs."
+fi
 
 
 
