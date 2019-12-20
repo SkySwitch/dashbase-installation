@@ -46,8 +46,6 @@ done
 check_license() {
   if [[ -z "$USERNAME" || -z "$LICENSE" ]]; then
     log_fatal "either username or license string is missing"
-  elif [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
-    log_warning "No License information is entered, install without license"
   elif [[ "$USERNAME" != "undefined" && "$LICENSE" != "undefined" ]]; then
     log_info "Entered username is $USERNAME"
     log_info "Entered license string is $LICENSE"
