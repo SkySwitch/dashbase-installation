@@ -73,10 +73,10 @@ kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod +x /dashbase/update-l
 kubectl exec -it admindash-0 -n dashbase -- bash -c "./update-license.sh"
 
 if [[ $? = 0 ]]; then
-  log_info "Update successful, enjoy your dashbase."
+  log_info "License update successful, enjoy your dashbase."
   rm -rf ./dashbase-license.txt
 else
-  log_fatal "Update failed, Please check logs."
+  log_fatal "License update failed."
 fi
 
 
