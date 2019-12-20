@@ -28,7 +28,7 @@ kubectl exec -it admindash-0 -n dashbase -- bash -c "sed '/^username:/d;/^licens
 kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> dashbase-values.yaml"
 
 
-log_info "helm upgrade dashbase chartmuseum/dashbase -f $VALUES_YAML --namespace dashbase "
+log_info "helm upgrade dashbase chartmuseum/dashbase -f dashbase_values.yaml --namespace dashbase "
 kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f dashbase_values.yaml --namespace dashbase "
 
 log_info "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
