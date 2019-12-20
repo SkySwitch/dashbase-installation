@@ -17,7 +17,6 @@ function log_fatal() {
 grep -e "^username: \".*\""  dashbase-license.txt > /dev/null  &&  grep -e "^license: \".*\"" dashbase-license.txt > /dev/null
 if [ $? -ne 0 ]; then
   log_fatal "Username or license format is invaild, please check it ! "
-  exit 1
 else
   log_info "dashbase-license.txt is valid, passed."
 fi
