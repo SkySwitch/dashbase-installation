@@ -35,7 +35,7 @@ echo "Creating presto-keystore file"
 
 keytool -genkey -noprompt \
  -alias dashbase \
- -dname "CN=$NAMESPACE-presto-coordinator-0.$NAMESPACE-presto-coordinator.$NAMESPACE.svc.cluster.local, OU=Engineering, O=Dashbase, L=Santa clara, S=CA, C=US" \
+ -dname "CN=presto-coordinator-0.presto-coordinator.$NAMESPACE.svc.cluster.local, OU=Engineering, O=Dashbase, L=Santa clara, S=CA, C=US" \
  -keystore presto-keystore \
  -storepass $KEYSTORE_PASSWORD \
  -keypass $KEYSTORE_PASSWORD \
@@ -59,7 +59,7 @@ echo "1. presto-kestore  java keystore for presto"
 echo "2. presto-keystore.p12 P12 format file for presto-keystore"
 echo "3. presto-cert.pem base 64 cert file for presto"
 echo "4. presto-key.pem  base 64 key file for presto"
-echo "The CN of this self-signed cert is $NAMESPACE-presto-coordinator-0.$NAMESPACE-presto-coordinator.$NAMESPACE.svc.cluster.local"
+echo "The CN of this self-signed cert is presto-coordinator-0.presto-coordinator.$NAMESPACE.svc.cluster.local"
 
 # create Base 64 encryption for generated key, cert, keystore, keystore password
 
