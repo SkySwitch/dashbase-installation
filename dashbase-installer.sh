@@ -315,8 +315,8 @@ create_storageclass() {
 download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from Github"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicx.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolic.tar"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicx.tar -C /data/"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicy.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicy.tar -C /data/"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
 }
 

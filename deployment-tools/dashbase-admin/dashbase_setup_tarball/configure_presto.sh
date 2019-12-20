@@ -10,7 +10,7 @@ DASHPASS=$(cat dashbase-keypass)
 echo "the dashbase keystore password = $DASHPASS"
 echo "the presto keystore password = $PKEYPASS"
 
-sed -i "s|PRESTO_KEYSTORE_PASSWORD|${PKEYPASS}|" dashbase-values.yaml
-sed -i "s|DASHBASE_KEYSTORE_PASSWORD|${DASHPASS}|" dashbase-values.yaml
+sed -i "s|PRESTO_KEYSTORE_PASSWORD|${PKEYPASS}|" /data/dashbase-values.yaml
+sed -i "s|DASHBASE_KEYSTORE_PASSWORD|${DASHPASS}|" /data/dashbase-values.yaml
 
 echo "the dashbase-values.yaml file is updated with dashbase and presto keystore password"
