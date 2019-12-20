@@ -47,13 +47,13 @@ done
   if [[ "$USERNAME" == "undefined" || "$LICENSE" == "undefined" ]]; then
     log_fatal "License information is not correct."
   else
-    log_info "Update default dashbase-values.yaml file with entered license information"
+    log_info "Loading dashbase-license username and license."
     echo "username: \"$USERNAME\"" > dashbase-license.txt
     echo "license: \"$LICENSE\"" >> dashbase-license.txt
   fi
 
 # Update dashbase license information
-log_info "update default dashbase-values.yaml file with entered license information"
+log_info "Update default dashbase-values.yaml file with entered license information."
 kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
 kubectl cp update-license.sh dashbase/admindash-0:/dashbase/
 kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod +x /dashbase/update-license.sh"
