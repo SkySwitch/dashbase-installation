@@ -68,25 +68,18 @@ check_license() {
 # Update dashbase license information
 log_info "update default dashbase-values.yaml file with entered license information"
 kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
-kubectl exec -it admindash-0 -n dashbase -- bash -c "sed '/^username:/d;/^license:/d' /data/dashbase-values.yaml > /data/dashbase-values.yaml"
-kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> dashbase-values.yaml"
+kubectl cp update-license.sh dashbase/admindash-0:/dashbase/
+kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod +x /dashbase/update-license.sh"
+kubectl exec -it admindash-0 -n dashbase -- bash -c "./update-license.sh"
 
-# Update dashbase license information
-log_info "helm upgrade dashbase chartmuseum/dashbase -f /data/dashbase-values.yaml --namespace dashbase --version $installed_version"
-kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --devel"
-
-log_info "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
-kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
-
-log_info "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
-kubectl wait --timeout=180s --for=condition=available deployment/api -n dashbase
-# Check update status
 if [[ $? = 0 ]]; then
   log_info "Update successful, enjoy your dashbase."
   rm -rf ./dashbase-license.txt
 else
   log_fatal "Update failed, Please check logs."
 fi
+
+
 
 
 
