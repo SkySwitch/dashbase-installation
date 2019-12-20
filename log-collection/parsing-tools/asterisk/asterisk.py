@@ -122,7 +122,7 @@ def convert_dateformat(pattern):
                     else:
                         mark = False
             else:
-                if not inside and char != ' ' and char != '.':
+                if not inside and char != ' ' and char != '.' and char != ',':
                     buf += "'"
                     inside = True
 
