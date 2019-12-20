@@ -13,6 +13,7 @@ function log_warning() {
 
 function log_fatal() {
   echo -e "FATAL *** $*"
+  rm -rf ./dashbase-license.txt
   exit 1
 }
 
