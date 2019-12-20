@@ -43,22 +43,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-check_license() {
-  if [[ -z "$USERNAME" || -z "$LICENSE" ]]; then
-    log_fatal "either username or license string is missing"
-  elif [[ "$USERNAME" != "undefined" && "$LICENSE" != "undefined" ]]; then
-    log_info "Entered username is $USERNAME"
-    log_info "Entered license string is $LICENSE"
-  else
-     log_fatal "Please check entered username and license string"
-  fi
-}
-
 # Create dashbase-license.txt
-  if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
-    log_warning "No License information is entered, install without license, no change on default dashbase-values.yaml file"
+  if [[ "$USERNAME" == "undefined" || "$LICENSE" == "undefined" ]]; then
+    log_fatal "License information is not correct."
   else
-    log_info "update default dashbase-values.yaml file with entered license information"
+    log_info "Update default dashbase-values.yaml file with entered license information"
     echo "username: \"$USERNAME\"" > dashbase-license.txt
     echo "license: \"$LICENSE\"" >> dashbase-license.txt
   fi
