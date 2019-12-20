@@ -1,0 +1,1 @@
+python -m unittest loggings/tests/asterisk.py
