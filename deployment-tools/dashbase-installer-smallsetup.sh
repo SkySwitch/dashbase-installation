@@ -316,6 +316,7 @@ download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from Github"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_small_nolicx.tar https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase_setup_small_nolicx.tar"
+  #kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_small_nolicx.tar https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup_small_nolicx.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_small_nolicx.tar -C /data/"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
 }
@@ -357,7 +358,7 @@ update_dashbase_valuefile() {
   fi
   # update keystore passwords for both dashbase and presto
   log_info "update dashbase and presto keystore password in dashbase-values.yaml"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd data ; /data/configure_presto.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/configure_presto.sh"
 }
 
 create_sslcert() {

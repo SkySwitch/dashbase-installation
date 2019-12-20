@@ -357,7 +357,7 @@ update_dashbase_valuefile() {
   fi
   # update keystore passwords for both dashbase and presto
   log_info "update dashbase and presto keystore password in dashbase-values.yaml"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd data ; /data/configure_presto.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/configure_presto.sh"
 }
 
 create_sslcert() {
