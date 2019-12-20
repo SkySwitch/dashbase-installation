@@ -1,0 +1,28 @@
+
+- paths:
+    - "/var/log/asterisk/full*"
+  type: log
+  multiline.pattern: '^\['
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    _message_parser:
+      type: multi
+      applyAll: 'true'
+      parsers:
+        sip:
+          type: sip
+        grok:
+          type: multi
+          parsers:
+            freepbx:
+              type: grok
+              pattern: "\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\] %{WORD:level:meta}\[%{INT:lwp:int}\](\[%{DATA:callid:text}\])? %{JAVAFILE:source:meta}: %{GREEDYDATA:message}"
+            asterisk:
+              type: grok
+              pattern: "\[%{GREEDYDATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\] %{WORD:level:meta}\[%{INT:lwp:int}\] %{JAVAFILE:source:meta}: %{GREEDYDATA:message}"
