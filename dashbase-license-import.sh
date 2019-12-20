@@ -34,7 +34,7 @@ kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashb
 log_info "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
 kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
 log_info "kubectl wait --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
-kubectl wait --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
+kubectl wait --timeout=-1 --for=condition=Ready pod/$(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
 
 
 
