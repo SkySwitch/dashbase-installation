@@ -24,12 +24,12 @@ fi
 #Update dashbase license information
 log_info "update default dashbase-values.yaml file with entered license information"
 kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
-kubectl exec -it admindash-0 -n dashbase -- bash -c "sed '/^username:/d;/^license:/d' dashbase_values.yaml > dashbase_values.yaml"
+kubectl exec -it admindash-0 -n dashbase -- bash -c "sed '/^username:/d;/^license:/d' /data/dashbase_values.yaml > /data/dashbase_values.yaml"
 kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> dashbase-values.yaml"
 
 
-log_info "helm upgrade dashbase chartmuseum/dashbase -f dashbase_values.yaml --namespace dashbase --version $installed_version"
-kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f dashbase_values.yaml --namespace dashbase --version $(helm ls '^dashbase$' |grep 'dashbase' |  awk '{print $10}')"
+log_info "helm upgrade dashbase chartmuseum/dashbase -f /data/dashbase_values.yaml --namespace dashbase --version $installed_version"
+kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase_values.yaml --namespace dashbase --version $(helm ls '^dashbase$' |grep 'dashbase' |  awk '{print $10}')"
 
 log_info "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
 kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
