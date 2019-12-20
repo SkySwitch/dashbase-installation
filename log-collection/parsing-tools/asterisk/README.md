@@ -1,9 +1,9 @@
 ### Asterisk filebeat configuration generator script
 
-Script reads asterisk logging configuration from provided logger.conf (and files included with #include) and creates filebeat configuration file asterisk.yaml
-Script gets `dateformat`, `use_callids` from [general] section of logger.conf and create grok parsing pattern appropriate for the dateformat and use_callids value.
-It will use produced grok pattern and provided `path_to_logs` to create full asterisk.yaml configuration.
-Created asterisk.yaml should be copied into ansible/roles/filebeat/templates/config folder before running ansible to deploy filebeat on the hosts running asterisk server.
+Script reads asterisk logging configuration from provided logger.conf (and files included with #include) and creates filebeat configuration file asterisk.yaml.
+Script gets `dateformat`, `use_callids` from `[general]` section of `logger.conf` and creates grok parsing pattern for the `dateformat` and `use_callids` values.
+It will use produced grok pattern and provided `path_to_logs` to create full `asterisk.yaml` configuration.
+Created `asterisk.yaml` should be copied into `ansible/roles/filebeat/templates/config` folder before running ansible to deploy filebeat on the hosts running asterisk server.
 
 To run: 
 ```
