@@ -5,13 +5,13 @@
 Get license like
 
 ```
-username: "user"
-license: "licensestring"
+username: "username"
+license: "license"
 ```
 
 ### Update Dashbase License
 
-Run dashbase-license-update.sh, with username and license. **Don't need ""**
+Run update_license.sh, with username and license. **Don't need ""**
 ```
-./dashbase-license-update.sh --username=user --license=licensestring
+./update_license.sh --username=username --license=license
 ```
