@@ -63,10 +63,6 @@ done
 # Update dashbase license information
 log_info "Update default dashbase-values.yaml file with entered license information."
 kubectl cp dashbase-license.txt dashbase/admindash-0:/dashbase/
-kubectl cp update-license.sh dashbase/admindash-0:/dashbase/
-kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod +x /dashbase/update-license.sh"
-kubectl exec -it admindash-0 -n dashbase -- bash -c "./update-license.sh"
-
 
 log_info "Cleaning old license of dashbase-values.yaml "
 kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i '/^username:/d;/^license:/d' /data/dashbase-values.yaml"
@@ -74,15 +70,15 @@ log_info "Update license into dashbase-values.yaml"
 kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> /data/dashbase-values.yaml"
 
 # Check chart version
-chart_version=$(helm ls '^dashbase$' |grep 'dashbase' |  awk '{print $9}')
-APP_version=$(helm ls '^dashbase$' |grep 'dashbase' |  awk '{print $9}')
+chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}'")
+app_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$10}'")
 
-if [[ $chart_version == "dashbase->0.0.0-0" ]]; then
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --devel &> /dev/null"
-  run_catch "helm upgrade dashbase chartmuseum/dashbase -f /data/dashbase-values.yaml --namespace dashbase --devel"
+if [[ $chart_version != $app_version ]]; then
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel &> /dev/null"
+  run_catch "helm upgrade dashbase chartmuseum/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel"
 else
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --version $APP_version &> /dev/null"
-  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --version $APP_version"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --version $APP_version &> /dev/null"
+  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --version $chart_version"
 fi
 
 # Update dashbase license information
@@ -92,7 +88,7 @@ run_catch "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{p
 kubectl wait --timeout=180s --for=condition=available deployment/api -n dashbase
 run_catch "kubectl wait --timeout=180s --for=condition=available deployment/api -n dashbase"
 
-if [[ $? = 0 ]]; then
+if [[ $? -eq 0 ]]; then
   log_info "License update successful, enjoy your dashbase."
   rm -rf ./dashbase-license.txt
 else
