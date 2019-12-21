@@ -71,12 +71,13 @@ kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >>
 
 # Check chart version
 chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}'")
-app_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$10}'")
 
-if [[ $chart_version != $app_version ]]; then
+if [[ $chart_version == dashbase-\>* ]]; then
+  echo "devel"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel &> /dev/null"
   run_catch "helm upgrade dashbase chartmuseum/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel"
 else
+  echo "$chart_version"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --version $APP_version &> /dev/null"
   run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --version $chart_version"
 fi
