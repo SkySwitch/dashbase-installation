@@ -1,0 +1,33 @@
+
+- patternType1:
+    multiline.match: after
+    multiline.negate: true
+    multiline.pattern: ^.
+    pattern: '%{DATA:timestamp:datetime:MMM ppd HH:mm:ss} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta}
+      %{SYSLOGPROG}: (%{DATA:pid})? %{LOGLEVEL:level:meta}: %{DATA:script}:? [%{DATA:cfg-route}]
+      *New request %{DATA:rm}* rU=%{DATA:rU}/tU=%{DATA:tU}/fU=%{DATA:fU}/rd=%{DATA:rd}/si=%{DATA:si}/sp=%{DATA:sp}'
+    type: grok
+- patternType2:
+    multiline.match: after
+    multiline.negate: true
+    multiline.pattern: ^.
+    pattern: '%{DATA:timestamp:datetime:MMM ppd HH:mm:ss} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta}
+      %{SYSLOGPROG}: (%{DATA:pid})? %{LOGLEVEL:level:meta}: %{DATA:script}:? ROUTING
+      TO FREESWITCH'
+    type: grok
+- patternType3:
+    multiline.match: after
+    multiline.negate: true
+    multiline.pattern: ^.
+    pattern: '%{DATA:timestamp:datetime:MMM ppd HH:mm:ss} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta}
+      %{SYSLOGPROG}: (%{DATA:pid})? %{LOGLEVEL:level:meta}: %{DATA:script}:? REPLAY
+      ERROR ROUTING TO FREESWITCH'
+    type: grok
+- patternType4:
+    multiline.match: after
+    multiline.negate: true
+    multiline.pattern: ^.
+    pattern: '%{DATA:timestamp:datetime:MMM ppd HH:mm:ss} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource:meta}
+      %{SYSLOGPROG}: (%{DATA:pid})? %{LOGLEVEL:level:meta}: %{DATA:script}:? ALERT:
+      pike blocking %{DATA:rm} from %{DATA:fu} (IP:%{DATA:si}:%{DATA:sp})'
+    type: grok
