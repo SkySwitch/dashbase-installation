@@ -47,6 +47,17 @@ For smaller setup such as 3 X t3.medium ( 3 X  2cpu + 4GB ram), use the dashbase
 ./dashbase-installer-smallsetup.sh --platform=aws
 ```
 
+Update dashbase license with username and license 
+
+```
+username: "username"
+license: "license"
+```
+
+Run update_license.sh, with username and license. **Don't need ""**
+```
+./deployment-tools/update_license.sh --username=username --license=license
+```
 
 To undo the dashbase installation on K8s cluster
 
