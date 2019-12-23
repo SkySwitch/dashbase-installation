@@ -70,7 +70,7 @@ log_info "Update license into dashbase-values.yaml"
 kubectl exec -it admindash-0 -n dashbase -- bash -c "cat dashbase-license.txt >> /data/dashbase-values.yaml"
 
 # Check chart version
-chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}' |  cut -f 2 -d - ")
+chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}' |  cut -c 10-  ")
 
 if [[ $chart_version == \>* ]]; then
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel &> /dev/null"
