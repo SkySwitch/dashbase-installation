@@ -25,7 +25,7 @@ install script options
                    e.g. --version=1.0.1
     --ingress      use ingress to expose web/tables; while default is using LB
 
-    --exposemon    expose dashbase observibility tools: pushgateway, prometheus, grafana
+    --exposemon    expose dashbase observibility tools: pushgateway, prometheus
     --valuefile    specify a custom dashbase value yaml file
                    e.g. --valuefile=/tmp/mydashbase_values.yaml
     --username     username for license information 
@@ -58,6 +58,20 @@ Run update_license.sh, with username and license. **Don't need ""**
 ```
 ./deployment-tools/update_license.sh --username=username --license=license
 ```
+
+Upgrade dashbase version
+
+Run upgrade-dashbase.sh script and specify dashbase version
+```
+./upgrade-dashbase.sh --version=1.0.2
+``` 
+options used on upgrade script
+
+     --version        specify dashbase version
+     --chartversion   optional entry for dashbase helm chart version, if missing will use default version in repo
+     --username       username for license information
+     --license        dashbase license string
+
 
 To undo the dashbase installation on K8s cluster
 
