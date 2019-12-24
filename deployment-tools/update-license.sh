@@ -74,14 +74,14 @@ chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^d
 
 if [[ $chart_version == \>* ]]; then
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel &> /dev/null"
-  run_catch "helm upgrade dashbase chartmuseum/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel"
+  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --devel"
 else
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --version $APP_version &> /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase --version $chart_version &> /dev/null"
   run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase --version $chart_version"
 fi
 
 # Update dashbase license information
-kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase
+kubectl delete pod "$(kubectl get pod -n dashbase | grep api | awk '{print $1}')" -n dashbase
 run_catch "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
 
 kubectl wait --timeout=180s --for=condition=available deployment/api -n dashbase
