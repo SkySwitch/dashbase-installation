@@ -1,9 +1,9 @@
-dashbase_version: nightly
+dashbase_version: nightly-a675c6
 
 https: true
 
-default_storageclass_provider:
-  platform: "aws"
+#default_storageclass_provider:
+#  platform: "aws"
 
 default:
   storage:
@@ -12,27 +12,27 @@ default:
   containerConfig:
     resources:
       requests:
-        cpu: 1
-        memory: 2G
+        cpu: 100m
+        memory: 1G
       limits:
-        cpu: 2
+        cpu: 1
         memory: 2G
   table:
     priorityClassName: dashbase-high-priority
     storage:
       class: "dashbase-data"
-      size: "3000Gi"
+      size: "100Gi"
 
     containerConfig:
       resources:
         requests:
-          cpu: 4
-          memory: 26G
+          cpu: 1
+          memory: 2G
         limits:
-          cpu: 4
-          memory: 28G
+          cpu: 1
+          memory: 2G
     environment:
-      JAVA_OPTS: "-Xmx20g -Xms16g"
+      JAVA_OPTS: "-Xmx2g -Xms2g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "14"
@@ -43,7 +43,7 @@ default:
       MIN_BUFFER_SIZE_MB: "200"
 
 presto:
-  enabled: true
+  enabled: false
   presto:
     prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
     dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
@@ -51,7 +51,7 @@ presto:
 ingress:
   enabled: true
   certmanager: false
-  host: test.dashbase.io
+  host: test.dashbase.local
 
 tables:
   logs:
@@ -67,6 +67,9 @@ services:
   prometheus:
     enabled: true
     image: "dashbase/prometheus:nightly"
+    environment:
+      ENABLE_KUBERNETES_SCRAPE: "true"
+      ENABLE_KUBERNETES_NODES_SCRAPE: "true"
   grafana:
     enabled: true
   alertmanager:
