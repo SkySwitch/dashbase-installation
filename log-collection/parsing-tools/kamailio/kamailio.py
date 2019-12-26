@@ -15,10 +15,10 @@ dict_list = []
 
 
 def write_filebeat_config(pattern, filebeat_config, path_to_logs):
-    ''' Writes filebeat configuration for asterisk using pattern and path_to_logs
+    ''' Writes filebeat configuration for kamailio using pattern and path_to_logs
     '''
 
-    with open(filebeat_config, "w") as fp:
+    with open(filebeat_config, "a+") as fp:
         try:
             path = """
 - paths:
@@ -42,20 +42,18 @@ def write_filebeat_config(pattern, filebeat_config, path_to_logs):
           type: sip
         grok:
           type: multi
-          parsers:
-            freepbx:
-              type: grok
-              pattern: "\\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\\] %{WORD:level:meta}\\[%{INT:lwp:int}\\](\\[%{DATA:callid:text}\\])? %{JAVAFILE:source:meta}: %{GREEDYDATA:message}"
-            asterisk:
-              type: grok
-              pattern: """
+          parsers: {}
+            """
 
             path += '"{}"'.format(path_to_logs)
-            document += '"{}"'.format(pattern)
-            fp.write(path + document)
-            print("Created asterisk filebeat configuration file {} successfully".format(filebeat_config))
+            fp.write(path + '\n')
+            cur_yaml = yaml.load(document)
+            for dict in dict_list:
+                cur_yaml['fields']['_message_parser']['parsers']['grok']['parsers'].update(dict)
+            yaml.dump(cur_yaml, fp)
+            print("Created kamailio filebeat configuration file {} successfully".format(filebeat_config))
         except Exception, e:
-            print("ERROR: Failed to output asterisk filebeat configuration file", e)
+            print("ERROR: Failed to output kamailio filebeat configuration file", e)
 
 
 def writeConfig(filebeat_file):
@@ -71,8 +69,7 @@ def writeConfig(filebeat_file):
 
 
 def buildConfig(pattern, patternType):
-    dict_file = {"pattern": pattern, "type": 'grok', "multiline.pattern": '^.', "multiline.negate": True,
-                 "multiline.match": 'after'}
+    dict_file = {"pattern": pattern, "type": 'grok'}
     dict_list.append({patternType: dict_file});
 
 
@@ -131,13 +128,11 @@ def main():
             pattern += decoder.log_config
             logging.debug(pattern)
             count = count + 1
-            time.sleep(1)
-            #buildConfig(pattern, "patternType" + str(count))
-            tm = datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d_%H:%M:%S.%f")[:-3]
-            filebeat_file = os.path.join(os.getcwd(), 'kamailio-{}.yaml'.format(tm))
-            write_filebeat_config(pattern, filebeat_file, path_to_logs)
+            buildConfig(pattern, "kamailio_pattern_type" + str(count))
 
     #writeConfig(filebeat_file)
+    write_filebeat_config(pattern, filebeat_file, path_to_logs)
+
     logging.debug('Done! I am going home. (Good)Bye!')
 
 
