@@ -1,6 +1,4 @@
 import argparse
-import sys
-import os
 import datetime
 import time
 
@@ -13,8 +11,10 @@ import logging
 
 dict_list = []
 
+SPECIAL_CHAR = ['*', '[', ']']
 
-def write_filebeat_config(pattern, filebeat_config, path_to_logs):
+
+def write_filebeat_config(filebeat_config, path_to_logs):
     ''' Writes filebeat configuration for kamailio using pattern and path_to_logs
     '''
 
@@ -47,30 +47,25 @@ def write_filebeat_config(pattern, filebeat_config, path_to_logs):
 
             path += '"{}"'.format(path_to_logs)
             fp.write(path + '\n')
-            cur_yaml = yaml.load(document)
+            cur_yaml = yaml.load(document, Loader=yaml.FullLoader)
             for dict in dict_list:
                 cur_yaml['fields']['_message_parser']['parsers']['grok']['parsers'].update(dict)
-            yaml.dump(cur_yaml, fp)
+            # TODO: yaml dumps adds new line char in patterns. Fix this.
+            yaml.safe_dump(cur_yaml, fp)
             print("Created kamailio filebeat configuration file {} successfully".format(filebeat_config))
         except Exception, e:
             print("ERROR: Failed to output kamailio filebeat configuration file", e)
 
 
-def writeConfig(filebeat_file):
-    with open(filebeat_file, "w") as fp:
-        try:
-            fp.truncate(0)
-            fp.write("\n")
-            yaml.dump(dict_list, fp)
-        except:
-            logging.error("Failed to dump YAML config.")
-        finally:
-            fp.close()
-
-
-def buildConfig(pattern, patternType):
+def build_config(pattern, pattern_type):
     dict_file = {"pattern": pattern, "type": 'grok'}
-    dict_list.append({patternType: dict_file});
+    dict_list.append({pattern_type: dict_file});
+
+
+def escape(pattern):
+    for char in SPECIAL_CHAR:
+        pattern = pattern.replace(char, '\\' + char)
+    return pattern
 
 
 def main():
@@ -128,10 +123,11 @@ def main():
             pattern += decoder.log_config
             logging.debug(pattern)
             count = count + 1
-            buildConfig(pattern, "kamailio_pattern_type" + str(count))
+            escaped_pattern = escape(pattern)
+            build_config(escaped_pattern, "kamailio_pattern_type_" + str(count))
+            logging.info(escaped_pattern)
 
-    #writeConfig(filebeat_file)
-    write_filebeat_config(pattern, filebeat_file, path_to_logs)
+    write_filebeat_config(filebeat_file, path_to_logs)
 
     logging.debug('Done! I am going home. (Good)Bye!')
 
