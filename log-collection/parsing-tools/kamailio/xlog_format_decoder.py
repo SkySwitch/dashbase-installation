@@ -26,8 +26,12 @@ class XlogFormatDecoder:
             self.log_config = self.log_config.replace(match.group(), "%{{DATA:{var}}}".format(
                 var=match.group().replace('$', '').replace("(", "-").replace(")", '')))
 
+        removal = "DATA"
+        reverse_removal = removal[::-1]
+        replacement = "GREEDYDATA"
+        reverse_replacement = replacement[::-1]
+
+        self.log_config = self.log_config[::-1].replace(reverse_removal, reverse_replacement, 1)[::-1]
         logging.info(self.log_config)
-        temp = self.log_config
-        logging.info(re.escape(temp))
         return self
 
