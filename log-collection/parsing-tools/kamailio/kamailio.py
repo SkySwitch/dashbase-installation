@@ -50,8 +50,7 @@ def write_filebeat_config(filebeat_config, path_to_logs):
             cur_yaml = yaml.load(document, Loader=yaml.FullLoader)
             for dict in dict_list:
                 cur_yaml['fields']['_message_parser']['parsers']['grok']['parsers'].update(dict)
-            # TODO: yaml dumps adds new line char in patterns. Fix this.
-            yaml.safe_dump(cur_yaml, fp)
+            yaml.safe_dump(cur_yaml, fp, explicit_start=True, default_style=False, width=4096)
             print("Created kamailio filebeat configuration file {} successfully".format(filebeat_config))
         except Exception, e:
             print("ERROR: Failed to output kamailio filebeat configuration file", e)
