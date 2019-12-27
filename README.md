@@ -76,7 +76,7 @@ options used on upgrade script
 To undo the dashbase installation on K8s cluster
 
 ```
-Downlod the script uninstall_dashbase.sh 
+Download the script uninstall_dashbase.sh 
 
 chmod a+x uninstall_dashbase.sh
 
