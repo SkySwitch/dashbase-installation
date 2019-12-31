@@ -64,17 +64,19 @@ if [ "$(kubectl get namespace |grep -c dashbase)" -eq "1" ]; then
      if [ "$(kubectl get po -n kube-system |grep -c tiller-deploy)" -gt "0" ]; then
         echo "helm tiller is deployed in kube-system namespace"
 
-        # check if dashbase is deployed, if yes delete it
-        if [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c -iv presto)" -eq "1" ]; then
+        # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
+        while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c -iv presto)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
           echo "dashbase components deployed"
           # remove dashbase
+          echo "removing dashbase components"
           kubectl exec -it admindash-0 -n dashbase -- helm delete --purge dashbase
-        fi
-          # check if presto is deployed if yes delete it
-        if [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep -c presto)" -eq "1" ]; then
+        done
+          # check if presto is deployed if yes delete it; and timeout after 8 minutes
+        while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep -c presto)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
           echo "presto components deployed"
+          echo "removing presto components"
           kubectl exec -it admindash-0 -n dashbase -- helm delete --purge presto
-        fi
+        done
      else
         echo "helm tiller is not found in K8s cluster"
      fi
