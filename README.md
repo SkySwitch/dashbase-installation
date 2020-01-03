@@ -4,6 +4,13 @@
 
 Download the dashbase-installer.sh script from this repo
 
+General assumption to use this dashbase-installer.sh script
+```
+ 1. You have setup K8s cluster
+ 2. Your workstation has kubectl command installed and able to access to K8s cluster
+
+```
+
 Give the installer permission
 ```
 chmod a+x dashbase-installer.sh
@@ -87,3 +94,41 @@ Install log file is saved in your current directory when running the script, the
 ```
  dashbase_install_`date +%d-%m-%Y_%H-%M-%S`.log
 ```
+
+### Setup K8s cluster on AWS (EKS Cluster)
+The create-aws-eks.sh script provides an easy way to create a basic AWS EKS cluster for dashbase installation purpose
+You can use this script to setup AWS EKS cluster and install dashbase at the same time.
+By default, the script will create an EKS cluster on us-east-2a with three worker nodes of size R5.2xlarge
+Download the create-aws-eks.sh script and input your AWS Access Key as shown from following example
+
+```
+chmod a+x create-aws-eks.sh
+
+# Create AWS EKS cluster in default us-east-2a
+
+./create-aws-eks.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=kqoQl8nH/tJ1INg6UVOv39+5TK2eJLCqwK+3a9jj
+
+# Create AWS EKS cluster in defautl us-east-2a and install dashbase with default options
+
+./create-aws-eks.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=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 --install_dashbase
+
+# Create AWS EKS cluster in us-west-2a and install dashbase with default options
+
+./create-aws-eks.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=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 --region=us-west-1 --install_dashbase
+```
+
+Options for the EKS cluster creation script
+
+      --aws_access_key          AWS Access Key ID
+      --aws_secret_access_key   AWS Secret Access Key
+      --region                  AWS region e.g. us-east-2 or us-west-2 
+                                Please check available regions allow EKS cluster
+      --instance_type           Default use R5.2xlarge if not specified
+      --node_number             Number of worker nodes, and dfault is three
+      --cluster_name            Specify custom EKS cluster name, and default is mydash<RANDOM_STRING>
+      --install_dashbase        Install dashbase with default options after EKS cluster is ready
+      --small_setup             Create a three nodes with t2.medium instance type, for testing purpose only
+      
+       
+
+
