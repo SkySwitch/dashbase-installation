@@ -5,6 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
+DASHVERSION="1.1.0-rc1"
 
 # log functions and input flag setup
 function log_info() {
@@ -194,11 +195,11 @@ check_node_memory() {
 
 check_node() {
   if ! check_node_cpu "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(8 core at least)."
+    echo "Node($1) doesn't have enough cpu resources(4 core at least)."
     return 0
   fi
   if ! check_node_memory "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(32Gi at least)."
+    echo "Node($1) doesn't have enough memory resources(8Gi at least)."
     return 0
   fi
 
@@ -208,12 +209,17 @@ check_node() {
 
 check_version() {
   if [ -z "$VERSION" ]; then
-    log_info "No input dashbase version, use default nightly"
+    VERSION=$DASHVERSION
+    log_info "No input dashbase version, use default version $DASHVERSION"
   else
     log_info "Dashbase version entered is $VERSION"
+    if [ "$(curl --silent -k https://registry.hub.docker.com/v2/repositories/dashbase/api/tags/$VERSION |tr -s ',' '\n' |grep -c digest)" -eq 1 ]; then
+      log_info "Entered dashbase version $VERSION is valid"
+    else
+      log_fatal "Entered dashbase version $VERSION is invalid"
+    fi
   fi
 }
-
 
 preflight_check() {
   # preflight checks
@@ -243,10 +249,10 @@ preflight_check() {
     check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
   done
   echo ""
-  if [ $AVAIILABLE_NODES -ge 2 ]; then
+  if [ $AVAIILABLE_NODES -ge 3 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 core and 32 Gi at least)."
+    log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 4 core and 8 Gi at least)."
   fi
 }
 
@@ -316,7 +322,6 @@ download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from Github"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_small_nolicx.tar https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase_setup_small_nolicx.tar"
-  #kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_small_nolicx.tar https://dashbase-public.s3-us-west-1.amazonaws.com/dashbase_setup_small_nolicx.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_small_nolicx.tar -C /data/"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
 }
@@ -351,7 +356,8 @@ update_dashbase_valuefile() {
   fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
-    log_info "use default nightly in dashbase_version on dashbase-values.yaml"
+    log_info "use default version $DASHVERSION in dashbase_version on dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $DASHVERSION|" /data/dashbase-values.yaml
   else
     log_info "use $VERSION in dashbase_version on dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $VERSION|" /data/dashbase-values.yaml
@@ -392,7 +398,9 @@ create_sslcert() {
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f /data/$DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --debug --devel --no-hooks > /dev/null"
+  log_info "Dashbase version $VERSION  and chart version $VERSION is going to install on the target K8s cluster"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f /data/$DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --version $VERSION --debug --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
@@ -404,7 +412,6 @@ install_dashbase() {
   CHKSUCCEDNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-dashbase-deploy-output.txt | grep -c met)
   if [ "$CHKDEPLOYNUM" -eq "$CHKSUCCEDNUM" ]; then log_info "dashbase installation is completed"; else log_fatal "dashbase installation is failed"; fi
 }
-
 
 # Expose endpoints via Ingress or LoadBalancer
 expose_endpoints() {
@@ -480,6 +487,7 @@ if [[ "$INGRESS_FLAG" == "true"  ]]; then
    kubectl get svc -n dashbase |grep ingress-nginx-ingress-controller |awk '{print $1 "    " $4}'
    echo "Access to dashbase web UI with https://web.$SUBDOMAIN"
    echo "Access to dashbase table endpoint with https://table-logs.$SUBDOMAIN"
+   echo "Access to dashbase grafana endpoint with https://grafana.$SUBDOMAIN"
    echo ""
 else
 

@@ -5,6 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
+DASHVERSION="1.1.0-rc1"
 
 # log functions and input flag setup
 function log_info() {
@@ -208,9 +209,14 @@ check_node() {
 
 check_version() {
   if [ -z "$VERSION" ]; then
-    log_info "No input dashbase version, use default nightly"
+    log_info "No input dashbase version, use default version $DASHVERSION"
   else
     log_info "Dashbase version entered is $VERSION"
+    if [ "$(curl --silent -k https://registry.hub.docker.com/v2/repositories/dashbase/api/tags/$VERSION |tr -s ',' '\n' |grep -c digest)" -eq 1 ]; then
+      log_info "Entered dashbase version $VERSION is valid"
+    else
+      log_fatal "Entered dashbase version $VERSION is invalid"
+    fi
   fi
 }
 
@@ -350,7 +356,8 @@ update_dashbase_valuefile() {
   fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
-    log_info "use default nightly in dashbase_version on dashbase-values.yaml"
+    log_info "use default version $DASHVERSION in dashbase_version on dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $DASHVERSION|" /data/dashbase-values.yaml
   else
     log_info "use $VERSION in dashbase_version on dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|dashbase_version: nightly|dashbase_version: $VERSION|" /data/dashbase-values.yaml
@@ -391,7 +398,9 @@ create_sslcert() {
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f /data/$DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --debug --devel --no-hooks > /dev/null"
+  log_info "Dashbase version $VERSION  and chart version $VERSION is going to install on the target K8s cluster"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f /data/$DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --version $VERSION --debug --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
@@ -479,6 +488,7 @@ if [[ "$INGRESS_FLAG" == "true"  ]]; then
    kubectl get svc -n dashbase |grep ingress-nginx-ingress-controller |awk '{print $1 "    " $4}'
    echo "Access to dashbase web UI with https://web.$SUBDOMAIN"
    echo "Access to dashbase table endpoint with https://table-logs.$SUBDOMAIN"
+   echo "Access to dashbase grafana endpoint with https://grafana.$SUBDOMAIN"
    echo ""
 else
 

@@ -63,7 +63,7 @@ license: "license"
 
 Run update_license.sh, with username and license. **Don't need ""**
 ```
-./deployment-tools/update_license.sh --username=username --license=license
+./deployment-tools/upgrade-dashbase.sh --username=username --license=license
 ```
 
 Upgrade dashbase version
@@ -75,7 +75,7 @@ Run upgrade-dashbase.sh script and specify dashbase version
 options used on upgrade script
 
      --version        specify dashbase version
-     --chartversion   optional entry for dashbase helm chart version, if missing will use default version in repo
+     --chartversion   optional entry for dashbase helm chart version, if missing will match with dashbase version
      --username       username for license information
      --license        dashbase license string
 
@@ -99,7 +99,8 @@ Install log file is saved in your current directory when running the script, the
 The create-aws-eks.sh script provides an easy way to create a basic AWS EKS cluster for dashbase installation purpose
 You can use this script to setup AWS EKS cluster and install dashbase at the same time.
 By default, the script will create an EKS cluster on us-east-2a with three worker nodes of size R5.2xlarge
-Download the create-aws-eks.sh script and input your AWS Access Key as shown from following example
+Download the create-aws-eks.sh script and input your AWS Access Key as shown from following examples
+** The following AWS key and secrets are just samples, please your own key and secrets from your account **
 
 ```
 chmod a+x create-aws-eks.sh

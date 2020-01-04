@@ -5,6 +5,8 @@ LICENSE="undefined"
 VALUEFILE="dashbase-values.yaml"
 VERSION="undefined"
 CHARTVERSION="undefined"
+DOCKERHUB_REGISTRY="https://registry.hub.docker.com/v2/repositories/dashbase/api/tags/"
+CURRENTVERSION=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get pods/web-0 -n dashbase  -o jsonpath='{.spec.containers[*].image}' |cut -d":" -f2)
 
 function log_info() {
   echo -e "INFO *** $*"
@@ -32,6 +34,9 @@ function run_catch() {
     log_fatal "FAILURE: $*"
   fi
 }
+
+echo "$@" >setup_arguments
+echo "$#" >no_arguments
 
 while [[ $# -gt 0 ]]; do
   PARAM=${1%%=*}
@@ -92,14 +97,32 @@ update_license() {
 }
 
 check_version() {
+  #CURRENTVERSION=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get pods/web-0 -n dashbase  -o jsonpath='{.spec.containers[*].image}' |cut -d":" -f2)
   if [ "$VERSION" == "undefined" ]; then
-    log_info "No input dashbase version, use default nightly"
-    VERSION="nightly"
+    log_info "No input dashbase version, no change in dashbase version"
+    VERSION=$CURRENTVERSION
     # update dashbase value yaml file for version string
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i '/^dashbase_version:/d' /data/dashbase-values.yaml"
-    kubectl exec -it admindash-0 -n dashbase -- sed -i "1 i\dashbase_version: nightly" /data/dashbase-values.yaml
+    # kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i '/^dashbase_version:/d' /data/dashbase-values.yaml"
+    # kubectl exec -it admindash-0 -n dashbase -- sed -i "1 i\dashbase_version: $VERSION" /data/dashbase-values.yaml
   else
     log_info "Dashbase version entered is $VERSION"
+    # checking input version is valid or not
+    log_info "Checking the entered version $VERSION is valid or not"
+    if [ "$(curl --silent -k "$DOCKERHUB_REGISTRY$VERSION" |tr -s ',' '\n' |grep -c digest)" -eq 1 ]; then
+      log_info "Entered dashbase version $VERSION is valid"
+    else
+      log_fatal "Entered dashbase version $VERSION is invalid"
+    fi
+    # make sure input version is newer than current version
+    CURRENTVERSION_TIME=$(curl --silent -k "$DOCKERHUB_REGISTRY$CURRENTVERSION" |tr -s ',' '\n' |grep last_updated |cut -d":" -f2-4 |sed -e 's/\"//g' |tr -d 'Z\}')
+    NEWVERSION_TIME=$(curl --silent -k "$DOCKERHUB_REGISTRY$VERSION" |tr -s ',' '\n' |grep last_updated |cut -d":" -f2-4 |sed -e 's/\"//g' |tr -d 'Z\}')
+    echo "Current dashbase version is created on $CURRENTVERSION_TIME"
+    echo "Current dashbase version is created on $NEWVERSION_TIME"
+    if [[ $(kubectl exec -it admindash-0 -n dashbase -- date -d "$CURRENTVERSION_TIME" "+%s") < $(kubectl exec -it admindash-0 -n dashbase -- date -d "$NEWVERSION_TIME" "+%s")  ]]; then
+      log_info "The entered version $VERSION is newer than current version $CURRENTVERSION"
+    else
+      log_fatal "The entered version $VERSION is older than current version $CURRENTVERSION , and please manually downgrade dashbase installation"
+    fi
     # update dashbase value yaml file for version string
     kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i '/^dashbase_version:/d' /data/dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "1 i\dashbase_version: $VERSION" /data/dashbase-values.yaml
@@ -109,8 +132,8 @@ check_version() {
 # Check chart version
 # if chart version is not provided, then will use whatever previously is used
 check_chart_version() {
-if [[ "$CHARTVERSION" == "undefined" ]]; then
-
+if [[ "$CHARTVERSION" == "undefined" ]] && [[ "$VERSION" == "undefined" ]]; then
+  echo "Both dashbase version and chart version are not provided"
   echo "checking previous chart version is used in the deployment"
   chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}' |  cut -c 10-  ")
 
@@ -119,10 +142,14 @@ if [[ "$CHARTVERSION" == "undefined" ]]; then
     chartver="--devel"
   else
     echo "current chart version is $chart_version"
-    echo "will use default chart version in repo"
-    chartver=""
+    echo "will use current chart version $chart_version"
+    chartver="--version $chart_version"
   fi
-else
+elif [[ "$CHARTVERSION" == "undefined" ]] && [[ "$VERSION" != "undefined"  ]]; then
+  echo "Dashbase version is provided and chart version is not provided"
+  echo "Both dashbase version and chart version will be in version $VERSION"
+  chartver="--version $VERSION"
+elif [[ "$CHARTVERSION" != "undefined" ]]; then
   echo "Entered chart version is $CHARTVERSION"
   chartver="--version $CHARTVERSION"
 fi
@@ -130,6 +157,7 @@ fi
 
 # main process below this line
 
+#CURRENTVERSION=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get pods/web-0 -n dashbase  -o jsonpath='{.spec.containers[*].image}' |cut -d":" -f2)
 backup_values_yaml
 
 # check entered dashbase value yaml file
@@ -153,7 +181,7 @@ fi
 
 
 # Force restart api pod when upgrade license only and no dashbase version change
-if [[ "$LICENSE" != "undefined" || "$USERNAME" != "undefined" ]] && [[ "$VERSION" == "nightly" ]]; then
+if [[ "$LICENSE" != "undefined" || "$USERNAME" != "undefined" ]] && [[ "$VERSION" == "$CURRENTVERSION" ]]; then
 
   kubectl delete pod "$(kubectl get pod -n dashbase | grep api | awk '{print $1}')" -n dashbase
   run_catch "kubectl delete pod $(kubectl get pod -n dashbase | grep api | awk '{print $1}') -n dashbase"
