@@ -209,6 +209,7 @@ check_node() {
 
 check_version() {
   if [ -z "$VERSION" ]; then
+    VERSION=$DASHVERSION
     log_info "No input dashbase version, use default version $DASHVERSION"
   else
     log_info "Dashbase version entered is $VERSION"
