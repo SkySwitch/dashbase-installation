@@ -132,11 +132,11 @@ check_version() {
 # Check chart version
 # if chart version is not provided, then will use whatever previously is used
 check_chart_version() {
+chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}' |  cut -c 10-  ")
+
 if [[ "$CHARTVERSION" == "undefined" ]] && [[ "$VERSION" == "undefined" ]]; then
   echo "Both dashbase version and chart version are not provided"
   echo "checking previous chart version is used in the deployment"
-  chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}' |  cut -c 10-  ")
-
   if [[ $chart_version == \>* ]]; then
     echo "current chart version is using latest devel, and will continue using devel chart version"
     chartver="--devel"
@@ -149,6 +149,12 @@ elif [[ "$CHARTVERSION" == "undefined" ]] && [[ "$VERSION" != "undefined"  ]]; t
   echo "Dashbase version is provided and chart version is not provided"
   echo "Both dashbase version and chart version will be in version $VERSION"
   chartver="--version $VERSION"
+elif [[ "$CHARTVERSION" == "devel" ]]; then
+  echo "Entered chart version is latest development version"
+  chartver="--devel"
+elif [[ "$CHARTVERSION" == "current" ]]; then
+  echo "Entered chart version is using current version $chart_version"
+  chartver="--version $chart_version"
 elif [[ "$CHARTVERSION" != "undefined" ]]; then
   echo "Entered chart version is $CHARTVERSION"
   chartver="--version $CHARTVERSION"
