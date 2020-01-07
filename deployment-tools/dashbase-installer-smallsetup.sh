@@ -484,7 +484,7 @@ echo "Exposed endpoints are below"
 if [[ "$INGRESS_FLAG" == "true"  ]]; then
    echo ""
    echo "Update your DNS server with the following ingress controller IP to map with this name *.$SUBDOMAIN"
-   kubectl get svc -n dashbase |grep ingress-nginx-ingress-controller |awk '{print $1 "    " $4}'
+   kubectl get svc -n dashbase |grep nginx-ingress-controller |awk '{print $1 "    " $4}'
    echo "Access to dashbase web UI with https://web.$SUBDOMAIN"
    echo "Access to dashbase table endpoint with https://table-logs.$SUBDOMAIN"
    echo "Access to dashbase grafana endpoint with https://grafana.$SUBDOMAIN"
