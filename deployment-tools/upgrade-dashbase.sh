@@ -117,7 +117,7 @@ check_version() {
     CURRENTVERSION_TIME=$(curl --silent -k "$DOCKERHUB_REGISTRY$CURRENTVERSION" |tr -s ',' '\n' |grep last_updated |cut -d":" -f2-4 |sed -e 's/\"//g' |tr -d 'Z\}')
     NEWVERSION_TIME=$(curl --silent -k "$DOCKERHUB_REGISTRY$VERSION" |tr -s ',' '\n' |grep last_updated |cut -d":" -f2-4 |sed -e 's/\"//g' |tr -d 'Z\}')
     echo "Current dashbase version is created on $CURRENTVERSION_TIME"
-    echo "Current dashbase version is created on $NEWVERSION_TIME"
+    echo "The entered dashbase version is created on $NEWVERSION_TIME"
     if [[ $(kubectl exec -it admindash-0 -n dashbase -- date -d "$CURRENTVERSION_TIME" "+%s") < $(kubectl exec -it admindash-0 -n dashbase -- date -d "$NEWVERSION_TIME" "+%s")  ]]; then
       log_info "The entered version $VERSION is newer than current version $CURRENTVERSION"
     else

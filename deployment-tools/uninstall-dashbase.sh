@@ -64,19 +64,25 @@ if [ "$(kubectl get namespace |grep -c dashbase)" -eq "1" ]; then
      if [ "$(kubectl get po -n kube-system |grep -c tiller-deploy)" -gt "0" ]; then
         echo "helm tiller is deployed in kube-system namespace"
 
+        # check if nginx is deployed , if yes delete it; and timeout after 8 minutes
+        while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+          echo "nginx-ingress controller is dedected"
+          echo "removing ngnix-ingress controller"
+          kubectl exec -it admindash-0 -n dashbase -- helm delete --purge nginx-ingress
+        done
         # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
-        while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c -iv presto)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+        while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
           echo "dashbase components deployed"
           # remove dashbase
           echo "removing dashbase components"
           kubectl exec -it admindash-0 -n dashbase -- helm delete --purge dashbase
         done
-          # check if presto is deployed if yes delete it; and timeout after 8 minutes
-        while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep -c presto)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
-          echo "presto components deployed"
-          echo "removing presto components"
-          kubectl exec -it admindash-0 -n dashbase -- helm delete --purge presto
-        done
+        # check if presto is deployed if yes delete it; and timeout after 8 minutes
+        # while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep -c presto)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+        #  echo "presto components deployed"
+        #  echo "removing presto components"
+        #  kubectl exec -it admindash-0 -n dashbase -- helm delete --purge presto
+        # done
      else
         echo "helm tiller is not found in K8s cluster"
      fi
