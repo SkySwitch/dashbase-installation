@@ -5,7 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.1.0-rc1"
+DASHVERSION="1.1.0-rc2"
 
 # log functions and input flag setup
 function log_info() {
