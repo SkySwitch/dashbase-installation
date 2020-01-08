@@ -19,7 +19,7 @@
     filebeat_version: "oss-6.8.5"
     prometheus_pushgateway_enable: True
     configs_list: "{{ configs.split(',') }}"
-    table: "{{ dashbase_url.strip('http://').strip('https://').split('.')[0].strip('table-') }}"
+    table: "logs"
     pushgateway_url: "{{ dashbase_url.split('//')[0] }}//pushgateway.{{ dashbase_url.split('.')[1:] | join('.') | regex_replace(':(\\d+)$') }}"
     prometheus_local_exporter_url: http://localhost:29273/metrics
     prometheus_pushgateway_url: "{{ pushgateway_url }}/metrics/job/filebeat/instance/{{ ansible_hostname }}"
