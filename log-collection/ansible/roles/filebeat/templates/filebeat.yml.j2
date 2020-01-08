@@ -56,6 +56,7 @@ output.elasticsearch:
   compression_level: 5
   hosts: "{{ dashbase_url }}"
   index: "{{ table }}"
+  ssl.verification_mode: none
 
 #================================ Logging =====================================
 
