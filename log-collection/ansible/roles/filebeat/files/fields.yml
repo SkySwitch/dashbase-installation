@@ -1728,4 +1728,425 @@
               description:
                 The url of the backend where request is forwarded
 
+- key: freeswitch
+  title: FreeSWITCH log content
+  description: >
+    Template for FreeSWITCH logs including cdr logs.
+  fields:
+    - name: channel_data.state_number
+      type: integer
+
+    - name: variables
+      type: group
+      fields:
+        - name: call_timeout
+          type: integer
+
+        - name: max_forwards
+          type: integer
+
+        - name: start_epoch
+          type: integer
+
+        - name: start_uepoch
+          type: integer
+
+        - name: profile_start_epoch
+          type: integer
+
+        - name: profile_start_uepoch
+          type: integer
+
+        - name: answer_epoch
+          type: integer
+
+        - name: answer_uepoch
+          type: integer
+
+        - name: bridge_epoch
+          type: integer
+
+        - name: bridge_uepoch
+          type: integer
+
+        - name: last_hold_epoch
+          type: integer
+
+        - name: last_hold_uepoch
+          type: integer
+
+        - name: hold_accum_seconds
+          type: integer
+
+        - name: hold_accum_usec
+          type: integer
+
+        - name: hold_accum_ms
+          type: integer
+
+        - name: resurrect_epoch
+          type: integer
+
+        - name: resurrect_uepoch
+          type: integer
+
+        - name: progress_epoch
+          type: integer
+
+        - name: progress_uepoch
+          type: integer
+
+        - name: progress_media_epoch
+          type: integer
+
+        - name: progress_media_uepoch
+          type: integer
+
+        - name: end_epoch
+          type: integer
+
+        - name: end_uepoch
+          type: integer
+
+        - name: duration
+          type: integer
+
+        - name: billsec
+          type: integer
+
+        - name: progresssec
+          type: integer
+
+        - name: answersec
+          type: integer
+
+        - name: waitsec
+          type: integer
+
+        - name: progress_mediasec
+          type: integer
+
+        - name: flow_billsec
+          type: integer
+
+        - name: mduration
+          type: integer
+
+        - name: billmsec
+          type: integer
+
+        - name: progressmsec
+          type: integer
+
+        - name: answermsec
+          type: integer
+
+        - name: waitmsec
+          type: integer
+
+        - name: progress_mediamsec
+          type: integer
+
+        - name: flow_billmsec
+          type: integer
+
+        - name: uduration
+          type: integer
+
+        - name: billusec
+          type: integer
+
+        - name: progressusec
+          type: integer
+
+        - name: answerusec
+          type: integer
+
+        - name: waitusec
+          type: integer
+
+        - name: progress_mediausec
+          type: integer
+
+        - name: flow_billusec
+          type: integer
+
+        - name: sip_cseq
+          type: integer
+
+        - name: sip_from_port
+          type: integer
+
+        - name: sip_invite_stamp
+          type: integer
+
+        - name: sip_network_port
+          type: integer
+
+        - name: sip_received_port
+          type: integer
+
+        - name: sip_req_port
+          type: integer
+
+        - name: sip_contact_port
+          type: integer
+
+        - name: sip_via_port
+          type: integer
+
+        - name: sip_via_rport
+          type: integer
+
+        - name: sip_term_status
+          type: integer
+
+        - name: sip_invite_failure_status
+          type: integer
+
+        - name: rtp_remote_audio_rtcp_port
+          type: integer
+
+        - name: local_media_port
+          type: integer
+
+        - name: remote_media_port
+          type: integer
+
+        - name: remote_audio_port_reported
+          type: integer
+
+        - name: remote_audio_port
+          type: integer
+
+        - name: rtp_audio_in_raw_bytes
+          type: integer
+
+        - name: rtp_audio_in_media_bytes
+          type: integer
+
+        - name: rtp_audio_in_packet_count
+          type: integer
+
+        - name: rtp_audio_in_media_packet_count
+          type: integer
+
+        - name: rtp_audio_in_skip_packet_count
+          type: integer
+
+        - name: rtp_audio_in_jitter_packet_count
+          type: integer
+
+        - name: rtp_audio_in_dtmf_packet_count
+          type: integer
+
+        - name: rtp_audio_in_cng_packet_count
+          type: integer
+
+        - name: rtp_audio_in_flush_packet_count
+          type: integer
+
+        - name: rtp_audio_in_largest_jb_size
+          type: integer
+
+        - name: rtp_audio_in_jitter_min_variance
+          type: double
+
+        - name: rtp_audio_in_jitter_max_variance
+          type: double
+
+        - name: rtp_audio_in_jitter_loss_rate
+          type: double
+
+        - name: rtp_audio_in_jitter_burst_rate
+          type: double
+
+        - name: rtp_audio_in_mean_interval
+          type: double
+
+        - name: rtp_audio_in_flaw_total
+          type: integer
+
+        - name: rtp_audio_in_quality_percentage
+          type: double
+
+        - name: rtp_audio_in_mos
+          type: double
+
+        - name: rtp_audio_out_raw_bytes
+          type: integer
+
+        - name: rtp_audio_out_media_bytes
+          type: integer
+
+        - name: rtp_audio_out_packet_count
+          type: integer
+
+        - name: rtp_audio_out_media_packet_count
+          type: integer
+
+        - name: rtp_audio_out_skip_packet_count
+          type: integer
+
+        - name: rtp_audio_out_dtmf_packet_count
+          type: integer
+
+        - name: rtp_audio_out_cng_packet_count
+          type: integer
+
+        - name: rtp_audio_rtcp_packet_count
+          type: integer
+
+        - name: rtp_audio_rtcp_octet_count
+          type: integer
+
+        - name: rtp_use_codec_channels
+          type: integer
+
+        - name: rtp_audio_recv_pt
+          type: integer
+
+        - name: rtp_use_codec_ptime
+          type: integer
+
+        - name: Event-Date-Timestamp
+          type: integer
+
+        - name: Event-Sequence
+          type: integer
+
+        - name: playback_ms
+          type: integer
+
+        - name: playback_seconds
+          type: integer
+
+    - name: callflow
+      type: group
+      fields:
+        - name: times
+          type: group
+          fields:
+            - name: created_time
+              type: integer
+
+            - name: profile_created_time
+              type: integer
+
+            - name: progress_time
+              type: integer
+
+            - name: progress_media_time
+              type: integer
+
+            - name: answered_time
+              type: integer
+
+            - name: bridged_time
+              type: integer
+
+            - name: last_hold_time
+              type: integer
+
+            - name: hold_accum_time
+              type: integer
+
+            - name: hangup_time
+              type: integer
+
+            - name: resurrect_time
+              type: integer
+
+            - name: transfer_time
+              type: integer
+
+    - name: callStats.audio
+      type: group
+      fields:
+        - name: inbound
+          type: group
+          fields:
+            - name: raw_bytes
+              type: integer
+
+            - name: media_bytes
+              type: integer
+
+            - name: packet_count
+              type: integer
+
+            - name: media_packet_count
+              type: integer
+
+            - name: skip_packet_count
+              type: integer
+
+            - name: jitter_packet_count
+              type: integer
+
+            - name: dtmf_packet_count
+              type: integer
+
+            - name: cng_packet_count
+              type: integer
+
+            - name: flush_packet_count
+              type: integer
+
+            - name: largest_jb_size
+              type: integer
+
+            - name: jitter_min_variance
+              type: double
+
+            - name: jitter_max_variance
+              type: double
+
+            - name: jitter_loss_rate
+              type: integer
+
+            - name: jitter_burst_rate
+              type: integer
+
+            - name: mean_interval
+              type: double
+
+            - name: flaw_total
+              type: integer
+
+            - name: quality_percentage
+              type: double
+
+            - name: mos
+              type: double
+
+        - name: outbound
+          type: group
+          fields:
+            - name: raw_bytes
+              type: integer
+
+            - name: media_bytes
+              type: integer
+
+            - name: packet_count
+              type: integer
+
+            - name: media_packet_count
+              type: integer
+
+            - name: skip_packet_count
+              type: integer
+
+            - name: dtmf_packet_count
+              type: integer
+
+            - name: cng_packet_count
+              type: integer
+
+            - name: rtcp_packet_count
+              type: integer
+
+            - name: rtcp_octet_count
+              type: integer
 
