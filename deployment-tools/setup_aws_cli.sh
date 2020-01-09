@@ -62,7 +62,7 @@ log_info "Configure AWS CLI"
 curl -k https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
 chmod a+x /usr/local/bin/kubectl
 
-CLUSTERNAME=$(aws eks list-clusters --region us-west-2 |grep mydash |sed -e 's/\"//g' |sed -e 's/^[ \t]*//')
+CLUSTERNAME=$(aws eks list-clusters --region $REGION |grep mydash |sed -e 's/\"//g' |sed -e 's/^[ \t]*//')
 echo "The dashbase K8s cluster name is $CLUSTERNAME"
 
 aws eks --region "$REGION" update-kubeconfig --name "$CLUSTERNAME"
