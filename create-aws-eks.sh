@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
     SMALL_SETUP="true"
     ;;
   *)
-    log_warning "Unknown parameter ($PARAM) with ${VALUE:-no value}"
+    log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
     ;;
   esac
 done
@@ -117,9 +117,8 @@ check_docker_helper() {
 }
 
 setup_docker_helper() {
-  #mkdir -p data
-  #docker run -itd --name docker-helper  --mount source=data,target=/data rluiarch/dashbase-admin:1.3
-  docker run -itd --name docker-helper rluiarch/dashbase-admin:1.3
+  mkdir -p data
+  docker run -itd --name docker-helper  -v data:/data rluiarch/dashbase-admin:1.3
   echo "Please wait until docker-helper container is ready"
   sleep 120 &
   show_spinner "$!"
@@ -132,6 +131,16 @@ setup_docker_helper() {
   else
     log_info "Dashbase docker-helper is successfully created"
   fi
+}
+
+backup_aws_keys() {
+  # Backup the entered AWS credentials in docker-helper's stateful volume
+  log_info "Backup the AWS credentials in the docker-helper's stateful volume /data"
+  echo "$REGION" > data/regionfile
+  docker exec -it docker-helper /bin/bash -c "tar -cvf /data/aws_credential_$(date +%d%m%Y_%H%M%S).tar -C /root .aws"
+  NEWAWSCTAR=$(docker exec -it docker-helper ls -ltr /data/ |tail -1 |awk '{print $NF}' |tr -d '\r')
+  echo "Backup aws credential to your current path data folder"
+  docker cp docker-helper:/data/"$NEWAWSCTAR" ./data/
 }
 
 setup_eks_cluster() {
@@ -191,6 +200,7 @@ setup_dashbase() {
 check_input
 check_docker_helper
 setup_docker_helper
+backup_aws_keys
 setup_eks_cluster
 check_eks_cluster
 setup_dashbase

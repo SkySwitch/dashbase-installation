@@ -131,5 +131,28 @@ Options for the EKS cluster creation script
       --small_setup             Create a three nodes with t2.medium instance type, for testing purpose only
       
        
+### Create or recreate docker-helper container after installation
+
+When using the create-aws-eks.sh script to setup AWS EKS cluster and install dashbase;  the script will create a docker-helper container on your workstation.
+The function of docker-helper is have AWS CLI be configured so we can use "aws eks " or "eksctl" command to create the cluster. However, when this docker-helper container is exited or deleted, you can recreate it using create-docker-helper.sh script. The following shows some  examples to run the create-docker-helper.sh script.
+
+```
+
+# Create docker-helper container and input new AWS access keys
+
+./create-docker-helper.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=kqoQl8nH/tJ1INg6UVOv39+5TK2eJLCqwK+3a9jj --region=us-west-2
+
+# Re-create docker-helper container after dashbase installation, assume your docker-helper container deleted or restarted. You don't need to enter AWS access keys, the script will find the previous AWS access key and region.
+
+./create-docker-helper.sh 
+
+```
+
+Options for create-docker-helper.sh
+
+      --aws_access_key          AWS Access Key ID
+      --aws_secret_access_key   AWS Secret Access Key
+      --region                  AWS region e.g. us-east-2 or us-west-2
+                                Please check available regions allow EKS cluster
 
 
