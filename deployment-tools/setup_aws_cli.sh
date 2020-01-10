@@ -18,6 +18,11 @@ function log_fatal() {
   exit 1
 }
 
+function fail_if_empty() {
+  [[ -z "$2" ]] && log_fatal "Parameter $1 must have a value."
+  return 0
+}
+
 echo "$@" >setup_arguments
 echo "$#" >no_arguments
 
