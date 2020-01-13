@@ -1,8 +1,8 @@
 dashbase_version: 1.0.1-rc1
 
 # License information
-username: "natalie"
-license: "99hV7IdyuCxBuSouUh94nw8ZgNd8dKZngzo7CbVPvaSpcV+LjRHjfVGZjcYMgKZE3+i5jVuaBkaNBSbvbFiyEi9UsLnOxJPu5t9keO+YvHSmeEUlj2tLpvdK7CkkRkmBNet8LN0/3mc="
+username:
+license:
 
 ingress:
   enabled: true
