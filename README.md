@@ -80,6 +80,26 @@ options used on upgrade script
      --license        dashbase license string
 
 
+
+To test drive Dasbhase on AWS EKS cluster
+
+```
+   1. create a t2.micro EC2 instance with CentOS 7.4  (e.g. ami-0df65459f2f119903 on us-west-2)
+   2. once the EC2 is up, ssh to the EC2 and become root.
+   3. inside the EC2, run the following commands:
+      ** Remember to change the AWS access keys, region and subdomain below
+
+      git clone https://github.com/dashbase/dashbase-installation.git
+      cd  dashbase-installation/
+      chmod a+x centos_setup_eks_dashbase.sh
+
+      ./centos_setup_eks_dashbase.sh --aws_access_key=YOURAWSACCESSKEY \
+                                     --aws_secret_access_key=YOURACESSSECRETACCESSKEY \
+                                     --region=us-west-2
+                                     --subdomain=abc.dashbase.io
+
+```
+
 To undo the dashbase installation on K8s cluster
 
 ```
