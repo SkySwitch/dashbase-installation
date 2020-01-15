@@ -35,8 +35,8 @@ function run_catch() {
   fi
 }
 
-echo "$@" >setup_arguments
-echo "$#" >no_arguments
+echo "$@" > /tmp/setup_arguments
+echo "$#" > /tmp/no_arguments
 
 while [[ $# -gt 0 ]]; do
   PARAM=${1%%=*}

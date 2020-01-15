@@ -22,8 +22,8 @@ function fail_if_empty() {
   return 0
 }
 
-echo "$@" >setup_arguments
-echo "$#" >no_arguments
+echo "$@" > /tmp/setup_arguments
+echo "$#" > /tmp/no_arguments
 
 while [[ $# -gt 0 ]]; do
   PARAM=${1%%=*}
@@ -59,7 +59,7 @@ check_uninstall_script() {
   if [ -f dashbase-installation/deployment-tools/uninstall-dashbase.sh ]; then
     log_info "Dashbase uninstallation script is found"
   else
-    log_infor "Dashbase uninstallation script is not found, downloading"
+    log_info "Dashbase uninstallation script is not found, downloading"
     /usr/bin/git clone https://github.com/dashbase/dashbase-installation.git
   fi
 }
@@ -70,7 +70,7 @@ run_by_root
 check_commands
 check_uninstall_script
 
-OLDCLUSTERNAME=$(aws eks list-clusters --region us-west-2 --output  text |grep mydash |awk '{ print $2 }')
+OLDCLUSTERNAME=$(aws eks list-clusters --region $REGION --output  text |grep mydash |awk '{ print $2 }')
 
 if [ -z "$REGION" ]; then log_fatal "Missing AWS region"; fi
 
@@ -88,10 +88,4 @@ dashbase-installation/deployment-tools/uninstall-dashbase.sh
 
 # remove RKS cluster
 /usr/local/bin/eksctl delete cluster --name "$OLDCLUSTERNAME" --region "$REGION"
-
-
-
-
-
-
 

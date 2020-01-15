@@ -34,8 +34,8 @@ function fail_if_empty() {
   return 0
 }
 
-echo "$@" >setup_arguments
-echo "$#" >no_arguments
+echo "$@" > /tmp/setup_arguments
+echo "$#" > /tmp/no_arguments
 
 while [[ $# -gt 0 ]]; do
   PARAM=${1%%=*}
