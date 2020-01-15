@@ -62,7 +62,7 @@ while [[ $# -gt 0 ]]; do
     CHARTVERSION=$VALUE
     ;;
   *)
-    log_warning "Unknown parameter ($PARAM) with ${VALUE:-no value}"
+    log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
     ;;
   esac
 done

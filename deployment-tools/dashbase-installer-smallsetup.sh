@@ -5,7 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.1.0-rc2"
+DASHVERSION="1.1.1"
 
 # log functions and input flag setup
 function log_info() {
@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]]; do
     EXPOSEMON="--exposemon"
     ;;
   *)
-    log_warning "Unknown parameter ($PARAM) with ${VALUE:-no value}"
+    log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
     ;;
   esac
 done
@@ -346,7 +346,16 @@ update_dashbase_valuefile() {
   fi
   # update dashbase license information
   if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
-    log_warning "No License information is entered, install without license, no change on default dashbase-values.yaml file"
+    USERNAME="dashuser"
+    log_warning "No License information is entered, install default 60 days trial license"
+    kubectl exec -it admindash-0 -n dashbase -- wget -q https://dashbase-public.s3-us-west-1.amazonaws.com/lapp/dash-lapp-1.0.0-rc9.jar -O dash-lapp-1.0.0-rc9.jar
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "/usr/bin/java -jar dash-lapp-1.0.0-rc9.jar -u $USERNAME -d 60 > 60dlicensestring"
+    LICENSE=$(kubectl exec -it admindash-0 -n dashbase -- cat 60dlicensestring)
+    echo "username: \"$USERNAME\"" > dashbase-license.txt
+    echo "license: \"$LICENSE\"" >> dashbase-license.txt
+    kubectl cp dashbase-license.txt dashbase/admindash-0:/data/
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/dashbase-license.txt >> /data/dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "rm -rf dash-lapp-1.0.0-rc9.jar"
   else
     log_info "update default dashbase-values.yaml file with entered license information"
     echo "username: \"$USERNAME\"" > dashbase-license.txt
