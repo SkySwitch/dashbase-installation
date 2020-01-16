@@ -1,25 +1,58 @@
 # Dashbase Installation
 
-### Setup the installer
-
-Download the dashbase-installer.sh script from this repo
-
-General assumption to use this dashbase-installer.sh script
-```
- 1. You have setup K8s cluster
- 2. Your workstation has kubectl command installed and able to access to K8s cluster
+### AWS only: Create EKS cluster and install Dashbase:
 
 ```
+   1. create a t2.micro EC2 instance with CentOS 7.4  (e.g. ami-0df65459f2f119903 on us-west-2) that will be used as cluster admin host.
+   2. once the EC2 is up, ssh to the EC2 and become root.
+   3. inside the EC2, run the following commands:
+      ** Remember to change the AWS access key and secret, region and subdomain below
 
-Give the installer permission
+      git clone https://github.com/dashbase/dashbase-installation.git
+      cd dashbase-installation/
+
+      ./aws_eks_dashbase_install.sh  --aws_access_key=YOURAWSACCESSKEY \
+                                     --aws_secret_access_key=YOURACESSSECRETACCESSKEY \
+                                     --region=YOURREGION --subdomain=YOURSUBDOMAIN --install_dashbase
+
 ```
-chmod a+x dashbase-installer.sh
+This will create EKS cluster with three t3.medium nodes in the region specified and install dashbase on this cluster.
+
+Installation process saves progress information into log file in current working directory:
+```
+ dashbase_install_`date +%d-%m-%Y_%H-%M-%S`.log
 ```
 
-Run the installer, the only required input is platform flag
-example below is to create dashbase installation, with internal https, secure presto, and expose web/tables endpoints in LB.
+At the end of installation process, ingress controller IP will be provided.
+Create Record Set mapping from ingress controller IP to subdomain using AWS Route 53.
+After that, endpoints to access Dashbase Web UI, Dashbase table for indexing and Dashbase grafana for monitoring can be accessed.
+
+
+### AWS only: Uninstall Dashbase and delete EKS cluster and all cluster-related resources:
+
+Run remove_aws_eks.sh script with --region parameter.
+It will find EKS dashbase cluster in that region and delete it.
 
 ```
+cd dashbase-installation/
+deployment-tools/remove_aws_eks.sh --region=REGION
+```
+
+### AWS, GCE, AZURE: Install Dashbase on already created K8s cluster:
+
+Pre-reqs:
+```
+ 1. You have K8s cluster with minimum 3 nodes of t3.medium or equivalent
+ 2. You have kubectl command installed and able to access K8s cluster
+ 3. You cloned Dashbase installation repository with:
+    git clone https://github.com/dashbase/dashbase-installation.git
+```
+
+Run the installer with --platform flag provided (mandatory)
+It will install dashbase with internal https, secure presto, and expose web/tables endpoints in LB.
+
+```
+cd dashbase-installation/
 ./dashbase-installer.sh --platform=aws
 ```
 
@@ -47,30 +80,23 @@ examples of using ingress, on AWS platform
 
 The standard installation requires minium 3 nodes with 8 CPU, and 64 GB Ram per node.
 
-For internal testing installation 
 For smaller setup such as 3 X t3.medium ( 3 X  2cpu + 4GB ram), use the dashbase-installer-smallsetup.sh inside the deployment-tools folder
 
 ```
-./dashbase-installer-smallsetup.sh --platform=aws
+./deployment-tools/dashbase-installer-smallsetup.sh --platform=aws
 ```
 
-Update dashbase license with username and license 
+### Update dashbase license
 
-```
-username: "username"
-license: "license"
-```
-
-Run update_license.sh, with username and license. **Don't need ""**
 ```
 ./deployment-tools/upgrade-dashbase.sh --username=username --license=license
 ```
 
-Upgrade dashbase version
+### Upgrade dashbase version
 
 Run upgrade-dashbase.sh script and specify dashbase version
 ```
-./upgrade-dashbase.sh --version=1.0.2
+./deployment-tools/upgrade-dashbase.sh --version=1.2.0
 ``` 
 options used on upgrade script
 
@@ -79,100 +105,5 @@ options used on upgrade script
      --username       username for license information
      --license        dashbase license string
 
-
-
-To test drive Dasbhase on AWS EKS cluster
-
-```
-   1. create a t2.micro EC2 instance with CentOS 7.4  (e.g. ami-0df65459f2f119903 on us-west-2)
-   2. once the EC2 is up, ssh to the EC2 and become root.
-   3. inside the EC2, run the following commands:
-      ** Remember to change the AWS access keys, region and subdomain below
-
-      git clone https://github.com/dashbase/dashbase-installation.git
-      cd  dashbase-installation/
-      chmod a+x centos_setup_eks_dashbase.sh
-
-      ./centos_setup_eks_dashbase.sh --aws_access_key=YOURAWSACCESSKEY \
-                                     --aws_secret_access_key=YOURACESSSECRETACCESSKEY \
-                                     --region=us-west-2
-                                     --subdomain=abc.dashbase.io
-
-```
-
-To undo the dashbase installation on K8s cluster
-
-```
-Download the script uninstall_dashbase.sh 
-
-chmod a+x uninstall_dashbase.sh
-
-./uninstall_dashbase.sh
-```
-
-Install log file is saved in your current directory when running the script, the install log will capture all screen output and with filename like below:
-```
- dashbase_install_`date +%d-%m-%Y_%H-%M-%S`.log
-```
-
-### Setup K8s cluster on AWS (EKS Cluster)
-The create-aws-eks.sh script provides an easy way to create a basic AWS EKS cluster for dashbase installation purpose
-You can use this script to setup AWS EKS cluster and install dashbase at the same time.
-By default, the script will create an EKS cluster on us-east-2a with three worker nodes of size R5.2xlarge
-Download the create-aws-eks.sh script and input your AWS Access Key as shown from following examples
-** The following AWS key and secrets are just samples, please your own key and secrets from your account **
-
-```
-chmod a+x create-aws-eks.sh
-
-# Create AWS EKS cluster in default us-east-2a
-
-./create-aws-eks.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=kqoQl8nH/tJ1INg6UVOv39+5TK2eJLCqwK+3a9jj
-
-# Create AWS EKS cluster in defautl us-east-2a and install dashbase with default options
-
-./create-aws-eks.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=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 --install_dashbase
-
-# Create AWS EKS cluster in us-west-2a and install dashbase with default options
-
-./create-aws-eks.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=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 --region=us-west-1 --install_dashbase
-```
-
-Options for the EKS cluster creation script
-
-      --aws_access_key          AWS Access Key ID
-      --aws_secret_access_key   AWS Secret Access Key
-      --region                  AWS region e.g. us-east-2 or us-west-2 
-                                Please check available regions allow EKS cluster
-      --instance_type           Default use R5.2xlarge if not specified
-      --node_number             Number of worker nodes, and dfault is three
-      --cluster_name            Specify custom EKS cluster name, and default is mydash<RANDOM_STRING>
-      --install_dashbase        Install dashbase with default options after EKS cluster is ready
-      --small_setup             Create a three nodes with t2.medium instance type, for testing purpose only
-      
-       
-### Create or recreate docker-helper container after installation
-
-When using the create-aws-eks.sh script to setup AWS EKS cluster and install dashbase;  the script will create a docker-helper container on your workstation.
-The function of docker-helper is have AWS CLI be configured so we can use "aws eks " or "eksctl" command to create the cluster. However, when this docker-helper container is exited or deleted, you can recreate it using create-docker-helper.sh script. The following shows some  examples to run the create-docker-helper.sh script.
-
-```
-
-# Create docker-helper container and input new AWS access keys
-
-./create-docker-helper.sh --aws_access_key=AKIA6GHKI73ZYYN4566D --aws_secret_access_key=kqoQl8nH/tJ1INg6UVOv39+5TK2eJLCqwK+3a9jj --region=us-west-2
-
-# Re-create docker-helper container after dashbase installation, assume your docker-helper container deleted or restarted. You don't need to enter AWS access keys, the script will find the previous AWS access key and region.
-
-./create-docker-helper.sh 
-
-```
-
-Options for create-docker-helper.sh
-
-      --aws_access_key          AWS Access Key ID
-      --aws_secret_access_key   AWS Secret Access Key
-      --region                  AWS region e.g. us-east-2 or us-west-2
-                                Please check available regions allow EKS cluster
 
 

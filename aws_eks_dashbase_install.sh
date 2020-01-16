@@ -199,10 +199,10 @@ setup_eks_cluster() {
   # Setup AWS CLI with provided Access key from the centos node
 
   if [ "$(/usr/local/bin/aws ec2 describe-vpcs --region $REGION --output text |grep -c VPCS)" -lt 9 ]; then
-    log_info "creating AWS eks cluster, please wait and this process may take up to 15-20 minutes"
+    log_info "creating AWS eks cluster, please wait. This process will take 15-20 minutes"
     /usr/local/bin/eksctl create cluster --managed --name $CLUSTERNAME --region $REGION --version 1.14 --node-type $INSTYPE --nodegroup-name standard-workers --nodes $NODENUM --node-zones $REGION$ZONE --nodes-max $NODENUM --nodes-min $NODENUM
   else
-    log_fatal "The specified EKS cluser region may not have sufficient capacity for additional VPC"
+    log_fatal "Specified EKS cluser region may not have sufficient capacity for additional VPC"
   fi
 }
 
@@ -222,10 +222,10 @@ check_eks_cluster() {
 setup_dashbase() {
 
   if [ "$INSTALL_DASHBASE" == "true" ]; then
-    log_info "Install dashbase option is entered. This will install dashbase on the previous created EKS cluster $CLUSTERNAME"
-    echo "download dashbase software on the docker-helper container"
+    log_info "Install dashbase option is entered. This will install dashbase on the previously created EKS cluster $CLUSTERNAME"
+    echo "download dashbase software"
     /usr/bin/git clone https://github.com/dashbase/dashbase-installation.git
-    echo "setup and configure dashbase, this process will take up to 20-30 minutes"
+    echo "setup and configure dashbase, this process will take 20-30 minutes"
     if  [ "$CLUSTERSIZE" == "small" ]; then
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase small setup with ingress controller endpoint is selected"
