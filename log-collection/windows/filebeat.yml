@@ -1,0 +1,65 @@
+#=========================== Filebeat inputs =============================
+filebeat.registry_flush: 30s
+filebeat.inputs:
+
+- type: log
+  enabled: true
+
+  # Glob based paths.
+  paths:
+    - LOG_PATH
+    #- d:\logs\freeswitch.log
+  multiline.pattern: ^.
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    _message_parser:
+      type: grok
+      pattern: PARSING_PATTERN
+      #pattern: '(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \[%{WORD:level:meta}\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}'
+
+#================================ Processors =====================================
+# Drop metadata added by Filebeat to save bandwidth as it's unnecessary
+
+processors:
+  - add_locale: ~
+  - rename:
+      when:
+        has_fields: ['fields._message_parser']
+      fields:
+        - from: "beat.timezone"
+          to: "fields._message_parser.defaultTimeZone"
+  - rename:
+      fields:
+        - from: "beat.hostname"
+          to: "hostname"
+  - drop_fields:
+      fields: ["offset", "beat", "prospector", "host", "input"]
+
+#==================== Elasticsearch template setting ==========================
+setup.template:
+  name: "logs"
+  pattern: "logs"
+  fields: "fields.yml"
+  overwrite: true
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  bulk_max_size: 3000
+  worker: 30
+  compression_level: 5
+  hosts: "DASHBASE_URL:443"
+  #hosts: "table-logs.staging.dashbase.io:443"
+  protocol: "https"
+  ssl.verification_mode: "none"
+
+#================================ Logging =====================================
+
+# Available log levels are: error, warning, info, debug
+logging.level: debug
+
