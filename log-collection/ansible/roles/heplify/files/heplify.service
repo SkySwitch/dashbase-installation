@@ -1,0 +1,12 @@
+[Unit]
+Description=Heplify capture packets to heplify server or to local files.
+Documentation=https://github.com/sipcapture/heplify
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/opt/scripts/heplify -m SIP -hs "" -n /var/log/heplify.log
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

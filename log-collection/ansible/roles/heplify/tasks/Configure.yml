@@ -1,0 +1,32 @@
+---
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+    - /var/run/heplify
+
+- name: Copy heplify package
+  copy:
+    src: heplify-{{ heplify_version}}-Linux
+    dest: /opt/scripts/heplify
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy heplify systemd config
+  copy:
+    src: heplify.service
+    dest: /lib/systemd/system/heplify.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Restart heplify service
+  systemd:
+    name: heplify
+    state: restarted

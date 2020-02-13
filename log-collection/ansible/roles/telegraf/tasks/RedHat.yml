@@ -3,7 +3,7 @@
   yum:
     name: curl
     state: present
-    
+
 - name: Create Directories
   file:
     path: "{{ item }}"
@@ -32,7 +32,7 @@
   yum:
     name: /opt/scripts/telegraf-1.10.4-1.x86_64.rpm
     state: present
-    
+
 - name: Change User of Telegraf Log Directory
   file:
     path: /var/log/telegraf/
@@ -49,8 +49,8 @@
 - name: Copy telegraf.yml  and 20-dashbase.yml files
   template: src={{ item.src }} dest={{ item.dest }}
   with_items:
-    - { src: 'templates/telegraf.yml.j2', dest: '/etc/telegraf/telegraf.conf' } 
-    - { src: 'templates/20-dashbase.yml.j2', dest: '/etc/telegraf/telegraf.d/20-dashbase.conf' } 
+    - { src: 'templates/telegraf.yml.j2', dest: '/etc/telegraf/telegraf.conf' }
+    - { src: 'templates/20-dashbase.yml.j2', dest: '/etc/telegraf/telegraf.d/20-dashbase.conf' }
 
 - name: Copy night-watch rpm
   copy:
@@ -73,7 +73,7 @@
     - prometheus_pushgateway_enable
 
 - name: Retart Telegraf Service
-  service: 
+  service:
     name: telegraf
     state: restarted
 

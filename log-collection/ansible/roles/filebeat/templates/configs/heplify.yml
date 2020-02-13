@@ -1,0 +1,34 @@
+- paths:
+    - /var/log/heplify.log
+  type: log
+  multiline.pattern: '^20'
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    x-dashbase-component: heplify
+    _message_parser:
+      type: multi
+      parsers_list:
+        - name: heplify
+          config:
+            type: multi
+            applyAll: 'true'
+            parsers:
+              heplify_grok:
+                type: grok
+                pattern: "%{DATA:timestamp:datetime} %{WORD:level:meta} HEP packet:\\{Version:%{WORD:hep.version:meta},Protocol:%{WORD:hep.protocol:meta},SrcIP:%{IPORHOST:hep.src-ip:text},DstIP:%{IPORHOST:hep.dst-ip:text},SrcPort:%{INT:hep.src-port:text},DstPort:%{INT:hep.dst-port:text},Tsec:%{INT:hep.tsec:int},Tmsec:%{INT:hep.tmsec:int},ProtoType:%{WORD:hep.proto-type:meta},NodeID:%{WORD:hep.node-id:text},NodePW:(?:%{DATA:hep.node-pw:text}|),CID:(?:%{DATA:hep.cid:text}|),Vlan:(?:%{WORD:hep.vlan:text}|)\\} with Payload:%{GREEDYDATA:message}"
+                timestamp:
+                  format: iso
+              heplify_sip:
+                type: sip
+                sortedFields: call-id
+        - name: basic
+          config:
+            type: timestamp
+            scan: 'true'
+            format: iso

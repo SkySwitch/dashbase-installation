@@ -13,6 +13,11 @@ filebeat.config.inputs:
   reload.enabled: true
   reload.period: 10s
 
+fields:
+{% for k, v in vars.items() if k is string and k|length > 11 and k.startswith('x-dashbase-') %}
+  {{ k }}: {{ v }}
+{% endfor %}
+
 #=========================== HTTP health endpoint =============================
 
 http.enabled: true
