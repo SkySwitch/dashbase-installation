@@ -8,9 +8,9 @@
 
 ## Copy app related config files
 - name: Copy filebeat app config files
-  template:
-    src: "configs/{{ item }}.yml"
-    dest: "/etc/filebeat/configs/"
+  copy:
+    src: "templates/configs/{{ item }}.yml"
+    dest: "/etc/filebeat/configs/{{ item }}.yml"
   with_items:
     "{{ configs_list }}"
 
