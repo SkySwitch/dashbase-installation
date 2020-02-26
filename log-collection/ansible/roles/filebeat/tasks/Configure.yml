@@ -14,11 +14,11 @@
   with_items:
     "{{ configs_list }}"
 
-##copy filebeat fields.yml
+##copy filebeat template.json
 - name: Copy fields file
   copy:
-    src: fields.yml
-    dest: /etc/filebeat/fields.yml
+    src: template.json
+    dest: /etc/filebeat/template.json
 
 ## Copy the filebeat config file
 - name: Copy filebeat.yml file

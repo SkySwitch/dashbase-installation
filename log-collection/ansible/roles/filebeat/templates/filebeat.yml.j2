@@ -52,7 +52,10 @@ processors:
 setup.template:
   name: "{{ table }}"
   pattern: "{{ table }}"
-  fields: "/etc/filebeat/fields.yml"
+  json:
+    enabled: true
+    path: "/etc/filebeat/template.json"
+    name: "{{ table }}"
   overwrite: true
 
 #-------------------------- Elasticsearch output ------------------------------

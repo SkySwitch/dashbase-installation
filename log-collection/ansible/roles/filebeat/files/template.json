@@ -1,0 +1,476 @@
+{
+  "freeswitch": {
+    "index_patterns": [
+      "freeswitch"
+    ],
+    "order": 1,
+    "mappings": {
+      "doc": {
+        "_meta": {
+          "version": "7.6.0",
+          "beat": "filebeat"
+        },
+        "date_detection": false,
+        "dynamic_templates": [
+          {
+            "fields": {
+              "mapping": {
+                "type": "keyword"
+              },
+              "match_mapping_type": "string",
+              "path_match": "fields.*"
+            }
+          }
+        ],
+        "properties": {
+          "callflow": {
+            "properties": {
+              "times": {
+                "properties": {
+                  "progress_media_time": {
+                    "type": "long"
+                  },
+                  "answered_time": {
+                    "type": "long"
+                  },
+                  "bridged_time": {
+                    "type": "long"
+                  },
+                  "hold_accum_time": {
+                    "type": "long"
+                  },
+                  "hangup_time": {
+                    "type": "long"
+                  },
+                  "transfer_time": {
+                    "type": "long"
+                  },
+                  "created_time": {
+                    "type": "long"
+                  },
+                  "profile_created_time": {
+                    "type": "long"
+                  },
+                  "progress_time": {
+                    "type": "long"
+                  },
+                  "last_hold_time": {
+                    "type": "long"
+                  },
+                  "resurrect_time": {
+                    "type": "long"
+                  }
+                }
+              }
+            }
+          },
+          "callStats": {
+            "properties": {
+              "audio": {
+                "properties": {
+                  "inbound": {
+                    "properties": {
+                      "packet_count": {
+                        "type": "long"
+                      },
+                      "flush_packet_count": {
+                        "type": "long"
+                      },
+                      "jitter_burst_rate": {
+                        "type": "long"
+                      },
+                      "largest_jb_size": {
+                        "type": "long"
+                      },
+                      "jitter_min_variance": {
+                        "type": "double"
+                      },
+                      "jitter_loss_rate": {
+                        "type": "long"
+                      },
+                      "quality_percentage": {
+                        "type": "double"
+                      },
+                      "mos": {
+                        "type": "double"
+                      },
+                      "raw_bytes": {
+                        "type": "long"
+                      },
+                      "media_bytes": {
+                        "type": "long"
+                      },
+                      "dtmf_packet_count": {
+                        "type": "long"
+                      },
+                      "mean_interval": {
+                        "type": "double"
+                      },
+                      "flaw_total": {
+                        "type": "long"
+                      },
+                      "media_packet_count": {
+                        "type": "long"
+                      },
+                      "skip_packet_count": {
+                        "type": "long"
+                      },
+                      "cng_packet_count": {
+                        "type": "long"
+                      },
+                      "jitter_packet_count": {
+                        "type": "long"
+                      },
+                      "jitter_max_variance": {
+                        "type": "double"
+                      }
+                    }
+                  },
+                  "outbound": {
+                    "properties": {
+                      "packet_count": {
+                        "type": "long"
+                      },
+                      "skip_packet_count": {
+                        "type": "long"
+                      },
+                      "dtmf_packet_count": {
+                        "type": "long"
+                      },
+                      "cng_packet_count": {
+                        "type": "long"
+                      },
+                      "rtcp_packet_count": {
+                        "type": "long"
+                      },
+                      "rtcp_octet_count": {
+                        "type": "long"
+                      },
+                      "raw_bytes": {
+                        "type": "long"
+                      },
+                      "media_bytes": {
+                        "type": "long"
+                      },
+                      "media_packet_count": {
+                        "type": "long"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "channel_data": {
+            "properties": {
+              "state_number": {
+                "type": "long"
+              }
+            }
+          },
+          "variables": {
+            "properties": {
+              "end_uepoch": {
+                "type": "long"
+              },
+              "sip_invite_failure_status": {
+                "type": "long"
+              },
+              "rtp_remote_audio_rtcp_port": {
+                "type": "long"
+              },
+              "rtp_audio_in_jitter_loss_rate": {
+                "type": "double"
+              },
+              "rtp_audio_recv_pt": {
+                "type": "long"
+              },
+              "Event-Sequence": {
+                "type": "long"
+              },
+              "hold_accum_ms": {
+                "type": "long"
+              },
+              "bridge_epoch": {
+                "type": "long"
+              },
+              "answerusec": {
+                "type": "long"
+              },
+              "sip_contact_port": {
+                "type": "long"
+              },
+              "remote_audio_port": {
+                "type": "long"
+              },
+              "rtp_audio_in_jitter_min_variance": {
+                "type": "double"
+              },
+              "rtp_audio_in_quality_percentage": {
+                "type": "double"
+              },
+              "sip_user_agent": {
+                "type": "keyword",
+                "ignore_above": 1024
+              },
+              "sip_network_port": {
+                "type": "long"
+              },
+              "sip_received_port": {
+                "type": "long"
+              },
+              "sip_via_port": {
+                "type": "long"
+              },
+              "rtp_audio_in_dtmf_packet_count": {
+                "type": "long"
+              },
+              "rtp_audio_in_jitter_max_variance": {
+                "type": "double"
+              },
+              "rtp_audio_out_skip_packet_count": {
+                "type": "long"
+              },
+              "rtp_use_codec_channels": {
+                "type": "long"
+              },
+              "progress_uepoch": {
+                "type": "long"
+              },
+              "rtp_use_codec_ptime": {
+                "type": "long"
+              },
+              "bridge_uepoch": {
+                "type": "long"
+              },
+              "resurrect_epoch": {
+                "type": "long"
+              },
+              "duration": {
+                "type": "long"
+              },
+              "progressusec": {
+                "type": "long"
+              },
+              "sip_req_port": {
+                "type": "long"
+              },
+              "remote_audio_port_reported": {
+                "type": "long"
+              },
+              "rtp_audio_in_jitter_packet_count": {
+                "type": "long"
+              },
+              "profile_start_uepoch": {
+                "type": "long"
+              },
+              "profile_start_epoch": {
+                "type": "long"
+              },
+              "answermsec": {
+                "type": "long"
+              },
+              "flow_billmsec": {
+                "type": "long"
+              },
+              "billusec": {
+                "type": "long"
+              },
+              "progress_mediausec": {
+                "type": "long"
+              },
+              "rtp_audio_in_media_bytes": {
+                "type": "long"
+              },
+              "rtp_audio_in_media_packet_count": {
+                "type": "long"
+              },
+              "max_forwards": {
+                "type": "long"
+              },
+              "rtp_audio_out_media_bytes": {
+                "type": "long"
+              },
+              "rtp_audio_out_cng_packet_count": {
+                "type": "long"
+              },
+              "rtp_audio_rtcp_packet_count": {
+                "type": "long"
+              },
+              "rtp_audio_in_jitter_burst_rate": {
+                "type": "double"
+              },
+              "last_hold_epoch": {
+                "type": "long"
+              },
+              "hold_accum_usec": {
+                "type": "long"
+              },
+              "progress_media_epoch": {
+                "type": "long"
+              },
+              "progresssec": {
+                "type": "long"
+              },
+              "progress_mediamsec": {
+                "type": "long"
+              },
+              "rtp_audio_out_dtmf_packet_count": {
+                "type": "long"
+              },
+              "Event-Date-Timestamp": {
+                "type": "long"
+              },
+              "call_timeout": {
+                "type": "long"
+              },
+              "playback_ms": {
+                "type": "long"
+              },
+              "end_epoch": {
+                "type": "long"
+              },
+              "billmsec": {
+                "type": "long"
+              },
+              "progressmsec": {
+                "type": "long"
+              },
+              "sip_term_status": {
+                "type": "long"
+              },
+              "rtp_audio_in_packet_count": {
+                "type": "long"
+              },
+              "rtp_audio_in_cng_packet_count": {
+                "type": "long"
+              },
+              "answer_uepoch": {
+                "type": "long"
+              },
+              "mduration": {
+                "type": "long"
+              },
+              "sip_invite_stamp": {
+                "type": "long"
+              },
+              "rtp_audio_in_flush_packet_count": {
+                "type": "long"
+              },
+              "rtp_audio_in_mean_interval": {
+                "type": "double"
+              },
+              "rtp_audio_in_mos": {
+                "type": "double"
+              },
+              "rtp_audio_rtcp_octet_count": {
+                "type": "long"
+              },
+              "progress_media_uepoch": {
+                "type": "long"
+              },
+              "waitmsec": {
+                "type": "long"
+              },
+              "sip_cseq": {
+                "type": "long"
+              },
+              "rtp_audio_out_raw_bytes": {
+                "type": "long"
+              },
+              "resurrect_uepoch": {
+                "type": "long"
+              },
+              "waitusec": {
+                "type": "long"
+              },
+              "local_media_port": {
+                "type": "long"
+              },
+              "rtp_audio_out_media_packet_count": {
+                "type": "long"
+              },
+              "playback_seconds": {
+                "type": "long"
+              },
+              "progress_epoch": {
+                "type": "long"
+              },
+              "remote_media_port": {
+                "type": "long"
+              },
+              "rtp_audio_in_raw_bytes": {
+                "type": "long"
+              },
+              "rtp_audio_in_skip_packet_count": {
+                "type": "long"
+              },
+              "rtp_audio_out_packet_count": {
+                "type": "long"
+              },
+              "answersec": {
+                "type": "long"
+              },
+              "answer_epoch": {
+                "type": "long"
+              },
+              "billsec": {
+                "type": "long"
+              },
+              "flow_billsec": {
+                "type": "long"
+              },
+              "start_uepoch": {
+                "type": "long"
+              },
+              "last_hold_uepoch": {
+                "type": "long"
+              },
+              "waitsec": {
+                "type": "long"
+              },
+              "hold_accum_seconds": {
+                "type": "long"
+              },
+              "flow_billusec": {
+                "type": "long"
+              },
+              "rtp_audio_in_largest_jb_size": {
+                "type": "long"
+              },
+              "rtp_audio_in_flaw_total": {
+                "type": "long"
+              },
+              "uduration": {
+                "type": "long"
+              },
+              "progress_mediasec": {
+                "type": "long"
+              },
+              "sip_from_port": {
+                "type": "long"
+              },
+              "sip_via_rport": {
+                "type": "long"
+              },
+              "start_epoch": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "refresh_interval": "5s",
+        "mapping": {
+          "total_fields": {
+            "limit": 10000
+          }
+        },
+        "number_of_routing_shards": 30
+      }
+    }
+  }
+}
