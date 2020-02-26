@@ -35,16 +35,16 @@
           pattern: |-
             \|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|
             ====================
-            tag: %{WORD:tag:meta}
-            pid: %{NUMBER:pid:int}
-            process: %{NUMBER:process:int}
-            time: %{NUMBER:time:double}
+            tag: %{WORD:capture.tag:text}
+            pid: %{NUMBER:capture.pid:int}
+            process: %{NUMBER:capture.process:int}
+            time: %{NUMBER:capture.time:double}
             date: %{DATA:timestamp:datetime:EEE MMM dd HH:mm:ss yyyy}
-            proto: %{DATA:proto:text}
-            srcip: %{IPORHOST:src-ip:text}
-            srcport: %{INT:src-port:text}
-            dstip: %{IPORHOST:dst-ip:text}
-            dstport: %{INT:dst-port:text}
+            proto: %{DATA:capture.proto:text}
+            srcip: %{IPORHOST:capture.src.ip:text}
+            srcport: %{INT:capture.src.port:text}
+            dstip: %{IPORHOST:capture.dst.ip:text}
+            dstport: %{INT:capture.dst.port:text}
             \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
             %{GREEDYDATA:message}
         sip:
