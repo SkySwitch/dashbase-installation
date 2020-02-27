@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashbasemetrics-config
+data:
+  exporter.yml: |-
+    metrics:
+      ucaas_status_code:
+        description: "ucaas status code"
+        table: "freeswitch"
+        aggregation: "topn(status-code, 20, topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100))))"
+      ucaas_call_volume:
+        description: "ucaas call volume"
+        table: "freeswitch"
+        accumulate: false
+        filter: "type:cdr AND _missing_:variables.originator"
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, cardinality(variables.call_uuid))))"
+      ucaas_avg_mos_score:
+        description: "ucaas average audio mos score"
+        table: "freeswitch"
+        filter: "type:cdr AND _missing_:variables.originator"
+        accumulate: false
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, avg(callStats.audio.inbound.mos))))"
+      ucaas_pct_mos_score:
+        description: "ucaas percentile audio mos score"
+        table: "freeswitch"
+        filter: "type:cdr AND _missing_:variables.originator"
+        accumulate: false
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, pct(callStats.audio.inbound.mos, 50, 90, 99))))"
+      ucaas_unique_leg_count:
+        description: "ucaas unique call legs"
+        table: "freeswitch"
+        accumulate: false
+        filter: "type:sip AND _missing_:to.tag AND method:invite"
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, cardinality(call-id))))"
+      ucaas_avg_call_duration:
+        description: "ucaas avg call duration"
+        table: "freeswitch"
+        accumulate: false
+        filter: "type:cdr AND _missing_:variables.originator"
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, avg(variables.mduration))))"
+      ucaas_pct_call_duration:
+        description: "ucaas percentile call duration"
+        table: "freeswitch"
+        accumulate: false
+        filter: "type:cdr AND _missing_:variables.originator"
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, pct(variables.mduration, 50, 90, 99))))"
+      ucaas_avg_pdd:
+        description: "ucaas avg post dial delay"
+        table: "freeswitch"
+        accumulate: false
+        filter: "type:cdr AND _missing_:variables.originator AND _exists_:variables.progress_mediausec"
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, avg(variables.progress_mediausec))))"
+      ucaas_pct_pdd:
+        description: "ucaas post dial delay percentiles"
+        table: "freeswitch"
+        accumulate: false
+        filter: "type:cdr AND _missing_:variables.originator AND _exists_:variables.progress_mediausec"
+        aggregation: "topn(hostname, 100, topn(customer_id, 100, topn(user-agent, 100, pct(variables.progress_mediausec, 50, 90, 99))))"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashbasemetrics
+  labels:
+    app: dashbasemetrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashbasemetrics
+  template:
+    metadata:
+      labels:
+        app: dashbasemetrics
+      annotations:
+        dashbase.io/scrape: "true"
+        dashbase.io/metric_path: "/metrics"
+        dashbase.io/scrape_port: "8989"
+    spec:
+      containers:
+        - name: exporter
+          image: dashbase/exporter:nightly
+          imagePullPolicy: Always
+          args: ['/etc/exporter.yml']
+          env:
+            - name: API_URL
+              value: https://api.dashbase.svc:9876
+          volumeMounts:
+          - name: config
+            mountPath: /etc/exporter.yml
+            readOnly: true
+            subPath: exporter.yml
+      volumes:
+        - name: config
+          configMap:
+            defaultMode: 0600
+            name: dashbasemetrics-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dashbasemetrics
+  name: dashbasemetrics
+spec:
+  ports:
+  - name: "exporter"
+    port: 8989
+    protocol: TCP
+    targetPort: 8989
+  selector:
+    app: dashbasemetrics
+  sessionAffinity: None
+  type: ClusterIP
