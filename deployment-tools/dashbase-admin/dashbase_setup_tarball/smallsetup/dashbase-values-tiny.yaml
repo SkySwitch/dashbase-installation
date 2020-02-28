@@ -1,0 +1,56 @@
+dashbase_version: nightly
+
+https: true
+
+default_storageclass_provider:
+  platform: "aws"
+
+default:
+  labels: {}
+  storage:
+    class: dashbase-meta
+    size: 10Gi
+
+ingress:
+  enabled: true
+  certmanager: false
+  host: test.dashbase.io
+
+tables:
+  logs:
+      replicas: 1
+      storage:
+         class: dashbase-data
+         size: 1000Gi
+      environment:
+         JAVA_OPTS: "-Xmx4g -Xms2g"
+
+presto:
+  enabled: true
+  presto:
+    prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
+    dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
+    coordinatorResources:
+      requests:
+        cpu: 1
+        memory: 1G
+      limits:
+        cpu: 1
+        momory: 1G
+
+services:
+  etcd:
+    enabled: true
+  api:
+    enabled: true
+  web:
+    enabled: true
+  prometheus:
+    enabled: true
+    image: "dashbase/prometheus:nightly"
+  grafana:
+    enabled: true
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: true

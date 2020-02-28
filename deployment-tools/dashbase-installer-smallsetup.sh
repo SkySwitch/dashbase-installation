@@ -5,7 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.2.4"
+DASHVERSION="1.2.6"
 
 # log functions and input flag setup
 function log_info() {
@@ -195,11 +195,11 @@ check_node_memory() {
 
 check_node() {
   if ! check_node_cpu "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(4 core at least)."
+    echo "Node($1) doesn't have enough cpu resources(4core at least)."
     return 0
   fi
   if ! check_node_memory "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(8Gi at least)."
+    echo "Node($1) doesn't have enough memory resources(32Gi at least)."
     return 0
   fi
 
@@ -249,10 +249,10 @@ preflight_check() {
     check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
   done
   echo ""
-  if [ $AVAIILABLE_NODES -ge 3 ]; then
+  if [ $AVAIILABLE_NODES -ge 2 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 4 core and 8 Gi at least)."
+    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
   fi
 }
 
