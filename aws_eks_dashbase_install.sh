@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RANDOM=$(openssl rand -hex 2 > randomstring)
+RANDOM=$(openssl rand -hex 3 > randomstring)
 RSTRING=$(cat randomstring)
 
 AWS_ACCESS_KEY="undefined"
@@ -13,7 +13,7 @@ CLUSTERNAME="mydash$RSTRING"
 CLUSTERSIZE="small"
 ZONE="a"
 SETUP_TYPE="ingress"
-CMDS="curl tar unzip git"
+CMDS="curl tar unzip git openssl"
 
 # log functions and input flag setup
 function log_info() {
@@ -121,11 +121,11 @@ check_commands() {
 check_input() {
   # checking required input arguments
   # if either AWS key or AWS secret is not present, script run will be fail and exit 1
-  # Default installation will setup a small K8s cluster with three t2.medium worker nodes, if instance type and node mumber is not provided
+  # Default installation will setup a small K8s cluster with two r5.xlarge worker nodes, if instance type and node mumber is not provided
   if [ "$AWS_ACCESS_KEY" == "undefined" ] || [ "$AWS_SECRET_ACCESS_KEY" == "undefined" ]; then
     log_fatal "Missing either AWS access key id or secret"
-  elif [[ "$NODENUM" -lt 3 ]]; then
-    log_fatal "Entered node number must be equal or greater than three"
+  elif [[ "$NODENUM" -lt 2 ]]; then
+    log_fatal "Entered node number must be equal or greater than two"
   elif [ "$CLUSTERSIZE" != "small" ] && [ "$CLUSTERSIZE" != "large" ]; then
     log_fatal "Entered cluster size is invalid, only small or large is allowed"
   else
