@@ -7,7 +7,7 @@ ENV KUBE_LATEST_VERSION="v1.16.3"
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
 #ENV HELM_VERSION="v3.0.0"
-ENV HELM_VERSION="v2.14.3"
+ENV HELM_VERSION="v3.1.1"
 
 # Default timezone: UTC
 ENV TZ=UTC

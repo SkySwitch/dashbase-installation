@@ -95,6 +95,26 @@ remove_dashbase_via_admindash() {
   done
 }
 
+remove_ingress_via_admindash_helm3() {
+  # check if nginx is deployed , if yes delete it; and timeout after 8 minutes
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -c nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "nginx-ingress controller is dedected"
+    log_info "removing ngnix-ingress controller"
+    kubectl exec -it admindash-0 -n dashbase -- helm delete nginx-ingress -n dashbase
+  done
+}
+
+remove_dashbase_via_admindash_helm3() {
+  # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "dashbase components deployed via helm"
+    # remove dashbase
+    log_info "removing dashbase components via helm in admindash pod"
+    kubectl exec -it admindash-0 -n dashbase -- helm delete dashbase -n dashbase
+  done
+}
+
+
 remove_ingress_via_helm() {
   # check if nginx is deployed , if yes delete it; and timeout after 8 minutes
   while [ "$(helm ls |grep dashbase |grep -c nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
@@ -113,6 +133,46 @@ remove_dashbase_via_helm() {
     helm delete --purge dashbase
   done
 }
+
+remove_ingress_via_helm_3() {
+  # check if nginx is deployed , if yes delete it; and timeout after 8 minutes
+  while [ "$(helm ls -n dashbase |grep -c nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "nginx-ingress controller is dedected"
+    log_info "removing ngnix-ingress controller"
+    helm delete nginx-ingress -n dashbase
+  done
+}
+
+remove_dashbase_via_helm_3() {
+  # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
+  while [ "$(helm ls -n dashbase |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "dashbase components deployed via helm"
+    # remove dashbase
+    log_info "removing dashbase components via helm in admindash pod"
+    helm delete dashbase -n dashbase
+  done
+}
+
+remove_release_via_helm() {
+  if [ "$( helm version --client |grep -c "v3." )" -eq "1" ]; then
+    log_info "helm3 is detected"
+    if [ "$(helm ls -n dashbase |grep -E -- 'dashbase|ingress')" ]; then
+      log_info "Either dashbase or ingress release exists on dashbase namespace"
+      remove_ingress_via_helm_3
+      remove_dashbase_via_helm_3
+    fi
+  elif [ "$( helm version --client |grep -c "v2." )" -eq "1" ]; then
+    log_info "helm2 is detected"
+    if [ "$(helm ls |grep -E -- 'dashbase|ingress')" ]; then
+      log_info "Either dashbase or ingress release exists on dashbase namespace"
+      remove_ingress_via_helm
+      remove_dashbase_via_helm
+    fi
+  else
+    log_fatal "the helm version is neither 2 or 3"
+  fi
+}
+
 
 delete_dashbase_pvc() {
   # delete dashbase persistent volume claim
@@ -154,11 +214,30 @@ remove_sa_dashadmin() {
   # delete sa dashadmin account
   if [ "$(kubectl get sa -n dashbase |grep -c dashadmin)" -gt "0" ]; then
     log_info "service account dashadmin exists"
-     "delete service account dashadmin"
+    log_info "delete service account dashadmin"
     kubectl delete sa dashadmin -n dashbase
   else
     log_info "service account dashadmin is not found in dashbase namespace"
   fi
+}
+
+remove_combo() {
+    # delete pvc
+    delete_dashbase_pvc
+    # delete secrets
+    delete_dashbase_secrets
+    # delete storageclass
+    remove_storageclass
+    #  delete helm tiller
+    remove_tiller
+    # delete clusterrolebindings
+    remove_clusterrolebindings
+    # delete sa dashadmin account
+    remove_sa_dashadmin
+    # delete sa tiller account
+    remove_sa_tiller
+    # delete namespace
+    kubectl delete namespace dashbase
 }
 
 # main process below this line
@@ -176,59 +255,44 @@ if [ "$(kubectl get namespace |grep -c dashbase)" -eq "1" ]; then
      if [ "$(kubectl get po -n dashbase |grep -c admindash)" -eq "1" ]; then
         log_info "admin pod exists"
         log_info "checking and removing any resources in dashbase namespace from admindash helm"
-        # check ingress and dashbase resources
-        remove_ingress_via_admindash
-        remove_dashbase_via_admindash
+        # check admin pod has helm 2 or 3
+        if [ "$(kubectl exec -it admindash-0 -n dashbase -- helm version --client |grep -c "v3.")" -eq "1" ]; then
+          remove_ingress_via_admindash_helm3
+          remove_dashbase_via_admindash_helm3
+        else
+          remove_ingress_via_admindash
+          remove_dashbase_via_admindash
+        fi
+
         sleep 10
         # delete admin pod
         log_info "delete admin pod dashadmin-0"
         kubectl delete sts/admindash -n dashbase
-        # delete pvc
-        delete_dashbase_pvc
-        # delete secrets
-        delete_dashbase_secrets
-        # delete storageclass
-        remove_storageclass
-        #  delete helm tiller
-        remove_tiller
-        # delete clusterrolebindings
-        remove_clusterrolebindings
-        # delete sa dashadmin account
-        remove_sa_dashadmin
-        # delete sa tiller account
-        remove_sa_tiller
-        # delete namespace
-        kubectl delete namespace dashbase
+        remove_combo
 
      # check if helm command exists in local workstation
-     elif [ "$(command -v helm)" ] && [ "$(helm ls |grep -E -- 'dashbase|ingress')" ]; then
+     elif [ "$(command -v helm)" ]; then
         log_info "helm command exists"
         log_info "checking and removing any resources in dashbase namespace from helm configured locally"
-        remove_ingress_via_helm
-        remove_dashbase_via_helm
+        log_info "check helm version 2 or 3"
+        remove_release_via_helm
         sleep 10
-        # delete pvc
-        delete_dashbase_pvc
-        # delete secrets
-        delete_dashbase_secrets
-        # delete storageclass
-        remove_storageclass
-        #  delete helm tiller
-        remove_tiller
-        # delete clusterrolebindings
-        remove_clusterrolebindings
-        # delete sa dashadmin account
-        remove_sa_dashadmin
-        # delete sa tiller account
-        remove_sa_tiller
-        # delete namespace
-        kubectl delete namespace dashbase
+        remove_combo
      else
         log_fatal "helm tiller is deployed but either no admindash pod or local helm command to check any resource deployed via helm"
     fi
   else
     log_info "No helm tiller deployed to this K8s cluster"
-    log_info "Since no helm tiller, that means no dashbase resource deployed"
+    log_info "check helm commands from local workstation"
+    if [ "$(command -v helm)" ]; then
+        log_info "helm command exists"
+        log_info "checking and removing any resources in dashbase namespace from helm configured locally"
+        log_info "check helm version 2 or 3"
+        remove_release_via_helm
+        sleep 10
+    else
+        log_warning "No helm found in local workstation"
+    fi
      # check if amdindash pod exists but no helm tiller deployed
      # this condition could be arise from a failed previous dashbase installation
     if [ "$(kubectl get po -n dashbase |grep -c admindash)" -eq "1" ]; then
@@ -237,22 +301,7 @@ if [ "$(kubectl get namespace |grep -c dashbase)" -eq "1" ]; then
         kubectl delete sts/admindash -n dashbase
     fi
     sleep 10
-    # delete pvc
-    delete_dashbase_pvc
-    # delete secrets
-    delete_dashbase_secrets
-    # delete storageclass
-    remove_storageclass
-    #  delete helm tiller
-    remove_tiller
-    # delete clusterrolebindings
-    remove_clusterrolebindings
-    # delete sa dashadmin account
-    remove_sa_dashadmin
-    # delete sa tiller account
-    remove_sa_tiller
-    # delete namespace
-    kubectl delete namespace dashbase
+    remove_combo
   fi
 else
   log_info "No dashbase namespace is found in this K8s cluster"
@@ -261,10 +310,4 @@ else
   remove_clusterrolebindings
   remove_sa_tiller
 fi
-
-
-
-
-
-
 
