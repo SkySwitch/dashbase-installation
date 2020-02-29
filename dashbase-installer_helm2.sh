@@ -5,7 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.2.8"
+DASHVERSION="1.2.4"
 
 # log functions and input flag setup
 function log_info() {
@@ -221,6 +221,7 @@ check_version() {
   fi
 }
 
+
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
@@ -277,8 +278,8 @@ adminpod_setup() {
     log_fatal "Previous admin pod admindash exists"
   else
     # Download and install installer helper statefulset yaml file
-    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts_helm3.yaml -o admindash-sts_helm3.yaml
-    kubectl apply -f admindash-sts_helm3.yaml -n dashbase
+    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts_helm2.yaml -o admindash-sts_helm2.yaml
+    kubectl apply -f admindash-sts_helm2.yaml -n dashbase
     kubectl wait --for=condition=Ready pods/admindash-0 --timeout=60s -n dashbase
     # Check to ensure admin pod is available else exit 1
     APODSTATUS=$(kubectl wait --for=condition=Ready pods/admindash-0 -n dashbase | grep -c "condition met")
@@ -296,15 +297,6 @@ setup_helm_tiller() {
   # check helm
   # adding dashbase helm repo
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo add dashbase https://charts.dashbase.io"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo list"
-}
-
-check_helm() {
-  # check helm
-  # adding dashbase helm repo
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo add dashbase https://charts.dashbase.io"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo add stable https://kubernetes-charts.storage.googleapis.com"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo list"
 }
 
@@ -418,7 +410,7 @@ install_dashbase() {
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
   log_info "Dashbase version $VERSION  and chart version $VERSION is going to install on the target K8s cluster"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug --no-hooks > /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase/dashbase -f /data/$DASHVALUEFILE --name dashbase --namespace dashbase --home /root/.helm --version $VERSION --debug --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
@@ -431,11 +423,12 @@ install_dashbase() {
   if [ "$CHKDEPLOYNUM" -eq "$CHKSUCCEDNUM" ]; then log_info "dashbase installation is completed"; else log_fatal "dashbase installation is failed"; fi
 }
 
+
 # Expose endpoints via Ingress or LoadBalancer
 expose_endpoints() {
   if [ "$INGRESS_FLAG" == "true" ]; then
     log_info "setup ngnix ingress controller to expose service "
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install nginx-ingress stable/nginx-ingress --namespace dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install stable/nginx-ingress --name nginx-ingress --namespace dashbase"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get po -n dashbase |grep ingress"
     # get the exposed IP address from nginx ingress controller
     EXTERNAL_IP=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get svc nginx-ingress-controller -n dashbase | tail -n +2 | awk '{ print $4}')
@@ -457,7 +450,7 @@ check_license
 preflight_check
 
 # install admin pod
-log_info "setup adminpod"
+echo "setup adminpod"
 adminpod_setup
 download_dashbase
 
@@ -473,13 +466,13 @@ else
 fi
 
 # setup helm tiller
-#if [ "$(kubectl get pod -n kube-system | grep -c tiller)" -gt "0" ]; then
-#  log_fatal "previous tiller pod exists in this K8s cluster"
-#else
-#  echo "creating tiller in K8s"
-#  setup_helm_tiller
-#fi
-check_helm
+if [ "$(kubectl get pod -n kube-system | grep -c tiller)" -gt "0" ]; then
+  log_fatal "previous tiller pod exists in this K8s cluster"
+else
+  echo "creating tiller in K8s"
+  setup_helm_tiller
+fi
+
 create_sslcert
 
 # setup dashbase value yaml file and install dashbase

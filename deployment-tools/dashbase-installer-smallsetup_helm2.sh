@@ -277,8 +277,8 @@ adminpod_setup() {
     log_fatal "Previous admin pod admindash exists"
   else
     # Download and install installer helper statefulset yaml file
-    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts.yaml -o admindash-sts.yaml
-    kubectl apply -f admindash-sts.yaml -n dashbase
+    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts_helm2.yaml -o admindash-sts_helm2.yaml
+    kubectl apply -f admindash-sts_helm2.yaml -n dashbase
     kubectl wait --for=condition=Ready pods/admindash-0 --timeout=60s -n dashbase
     # Check to ensure admin pod is available else exit 1
     APODSTATUS=$(kubectl wait --for=condition=Ready pods/admindash-0 -n dashbase | grep -c "condition met")

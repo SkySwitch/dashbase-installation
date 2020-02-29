@@ -19,10 +19,10 @@ default:
     containerConfig:
       resources:
         requests:
-          cpu: 2
+          cpu: 3.5
           memory: 26G
         limits:
-          cpu: 2
+          cpu: 3.5
           memory: 28G
     environment:
       JAVA_OPTS: "-Xmx20g -Xms16g"

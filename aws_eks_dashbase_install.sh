@@ -6,7 +6,7 @@ RSTRING=$(cat randomstring)
 AWS_ACCESS_KEY="undefined"
 AWS_SECRET_ACCESS_KEY="undefined"
 REGION="us-east-2"
-HELM_VERSION="v2.14.3"
+HELM_VERSION="v3.1.1"
 INSTYPE="r5.xlarge"
 NODENUM=2
 CLUSTERNAME="mydash$RSTRING"
@@ -116,7 +116,17 @@ check_commands() {
   done
 }
 
-
+check_ostype() {
+  if [[ $OSTYPE == *"darwin"* ]]; then
+    log_fatal "Dedected current workstation is a mac"
+    WKOSTYPE="mac"
+  elif [[ $OSTYPE == *"linux"* ]]; then
+    log_info "Dedected current workstation is a linux"
+    WKOSTYPE="linux"
+  else
+    log_fatal "This script is only tested on linux and mac; and fail to detect the current worksattion os type"
+  fi
+}
 
 check_input() {
   # checking required input arguments
@@ -157,10 +167,16 @@ check_input() {
 
 
 setup_centos() {
-  log_info "Install AWS CLI"
-  curl https://s3.amazonaws.com/aws-cli/awscli-bundle-1.16.188.zip -o awscli-bundle.zip
-  unzip -o awscli-bundle.zip
-  awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+  # install aws cli
+  if [ "$(command -v aws > /dev/null ; echo $?)" -eq "0" ]; then
+    log_info "aws cli is already installed"
+    aws --version
+  else
+    log_info "aws cli is not installed, installing it now"
+     curl https://s3.amazonaws.com/aws-cli/awscli-bundle-1.16.188.zip -o awscli-bundle.zip
+     unzip -o awscli-bundle.zip
+     awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+  fi
 
   log_info "Configure AWS CLI"
   /usr/local/bin/aws --version
@@ -169,18 +185,40 @@ setup_centos() {
   /usr/local/bin/aws --profile default configure set region $REGION
   sleep 5
   /usr/local/bin/aws configure list
+
   # install kubectl
-  curl -k https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
-  chmod a+x /usr/local/bin/kubectl
+  if [ "$(command -v kubectl > /dev/null ; echo $?)" -eq "0" ]; then
+    log_info "kubectl is installed in this host"
+    kubectl version --client --short=true
+  else
+     log_info "kubectl is not installed, installing it now"
+     curl -k https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+     chmod a+x /usr/local/bin/kubectl
+  fi
   # install eksctl
-  curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-  mv /tmp/eksctl /usr/local/bin
-  chmod +x /usr/local/bin/eksctl
-  # install helm
-  curl -k https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz -o  helm-${HELM_VERSION}-linux-amd64.tar.gz
-  tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
-  cp linux-amd64/helm /usr/local/bin/
-  chmod +x /usr/local/bin/helm
+  if [ "$(command -v eksctl > /dev/null ; echo $?)" -eq "0" ]; then
+    log_info "eksctl is installed in this host"
+    eksctl version
+  else
+    log_info "eksctl is not installed, installing it now"
+    curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+    mv /tmp/eksctl /usr/local/bin
+    chmod +x /usr/local/bin/eksctl
+  fi
+  # install helm 3
+  if [ "$(command -v helm > /dev/null ; echo $?)" -eq "0" ]; then
+    log_info "helm is installed, checking helm version"
+     # check helm version 2 or 3
+     if [ "$( helm version --client |grep -c "v3." )" -eq "1" ]; then log_info "this is helm3"; else log_fatal "helm2 is detected, please uninstall it before proceeding"; fi
+  else
+    log_info "helm 3 is not installed, isntalling it now"
+    curl -k https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz -o  helm-${HELM_VERSION}-linux-amd64.tar.gz
+    tar -zxvf helm-${HELM_VERSION}-linux-amd64.tar.gz
+    cp linux-amd64/helm /usr/local/bin/
+    chmod +x /usr/local/bin/helm
+  fi
+
+  # export all command path
   export PATH=$PATH:/usr/local/bin/kubectl:/usr/local/bin/helm:/usr/local/bin/eksctl
 }
 
@@ -188,9 +226,9 @@ check_previous_mydash() {
 echo "Checking exiting EKS clusters in $REGION"
 PREVIOUSEKS=$(aws eks list-clusters --region $REGION | grep mydash | sed -e 's/\"//g' | sed -e 's/^[ \t]*//')
 if [ -z "$PREVIOUSEKS" ]; then
-  log_info "No previous mydashXXXX EKS cluster detected"
+  log_info "No previous mydashXXXXXX EKS cluster detected"
 else
-  log_fatal "Previous mydashXXXX EKS clustername $PREVIOUSEKS is detected"
+  log_fatal "Previous mydashXXXXXX EKS clustername $PREVIOUSEKS is detected"
 fi
 }
 
@@ -229,10 +267,10 @@ setup_dashbase() {
     if  [ "$CLUSTERSIZE" == "small" ]; then
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase small setup with ingress controller endpoint is selected"
-         dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+         dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm3.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
-         dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws
+         dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm3.sh --platform=aws
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
       if [ "$SETUP_TYPE" == "ingress" ]; then
@@ -251,6 +289,7 @@ setup_dashbase() {
 
 # main process below this line
 run_by_root
+check_ostype
 check_commands
 check_input
 setup_centos
