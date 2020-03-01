@@ -273,6 +273,10 @@ setup_dashbase() {
          dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm3.sh --platform=aws
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
+      if [ "$NODENUM" -eq "2" ]; then
+         log_info "Change default node number from 2 to 3"
+         NODENUM=3
+      fi
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase large setup with ingress controller endpoint is selected"
          dashbase-installation/dashbase-installer.sh --platform=aws --ingress --ingress --subdomain=$SUBDOMAIN
