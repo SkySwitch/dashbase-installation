@@ -132,7 +132,10 @@ check_input() {
     log_info "Entered aws access key id = $AWS_ACCESS_KEY"
     log_info "Entered aws secret access key = $AWS_SECRET_ACCESS_KEY"
     log_info "Default AWS region = $REGION"
-    if [ "$CLUSTERSIZE" == "large" ]; then INSTYPE="r5.2xlarge"; fi
+    if [ "$CLUSTERSIZE" == "large" ]; then 
+       INSTYPE="r5.2xlarge"
+       if [ "$NODENUM" -eq "2" ]; then  log_info "Change default node number from 2 to 3"; NODENUM=3; fi
+    fi
     log_info "Instance type used on EKS cluster = $INSTYPE"
     log_info "Number of worker nodes in EKS cluster = $NODENUM"
     log_info "The EKS cluster name = $CLUSTERNAME"
@@ -235,10 +238,6 @@ setup_dashbase() {
          dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm2.sh --platform=aws
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
-      if [ "$NODENUM" -eq "2" ]; then
-         log_info "Change default node number from 2 to 3"
-         NODENUM=3
-      fi
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase large setup with ingress controller endpoint is selected"
          dashbase-installation/dashbase-installer_helm2.sh --platform=aws --ingress --ingress --subdomain=$SUBDOMAIN

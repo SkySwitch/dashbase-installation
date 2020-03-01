@@ -142,7 +142,10 @@ check_input() {
     log_info "Entered aws access key id = $AWS_ACCESS_KEY"
     log_info "Entered aws secret access key = $AWS_SECRET_ACCESS_KEY"
     log_info "Default AWS region = $REGION"
-    if [ "$CLUSTERSIZE" == "large" ]; then INSTYPE="r5.2xlarge"; fi
+    if [ "$CLUSTERSIZE" == "large" ]; then
+       INSTYPE="r5.2xlarge"
+       if [ "$NODENUM" -eq "2" ]; then  log_info "Change default node number from 2 to 3"; NODENUM=3; fi
+    fi
     log_info "Instance type used on EKS cluster = $INSTYPE"
     log_info "Number of worker nodes in EKS cluster = $NODENUM"
     log_info "The EKS cluster name = $CLUSTERNAME"
@@ -164,7 +167,6 @@ check_input() {
      log_info "Dashbase installation is not selected"
   fi
 }
-
 
 setup_centos() {
   # install aws cli
@@ -234,7 +236,7 @@ fi
 
 
 setup_eks_cluster() {
-  # Setup AWS CLI with provided Access key from the centos node
+  # Setup AWS EKS cluster with provided AWS Access key from the centos node
 
   if [ "$(/usr/local/bin/aws ec2 describe-vpcs --region $REGION --output text |grep -c VPCS)" -lt 9 ]; then
     log_info "creating AWS eks cluster, please wait. This process will take 15-20 minutes"
@@ -273,10 +275,6 @@ setup_dashbase() {
          dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm3.sh --platform=aws
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
-      if [ "$NODENUM" -eq "2" ]; then
-         log_info "Change default node number from 2 to 3"
-         NODENUM=3
-      fi
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase large setup with ingress controller endpoint is selected"
          dashbase-installation/dashbase-installer.sh --platform=aws --ingress --ingress --subdomain=$SUBDOMAIN
