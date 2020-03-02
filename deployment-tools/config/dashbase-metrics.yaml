@@ -8,7 +8,7 @@ data:
       error_count:
         description: "count of logs with level:error"
         table: "logs"
-         filter: "level:error"
+        filter: "level:error"
         aggregation: "count(*)"
         accumulate: true
 ---
