@@ -8,19 +8,9 @@ data:
       error_count:
         description: "count of logs with level:error"
         table: "logs"
+         filter: "level:error"
         aggregation: "count(*)"
-      sip_status_codes:
-        description: "breakdown of sip status codes"
-        table: "freeswitch"
         accumulate: true
-        filter: "type:sip"
-        aggregation: "topn(status-code, 20, topn(hostname, 100))"
-      pct_mos_score:
-        description: "percentile audio mos score"
-        table: "freeswitch"
-        filter: "type:cdr AND _missing_:variables.originator"
-        accumulate: false
-        aggregation: "topn(hostname, 100, pct(callStats.audio.inbound.mos, 50, 90, 99))"
 ---
 apiVersion: apps/v1
 kind: Deployment
