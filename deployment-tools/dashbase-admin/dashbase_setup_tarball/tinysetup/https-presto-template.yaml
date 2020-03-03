@@ -1,0 +1,28 @@
+kind: Secret
+metadata:
+  name: presto-keystore
+apiVersion: v1
+data:
+  presto-keystore: KEYSTORE
+---
+kind: Secret
+metadata:
+  name: presto-keystore-password
+apiVersion: v1
+data:
+  presto-keystore_password: KEYPASS
+---
+kind: Secret
+metadata:
+  name: presto-cert
+apiVersion: v1
+data:
+  presto-cert.pem: CERTPEM
+---
+kind: Secret
+metadata:
+  name: presto-key
+apiVersion: v1
+data:
+  presto-key.pem: KEYPEM
+---
