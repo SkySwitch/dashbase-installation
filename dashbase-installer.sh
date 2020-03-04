@@ -5,7 +5,7 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.2.8"
+DASHVERSION="1.3.0-rc3"
 
 # log functions and input flag setup
 function log_info() {
@@ -161,11 +161,11 @@ check_k8s_permission() {
 check_node_cpu() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 1800 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 6000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 2 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 6 ]]; then
       return 0
     fi
   else
@@ -249,7 +249,7 @@ preflight_check() {
     check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
   done
   echo ""
-  if [ $AVAIILABLE_NODES -ge 3 ]; then
+  if [ $AVAIILABLE_NODES -ge 2 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
     log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 8 core and 64 Gi at least)."

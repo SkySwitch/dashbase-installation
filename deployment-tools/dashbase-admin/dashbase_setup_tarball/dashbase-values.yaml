@@ -43,7 +43,7 @@ default:
       MIN_BUFFER_SIZE_MB: "200"
 
 presto:
-  enabled: true
+  enabled: false
   presto:
     prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
     dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD

@@ -144,7 +144,8 @@ check_input() {
     log_info "Default AWS region = $REGION"
     if [ "$CLUSTERSIZE" == "large" ]; then
        INSTYPE="r5.2xlarge"
-       if [ "$NODENUM" -eq "2" ]; then  log_info "Change default node number from 2 to 3"; NODENUM=3; fi
+       # uncomment the following line to make default large cluster size be 3 nodes
+       #if [ "$NODENUM" -eq "2" ]; then  log_info "Change default node number from 2 to 3"; NODENUM=3; fi
     fi
     log_info "Instance type used on EKS cluster = $INSTYPE"
     log_info "Number of worker nodes in EKS cluster = $NODENUM"
