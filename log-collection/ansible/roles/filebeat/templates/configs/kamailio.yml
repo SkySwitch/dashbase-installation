@@ -38,7 +38,7 @@
             pid: %{NUMBER:capture.pid:int}
             process: %{NUMBER:capture.process:int}
             time: %{NUMBER:capture.time:double}
-            date: %{DATA:timestamp:datetime:EEE MMM dd HH:mm:ss yyyy}
+            date: %{DATA:timestamp:datetime:EEE MMM d HH:mm:ss yyyy}
             proto: %{DATA:capture.proto:text}
             srcip: %{IPORHOST:capture.src.ip:text}
             srcport: %{INT:capture.src.port:text}
