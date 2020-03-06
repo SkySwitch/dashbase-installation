@@ -72,14 +72,20 @@ create_s3() {
   if [ "$(aws s3 ls s3://$BUCKETNAME > /dev/null; echo $?)" -eq "0" ]; then log_info "S3 bucket $BUCKETNAME created successfully"; else log_fatal "S3 bucket $BUCKETNAME failed to create"; fi
 }
 
-# shellcheck disable=SC2120
+# update bucket policy json with BUCKETNAME
+update_s3_policy_json() {
+   sed -i "s/MYDASHBUCKET/$BUCKETNAME/" mydash-s3.json
+}
+
+
+# create s3 bucket policy
 create_s3_bucket_policy() {
   aws iam create-policy --policy-name $BUCKETNAME --policy-document file://mydash-s3.json
   POARN=$(echo "aws iam list-policies --query 'Policies[?PolicyName==\`$BUCKETNAME\`].Arn' --output text |awk '{ print $1}'" | bash)
   log_info "The s3 bucket policy ARN is $POARN"
 }
 
-# shellcheck disable=SC2120
+# attach the s3 bucket policy to the EKS worker nodegroup instance profile
 insert_s3_policy_to_nodegroup() {
   INSNODE=$(kubectl get nodes  |tail  -1 |awk '{print $1}')
   INSPROFILENAME=$(aws ec2 describe-instances --region us-east-1 --filters "Name=network-interface.private-dns-name,Values=$INSNODE" --query 'Reservations[*].Instances[*].[IamInstanceProfile.Arn]' --output text |cut -d "/" -f2)
@@ -104,6 +110,7 @@ insert_s3_policy_to_nodegroup() {
 #run_by_root
 check_commands
 create_s3
+update_s3_policy_json
 create_s3_bucket_policy
 insert_s3_policy_to_nodegroup
 

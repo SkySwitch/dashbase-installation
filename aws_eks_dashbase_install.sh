@@ -226,20 +226,33 @@ setup_centos() {
 }
 
 check_previous_mydash() {
-echo "Checking exiting EKS clusters in $REGION"
-PREVIOUSEKS=$(aws eks list-clusters --region $REGION | grep mydash | sed -e 's/\"//g' | sed -e 's/^[ \t]*//')
-if [ -z "$PREVIOUSEKS" ]; then
-  log_info "No previous mydashXXXXXX EKS cluster detected"
-else
-  log_fatal "Previous mydashXXXXXX EKS clustername $PREVIOUSEKS is detected"
-fi
+  echo "Checking exiting EKS clusters in $REGION"
+  PREVIOUSEKS=$(aws eks list-clusters --region $REGION | grep mydash | sed -e 's/\"//g' | sed -e 's/^[ \t]*//')
+  if [ -z "$PREVIOUSEKS" ]; then
+    log_info "No previous mydashXXXXXX EKS cluster detected"
+  else
+    log_fatal "Previous mydashXXXXXX EKS clustername $PREVIOUSEKS is detected"
+  fi
 }
 
+check_max_vpc_limit() {
+  echo "Checking the current number of VPC in the region $REGION"
+  VPC_LIMIT=$(aws service-quotas get-service-quota --service-code 'vpc' --region $REGION --quota-code 'L-F678F1CE' --output text |awk '{print $NF}' |awk '{$0=int($0)}1')
+  log_info "The max vpc limit in the region $REGION is $VPC_LIMIT"
+}
 
 setup_eks_cluster() {
-  # Setup AWS EKS cluster with provided AWS Access key from the centos node
+  # Setup AWS EKS cluster with provided AWS Access key from the centos nodea
+  # verify vpc max limit is int or not
+  if [[ $VPC_LIMIT =~ ^-?[0-9]+$ ]]; then
+    log_info "Checking VPC max limit value and  is an integer and is equal to $VPC_LIMIT" 
+  else  
+    log_warning "The detected VPC max limit is not an integer, something may be wrong, and will use default vpc max limit in the region $REGION and is 5"
+    VPC_LIMIT="5"
+  fi
 
-  if [ "$(/usr/local/bin/aws ec2 describe-vpcs --region $REGION --output text |grep -c VPCS)" -lt 9 ]; then
+  # compare vpc count with max vpc limit , the vpc count should be less than vpc limit
+  if [ "$(/usr/local/bin/aws ec2 describe-vpcs --region $REGION --output text |grep -c VPCS)" -lt $VPC_LIMIT ]; then
     log_info "creating AWS eks cluster, please wait. This process will take 15-20 minutes"
     /usr/local/bin/eksctl create cluster --managed --name $CLUSTERNAME --region $REGION --version 1.14 --node-type $INSTYPE --nodegroup-name standard-workers --nodes $NODENUM --node-zones $REGION$ZONE --nodes-max $NODENUM --nodes-min $NODENUM
   else
@@ -297,6 +310,7 @@ check_commands
 check_input
 setup_centos
 check_previous_mydash
+check_max_vpc_limit
 setup_eks_cluster
 check_eks_cluster
 setup_dashbase
