@@ -1,0 +1,78 @@
+#=========================== Filebeat inputs =============================
+filebeat.registry_flush: 30s
+filebeat.inputs:
+
+- type: log
+  enabled: true
+
+  # Glob based paths.
+  paths:
+    - 'C:\Program Files (x86)\Syslogd\Logs\SyslogCatchAll*.txt'
+
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    _message_parser:
+      type: multi
+      parsers_list:
+        - name: kiwi
+          config:
+            type: grok
+            pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{DATA}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\] %{NUMBER:pid} %{DATA:id1} %{URIHOST:uri_host} %{LOGLEVEL:level:meta} \(%{DATA:source_file:meta}:%{INT:line:int}\) - %{GREEDYDATA:message}'
+        - name: sip
+          config:
+            type: multi
+            applyAll: 'true'
+            parsers:
+              sip_grok:
+                type: grok
+                pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{DATA}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\] %{NUMBER:pid} %{DATA:id1} %{GREEDYDATA:message}'
+              sip_sip:
+                type: sip
+                sortedFields: call-id,user-agent
+
+  multiline.pattern: ^\d{4}-\d{2}-\d{2}
+  multiline.negate: true
+  multiline.match: after
+  
+#================================ Processors =====================================
+# Drop metadata added by Filebeat to save bandwidth as it's unnecessary
+
+processors:
+  - add_locale: ~
+  - rename:
+      when:
+        has_fields: ['fields._message_parser']
+      fields:
+        - from: "beat.timezone"
+          to: "fields._message_parser.defaultTimeZone"
+  - rename:
+      fields:
+        - from: "beat.hostname"
+          to: "hostname"
+  - drop_fields:
+      fields: ["offset", "beat", "prospector", "host", "input"]
+
+#==================== Elasticsearch template setting ==========================
+setup.template:
+  name: "logs"
+  pattern: "logs"
+  fields: "fields.yml"
+  overwrite: true
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  bulk_max_size: 3000
+  worker: 30
+  compression_level: 5
+  hosts: "DASHBASE_URL:443"
+  protocol: "https"
+  ssl.verification_mode: "none"
+
+#================================ Logging =====================================
+
+# Available log levels are: error, warning, info, debug
+logging.level: info
