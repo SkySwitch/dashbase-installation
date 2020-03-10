@@ -68,8 +68,13 @@ BUCKETNAME="s3-$CLUSTERNAME"
 log_info "the S3 bucket that will be created with name $BUCKETNAME"
 # create s3 bucket
 create_s3() {
-  aws s3 mb s3://$BUCKETNAME --region $REGION
-  if [ "$(aws s3 ls s3://$BUCKETNAME > /dev/null; echo $?)" -eq "0" ]; then log_info "S3 bucket $BUCKETNAME created successfully"; else log_fatal "S3 bucket $BUCKETNAME failed to create"; fi
+  if [ "$(aws s3 ls / |grep -c $BUCKETNAME)" -eq "1" ]; then
+     log_info "S3 bucket already be created previously"
+  else
+     log_info "s3 bucekt with name %BUCKETNAME is not found, creating"
+     aws s3 mb s3://$BUCKETNAME --region $REGION
+     if [ "$(aws s3 ls s3://$BUCKETNAME > /dev/null; echo $?)" -eq "0" ]; then log_info "S3 bucket $BUCKETNAME created successfully"; else log_fatal "S3 bucket $BUCKETNAME failed to create"; fi
+  fi
 }
 
 # update bucket policy json with BUCKETNAME
@@ -77,18 +82,23 @@ update_s3_policy_json() {
    sed -i "s/MYDASHBUCKET/$BUCKETNAME/" mydash-s3.json
 }
 
-
 # create s3 bucket policy
 create_s3_bucket_policy() {
-  aws iam create-policy --policy-name $BUCKETNAME --policy-document file://mydash-s3.json
   POARN=$(echo "aws iam list-policies --query 'Policies[?PolicyName==\`$BUCKETNAME\`].Arn' --output text |awk '{ print $1}'" | bash)
-  log_info "The s3 bucket policy ARN is $POARN"
+  if [ -z "$POARN" ]; then
+     log_info "s3 bucket policy $BUCKETNAME not exists, and now creating"
+     aws iam create-policy --policy-name $BUCKETNAME --policy-document file://mydash-s3.json
+     POARN=$(echo "aws iam list-policies --query 'Policies[?PolicyName==\`$BUCKETNAME\`].Arn' --output text |awk '{ print $1}'" | bash)
+     log_info "The s3 bucket policy ARN is $POARN"
+  else
+     log_info "s3 bucket policy $POARN exists"
+  fi
 }
 
 # attach the s3 bucket policy to the EKS worker nodegroup instance profile
 insert_s3_policy_to_nodegroup() {
   INSNODE=$(kubectl get nodes  |tail  -1 |awk '{print $1}')
-  INSPROFILENAME=$(aws ec2 describe-instances --region us-east-1 --filters "Name=network-interface.private-dns-name,Values=$INSNODE" --query 'Reservations[*].Instances[*].[IamInstanceProfile.Arn]' --output text |cut -d "/" -f2)
+  INSPROFILENAME=$(aws ec2 describe-instances --region $REGION --filters "Name=network-interface.private-dns-name,Values=$INSNODE" --query 'Reservations[*].Instances[*].[IamInstanceProfile.Arn]' --output text |cut -d "/" -f2)
   log_info "The instance profile name assciated to the worker nodes is $INSPROFILENAME"
   POARN=$(echo "aws iam list-policies --query 'Policies[?PolicyName==\`$BUCKETNAME\`].Arn' --output text |awk '{ print $1}'" | bash)
 
@@ -105,7 +115,6 @@ insert_s3_policy_to_nodegroup() {
     log_fatal "The s3 bucket access policy $POARN is not attached to role $IAMINSROLE"
   fi
 
-
 }
 #run_by_root
 check_commands
@@ -113,5 +122,3 @@ create_s3
 update_s3_policy_json
 create_s3_bucket_policy
 insert_s3_policy_to_nodegroup
-
-

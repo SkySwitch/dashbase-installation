@@ -283,10 +283,10 @@ setup_dashbase() {
     if  [ "$CLUSTERSIZE" == "small" ]; then
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase small setup with ingress controller endpoint is selected"
-         dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm3.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+         dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
-         dashbase-installation/deployment-tools/dashbase-installer-smallsetup_helm3.sh --platform=aws
+         dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
       if [ "$SETUP_TYPE" == "ingress" ]; then
