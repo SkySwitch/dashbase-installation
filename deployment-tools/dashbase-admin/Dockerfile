@@ -46,7 +46,7 @@ ADD validate-license.py /dashbase
 RUN chmod +x /dashbase/validate-license.py
 
 COPY requirements.txt /dashbase
-COPY dashbase-values.yaml /dashbase
+# COPY dashbase-values.yaml /dashbase
 
 RUN pip install -r /dashbase/requirements.txt
 

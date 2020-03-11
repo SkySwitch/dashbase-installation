@@ -333,6 +333,8 @@ download_dashbase() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_small_nolicx.tar https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase_setup_small_nolicx.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_small_nolicx.tar -C /data/"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
+  # create sym link for dashbase custom values yaml from /dashbase
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "ln -s /data/dashbase-values.yaml  /dashbase/dashbase-values.yaml"
 }
 
 update_dashbase_valuefile() {
