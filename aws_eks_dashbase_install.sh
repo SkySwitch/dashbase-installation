@@ -291,7 +291,7 @@ setup_dashbase() {
     elif [ "$CLUSTERSIZE" == "large" ]; then
       if [ "$SETUP_TYPE" == "ingress" ]; then
          log_info "Dashbase large setup with ingress controller endpoint is selected"
-         dashbase-installation/dashbase-installer.sh --platform=aws --ingress --ingress --subdomain=$SUBDOMAIN
+         dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          dashbase-installation/dashbase-installer.sh --platform=aws
