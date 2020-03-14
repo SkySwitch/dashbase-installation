@@ -279,7 +279,8 @@ adminpod_setup() {
     # Download and install installer helper statefulset yaml file
     curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts_helm3.yaml -o admindash-sts_helm3.yaml
     kubectl apply -f admindash-sts_helm3.yaml -n dashbase
-    kubectl wait --for=condition=Ready pods/admindash-0 --timeout=60s -n dashbase
+    log_info "setting up admin pod, please wait for three minutes"
+    kubectl wait --for=condition=Ready pods/admindash-0 --timeout=180s -n dashbase
     # Check to ensure admin pod is available else exit 1
     APODSTATUS=$(kubectl wait --for=condition=Ready pods/admindash-0 -n dashbase | grep -c "condition met")
     if [ "$APODSTATUS" -eq "1" ]; then echo "Admin Pod is available"; else log_fatal "Admin Pod  admindash-0 is not available"; fi
