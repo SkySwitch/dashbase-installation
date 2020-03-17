@@ -37,7 +37,7 @@
             tag: %{WORD:capture.tag:text}
             pid: %{NUMBER:capture.pid:int}
             process: %{NUMBER:capture.process:int}
-            time: %{NUMBER:capture.time:double}
+            time: %{NUMBER:capture.tsec:double}
             date: %{DATA:timestamp:datetime:EEE MMM d HH:mm:ss yyyy}
             proto: %{DATA:capture.proto:text}
             srcip: %{IPORHOST:capture.src.ip:text}
@@ -46,7 +46,6 @@
             dstport: %{INT:capture.dst.port:text}
             \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
             %{GREEDYDATA:message}
-            \|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|\|
         sip:
           type: sip
           sortedFields: call-id,user-agent
