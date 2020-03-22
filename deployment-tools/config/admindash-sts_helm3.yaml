@@ -36,7 +36,7 @@ spec:
       serviceAccountName: dashadmin
       containers:
         - name: admindash
-          image: rluiarch/dashbase-admin:1.5
+          image: rluiarch/dashbase-admin:1.6
           imagePullPolicy: IfNotPresent
           command: ["/bin/bash","-c","while true; do sleep 1000; done"]
           ports:

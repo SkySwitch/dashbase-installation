@@ -5,7 +5,9 @@ INGRESS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.3.0-rc3"
+DASHVERSION="1.3.2"
+AUTHUSERNAME="undefined"
+AUTHPASSWORD="undefined"
 
 # log functions and input flag setup
 function log_info() {
@@ -59,6 +61,17 @@ while [[ $# -gt 0 ]]; do
   --license)
     fail_if_empty "$PARAM" "$VALUE"
     LICENSE=$VALUE
+    ;;
+  --authusername)
+    fail_if_empty "$PARAM" "$VALUE"
+    AUTHUSERNAME=$VALUE
+    ;;
+  --authpassword)
+    fail_if_empty "$PARAM" "$VALUE"
+    AUTHPASSWORD=$VALUE
+    ;;
+  --basic_auth)
+    BASIC_AUTH="true"
     ;;
   --ingress)
     INGRESS_FLAG="true"
@@ -221,6 +234,48 @@ check_version() {
   fi
 }
 
+check_ostype() {
+  if [[ $OSTYPE == *"darwin"* ]]; then
+    log_info "Dedected current workstation OS is mac"
+  elif [[ $OSTYPE == *"linux"* ]]; then
+    #log_info "Dedected current workstation is a linux"
+    LINUXTYPE=$(cat /etc/os-release |grep NAME |grep -iv "_" |sed 's/\"//g' |cut -d "=" -f2 |awk '{print $1}')
+    if [ "$LINUXTYPE" ==  "CentOS" ]; then
+      log_info "Dedected current workstation OS is centos"
+    elif [ "$LINUXTYPE" ==  "Ubuntu" ]; then
+      log_info "Dedected current workstation OS is ubuntu"
+    fi
+  else
+    log_warning "Dedected current workstation OS is neither mac, centos, ubuntu"
+  fi
+}
+
+check_basic_auth() {
+  # check basic auth input
+  if [ "$BASIC_AUTH" != "true" ]; then
+    log_info "Basic auth setting is not selected"
+  else
+    log_info "Basic auth is selected and checks input auth username and password"
+    if [ "$AUTHUSERNAME" == "undefined" ] | [ "$AUTHPASSWORD" == "undefined" ]; then
+      log_fatal "Either basic auth username or password is not entered"
+    else
+      if  [[ "$AUTHUSERNAME" =~ [^a-zA-Z0-9] ]] && [[ "$AUTHPASSWORD" =~ [^a-zA-Z0-9] ]]  ; then
+        log_fatal "The entered auth username or password is not alphanumeric"
+      else
+         log_info "The entered auth usermane is $AUTHUSERNAME"
+         log_info "The entered auth password is $AUTHPASSWORD"
+      fi
+    fi
+  fi
+  # check basic auth dependency
+  # basic auth only works in ingres and requires ingress be true and non null subdomain string
+  if [ "$BASIC_AUTH" == "true" ] && [ "$INGRESS_FLAG" != "true" ]; then
+    log_fatal "Basic auth is selected but not selecting --ingress for installer script"
+  elif [ "$BASIC_AUTH" == "true" ] && [ -z "$SUBDOMAIN" ]; then
+    log_fatal "Basic auth is selected but not providing --subdomain=sub.example.com string for installer script"
+  fi
+}
+
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
@@ -334,7 +389,13 @@ download_dashbase() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicy.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicy.tar -C /data/"
   # get the custom values yaml file
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values.yaml"
+  if [ "$BASIC_AUTH" == true ]; then
+    log_info "Download dashbase-values.yaml file for basic auth"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values-basicauth.yaml"
+  else
+    log_info "Download dashbase-values.yaml file without basic auth"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values.yaml"
+  fi
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
   # create sym link for dashbase custom values yaml from /dashbase
   kubectl exec -it admindash-0 -n dashbase -- bash -c "ln -s /data/dashbase-values.yaml  /dashbase/dashbase-values.yaml"
@@ -418,6 +479,13 @@ create_sslcert() {
   fi
 }
 
+create_basic_auth_secret() {
+  log_info "create basic auth secret in admin pod"
+  kubectl exec -it admindash-0 -n dashbase -- htpasswd -b -c /data/auth "$AUTHUSERNAME" "$AUTHPASSWORD"
+  kubectl exec -it admindash-0 -n dashbase -- kubectl create secret generic dashbase-auth --from-file=/data/auth -n dashbase
+  kubectl get secret dashbase-auth -n dashbase
+}
+
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
@@ -445,6 +513,15 @@ expose_endpoints() {
     # get the exposed IP address from nginx ingress controller
     EXTERNAL_IP=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get svc nginx-ingress-controller -n dashbase | tail -n +2 | awk '{ print $4}')
     log_info "the exposed IP address for web and tables endpoint is $EXTERNAL_IP"
+    # Add basic auth ingress
+    if [ "$BASIC_AUTH" == "true" ]; then
+      log_info "Creating ingress for web with basic auth"
+      create_basic_auth_secret
+      # update ingress-web.yaml with subdomain name
+      kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i 's|test.dashbase.io|$SUBDOMAIN|' /data/ingress-web.yaml"
+      # apply the ingress-web.yaml into K8s cluster
+      kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/ingress-web.yaml -n dashbase"
+    fi
   else
     log_info "setup LoadBalancer with https endpoints to expose services"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/create-lb.sh --https $EXPOSEMON"
@@ -457,6 +534,7 @@ expose_endpoints() {
 {
 check_platform_input
 check_ingress_subdomain
+check_basic_auth
 check_version
 check_license
 preflight_check
@@ -477,13 +555,6 @@ else
   create_storageclass
 fi
 
-# setup helm tiller
-#if [ "$(kubectl get pod -n kube-system | grep -c tiller)" -gt "0" ]; then
-#  log_fatal "previous tiller pod exists in this K8s cluster"
-#else
-#  echo "creating tiller in K8s"
-#  setup_helm_tiller
-#fi
 check_helm
 create_sslcert
 

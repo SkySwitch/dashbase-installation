@@ -41,6 +41,7 @@ RUN apk add --update openssh && rm -rf /tmp/* /var/cache/apk/*
 RUN apk add --update openjdk8-jre
 RUN apk add --update openssl
 RUN apk add --update coreutils
+RUN apk add --update apache2-utils
 
 ADD validate-license.py /dashbase
 RUN chmod +x /dashbase/validate-license.py

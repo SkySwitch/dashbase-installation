@@ -14,6 +14,8 @@ CLUSTERSIZE="small"
 ZONE="a"
 SETUP_TYPE="ingress"
 CMDS="curl tar unzip git openssl"
+AUTHUSERNAME="undefined"
+AUTHPASSWORD="undefined"
 
 # log functions and input flag setup
 function log_info() {
@@ -76,6 +78,17 @@ while [[ $# -gt 0 ]]; do
     fail_if_empty "$PARAM" "$VALUE"
     SETUP_TYPE=$VALUE
     ;;
+  --authusername)
+    fail_if_empty "$PARAM" "$VALUE"
+    AUTHUSERNAME=$VALUE
+    ;;
+  --authpassword)
+    fail_if_empty "$PARAM" "$VALUE"
+    AUTHPASSWORD=$VALUE
+    ;;
+  --basic_auth)
+    BASIC_AUTH="true"
+    ;;
   --subdomain)
     fail_if_empty "$PARAM" "$VALUE"
     SUBDOMAIN=$VALUE
@@ -118,13 +131,13 @@ check_commands() {
 
 check_ostype() {
   if [[ $OSTYPE == *"darwin"* ]]; then
-    log_fatal "Dedected current workstation is a mac"
+    log_fatal "Dedected current workstation is a mac, this script only tested on linux"
     WKOSTYPE="mac"
   elif [[ $OSTYPE == *"linux"* ]]; then
     log_info "Dedected current workstation is a linux"
     WKOSTYPE="linux"
   else
-    log_fatal "This script is only tested on linux and mac; and fail to detect the current worksattion os type"
+    log_fatal "This script is only tested on linux; and fail to detect the current worksattion os type"
   fi
 }
 
@@ -225,6 +238,32 @@ setup_centos() {
   export PATH=$PATH:/usr/local/bin/kubectl:/usr/local/bin/helm:/usr/local/bin/eksctl
 }
 
+check_basic_auth() {
+  # check basic auth input
+  if [ "$BASIC_AUTH" != "true" ]; then
+    log_info "Basic auth setting is not selected"
+  else
+    log_info "Basic auth is selected and checks input auth username and password"
+    if [ "$AUTHUSERNAME" == "undefined" ] | [ "$AUTHPASSWORD" == "undefined" ]; then
+      log_fatal "Either basic auth username or password is not entered"
+    else
+      if  [[ "$AUTHUSERNAME" =~ [^a-zA-Z0-9] ]] && [[ "$AUTHPASSWORD" =~ [^a-zA-Z0-9] ]]  ; then
+        log_fatal "The entered auth username or password is not alphanumeric"
+      else
+         log_info "The entered auth usermane is $AUTHUSERNAME"
+         log_info "The entered auth password is $AUTHPASSWORD"
+      fi
+    fi
+  fi
+  # check basic auth dependency
+  # basic auth only works in ingres and requires ingress be true and non null subdomain string
+  if [ "$BASIC_AUTH" == "true" ] && [ "$SETUP_TYPE" != "ingress" ]; then
+    log_fatal "Basic auth is selected but not setup type is not selecting ingress, please check your options"
+  elif [ "$BASIC_AUTH" == "true" ] && [ -z "$SUBDOMAIN" ]; then
+    log_fatal "Basic auth is selected but not providing --subdomain=sub.example.com string for installer script"
+  fi
+}
+
 check_previous_mydash() {
   echo "Checking exiting EKS clusters in $REGION"
   PREVIOUSEKS=$(aws eks list-clusters --region $REGION | grep mydash | sed -e 's/\"//g' | sed -e 's/^[ \t]*//')
@@ -281,17 +320,23 @@ setup_dashbase() {
     /usr/bin/git clone https://github.com/dashbase/dashbase-installation.git
     echo "setup and configure dashbase, this process will take 20-30 minutes"
     if  [ "$CLUSTERSIZE" == "small" ]; then
-      if [ "$SETUP_TYPE" == "ingress" ]; then
-         log_info "Dashbase small setup with ingress controller endpoint is selected"
+      if [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "false" ]; then
+         log_info "Dashbase small setup with ingress controller endpoint and no basic auth is selected"
          dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+      elif [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "true" ]; then
+         log_info "Dashbase small setup with ingress controller endpoint and basic auth is selected"
+         dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
-      if [ "$SETUP_TYPE" == "ingress" ]; then
-         log_info "Dashbase large setup with ingress controller endpoint is selected"
+      if [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "false" ]; then
+         log_info "Dashbase large setup with ingress controller endpoint and no basic auth is selected"
          dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+      elif [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "true" ]; then
+         log_info "Dashbase large setup with ingress controller endpoint and basic auth is selected"
+         dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          dashbase-installation/dashbase-installer.sh --platform=aws
@@ -308,6 +353,7 @@ run_by_root
 check_ostype
 check_commands
 check_input
+check_basic_auth
 setup_centos
 check_previous_mydash
 check_max_vpc_limit
