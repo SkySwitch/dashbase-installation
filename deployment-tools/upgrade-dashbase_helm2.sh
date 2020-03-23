@@ -68,7 +68,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 backup_values_yaml() {
-  HELM_VERSION=$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep '^dashbase' |awk '{print $10}')
+  HELM_VERSION=$(kubectl exec -it admindash-0 -n dashbase -- helm ls --home /root/.helm |grep dashbase |awk '{print $2}')
   kubectl exec -it admindash-0 -n dashbase -- bash -c "mkdir -p /data/backup_values_yaml"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "cp /data/dashbase-values.yaml /data/backup_values_yaml/dashbase-values_$(date +%d-%m-%Y_%H-%M-%S)_$HELM_VERSION.yaml"
 }
@@ -132,7 +132,7 @@ check_version() {
 # Check chart version
 # if chart version is not provided, then will use whatever previously is used
 check_chart_version() {
-chart_version=$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep '^dashbase' |awk '{print $10}')
+chart_version=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "helm ls '^dashbase$' |grep 'dashbase' |  awk '{print \$9}' |  cut -c 10-  ")
 
 if [[ "$CHARTVERSION" == "undefined" ]] && [[ "$VERSION" == "undefined" ]]; then
   echo "Both dashbase version and chart version are not provided"
@@ -163,6 +163,7 @@ fi
 
 # main process below this line
 
+#CURRENTVERSION=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get pods/web-0 -n dashbase  -o jsonpath='{.spec.containers[*].image}' |cut -d":" -f2)
 backup_values_yaml
 
 # check entered dashbase value yaml file
@@ -173,15 +174,15 @@ if [ "$VALUEFILE" == "dashbase-values.yaml" ]; then
   update_license
   check_version
   check_chart_version
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase $chartver &> /dev/null"
-  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --namespace dashbase $chartver"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase $chartver &> /dev/null"
+  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/dashbase-values.yaml --home /root/.helm --namespace dashbase $chartver"
 else
   log_info "using custom dashbase value file $VALUEFILE"
   kubectl cp "$VALUEFILE" dashbase/admindash-0:/data/
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   check_chart_version
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase $chartver > /dev/null"
-  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase $chartver"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm upgrade dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --home /root/.helm $chartver > /dev/null"
+  run_catch "helm upgrade dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --home /root/.helm $chartver"
 fi
 
 
