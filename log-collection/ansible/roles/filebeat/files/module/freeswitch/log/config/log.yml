@@ -1,0 +1,52 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+multiline.pattern: '^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?\d{4}-\d{2}-\d{2}|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?EXECUTE|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?Dialplan|^recv|^send'
+multiline.negate: true
+multiline.match: after
+close_inactive: 90s
+harvester_limit: 1000
+scan_frequency: 1s
+symlinks: true
+clean_removed: true
+fields:
+ _message_parser:
+   type: multi
+   parsers_list:
+   - name: freeswitch
+     config:
+       type: grok
+       pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
+   - name: sip
+     config:
+       type: multi
+       applyAll: 'true'
+       parsers:
+         sip_timestamp:
+           type: timestamp
+           scan: 'true'
+           format: HH:mm:ss.SSSSSS
+         sip_sip:
+           type: sip
+           sortedFields: "call-id"
+   - name: universal
+     config:
+       type: grok
+       pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
+
+processors:
+  - add_locale: ~
+  - rename:
+      when:
+        has_fields: ['fields._message_parser']
+      fields:
+        - from: "beat.timezone"
+          to: "fields._message_parser.defaultTimeZone"
+  - rename:
+      fields:
+        - from: "beat.hostname"
+          to: "hostname"
+  - drop_fields:
+      fields: ["offset", "beat", "prospector", "host", "input"]

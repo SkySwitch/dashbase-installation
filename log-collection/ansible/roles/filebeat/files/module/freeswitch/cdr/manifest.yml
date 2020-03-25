@@ -1,0 +1,10 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/freeswitch/json_cdr/*/*.cdr.json
+      - /usr/local/freeswitch/log/json_cdr/*/*.cdr.json
+
+ingest_pipeline: ingest/pipeline.json
+input: config/cdr.yml

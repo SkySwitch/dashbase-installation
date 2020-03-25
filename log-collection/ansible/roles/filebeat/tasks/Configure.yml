@@ -12,7 +12,15 @@
     src: "templates/configs/{{ item }}.yml"
     dest: "/etc/filebeat/configs/{{ item }}.yml"
   with_items:
-    "{{ configs_list }}"
+    "{{ configs_list | intersect(filebeat_modules) }}"
+
+## Copy module related config files
+- name: Copy filebeat module config files
+  copy:
+    src: "module/{{ item }}"
+    dest: "/usr/share/filebeat/module/{{ item }}"
+  with_items:
+    "{{ configs_list | intersect(filebeat_modules) }}"
 
 ##copy filebeat fields.yml
 - name: Copy fields file

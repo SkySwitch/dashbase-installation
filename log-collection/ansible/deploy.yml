@@ -28,3 +28,6 @@
     nightwatch_version: 1.1.1
     nightwatch_configs: ""
     heplify_version: 1.55
+
+    # builtin vars, do not override by "-e"
+    filebeat_modules: ["freeswitch"]

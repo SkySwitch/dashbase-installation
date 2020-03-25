@@ -1,0 +1,25 @@
+{
+  "description": "cdr pipeline",
+  "processors": [
+    {
+      "max": {
+        "fields": [
+          "callflow.times.progress_time",
+          "callflow.times.progress_media_time"
+        ],
+        "target_field": "ucaas_cdr_process_max_epoch",
+        "ignore_missing": true
+      }
+    },
+    {
+      "diff": {
+        "fields": [
+          "ucaas_cdr_process_max_epoch",
+          "callflow.times.created_time"
+        ],
+        "target_field": "ucaas_cdr_process_diff_epoch",
+        "ignore_missing": true
+      }
+    }
+  ]
+}

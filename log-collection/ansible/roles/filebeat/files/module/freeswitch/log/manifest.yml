@@ -1,0 +1,10 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/freeswitch/freeswitch.log
+      - /usr/local/freeswitch/log/freeswitch.log
+
+#ingest_pipeline: ingest/pipeline.json
+input: config/log.yml
