@@ -7,7 +7,7 @@
 
 #=========================== Filebeat prospectors =============================
 
-filebeat.registry_flush: 30s
+filebeat.registry.flush: 30s
 filebeat.config.inputs:
   path: configs/*.yml
   reload.enabled: true
@@ -37,14 +37,14 @@ processors:
       when:
         has_fields: ['fields._message_parser']
       fields:
-        - from: "beat.timezone"
+        - from: "event.timezone"
           to: "fields._message_parser.defaultTimeZone"
   - rename:
       fields:
-        - from: "beat.hostname"
+        - from: "agent.hostname"
           to: "hostname"
   - drop_fields:
-      fields: ["offset", "beat", "prospector", "host", "input"]
+      fields: ["offset", "beat", "prospector", "host", "input", "log.offset", "ecs", "agent", "event"]
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
