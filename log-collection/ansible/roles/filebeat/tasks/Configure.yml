@@ -32,7 +32,7 @@
 - name: Copy filebeat module config files
   copy:
     src: "module/{{ item }}"
-    dest: "/usr/share/filebeat/module/{{ item }}"
+    dest: "/usr/share/filebeat/module/"
   with_items:
     "{{ configs_list | intersect(filebeat_modules) }}"
 

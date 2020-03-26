@@ -49,7 +49,7 @@ processors:
         - from: "agent.hostname"
           to: "hostname"
   - drop_fields:
-      fields: ["offset", "beat", "prospector", "host", "input", "ecs", "agent", "event"]
+      fields: ["offset", "beat", "prospector", "host", "input", "ecs", "agent"]
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
@@ -69,6 +69,10 @@ output.elasticsearch:
   hosts: "{{ dashbase_url }}"
   index: "{{ table }}"
   ssl.verification_mode: none
+  pipelines:
+  - pipeline: "filebeat-7.6.1-freeswitch-cdr-pipeline"
+    when.equals:
+      event.dataset: freeswitch.cdr
 
 #================================ Logging =====================================
 

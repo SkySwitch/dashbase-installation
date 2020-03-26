@@ -15,16 +15,9 @@ fields:
   type: cdr
 
 processors:
-  - add_locale: ~
-  - rename:
-      when:
-        has_fields: ['fields._message_parser']
+  - copy_fields:
       fields:
-        - from: "beat.timezone"
-          to: "fields._message_parser.defaultTimeZone"
-  - rename:
-      fields:
-        - from: "beat.hostname"
-          to: "hostname"
-  - drop_fields:
-      fields: ["offset", "beat", "prospector", "host", "input"]
+        - from: variables.sip_user_agent
+          to: user-agent
+      fail_on_error: false
+      ignore_missing: true
