@@ -1,4 +1,18 @@
-- name: create filebeat config directory
+# https://www.elastic.co/guide/en/beats/filebeat/7.6/running-with-systemd.html
+- name: Create systemd config directory for filebeat
+  file:
+    path: /etc/systemd/system/filebeat.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy systemd config file for filebeat
+  copy:
+    src: filebeat.systemd.conf
+    dest: /etc/systemd/system/filebeat.service.d/filebeat.systemd.conf
+
+- name: Create filebeat config directory
   file:
     path: /etc/filebeat/configs
     state: directory

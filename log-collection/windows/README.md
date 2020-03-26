@@ -5,13 +5,13 @@
 
    1. Login to Windows Server 2012 as an Administrator 
 
-   2. Download Filebeat OSS 6.8.5 from https://www.elastic.co/downloads/past-releases/filebeat-oss-6-8-5 
+   2. Download Filebeat OSS 7.6.1 from https://www.elastic.co/downloads/past-releases/filebeat-oss-7-6-1
 
-   3. Unzip filebeat-oss-6.8.5-windows-x86_64.zip. Unzipping will create filebeat-oss-6.8.5-windows-x86_64 folder.  
+   3. Unzip filebeat-oss-7.6.1-windows-x86_64.zip. Unzipping will create filebeat-oss-7.6.1-windows-x86_64 folder.  
 
-   4. Open Powershell with Administrator priviledge and move filebeat-oss-6.8.5-windows-x86_64 folder to “c:\program files\”:
+   4. Open Powershell with Administrator priviledge and move filebeat-oss-7.6.1-windows-x86_64 folder to “c:\program files\”:
 
-      mv c:\Users\Administrator\Downloads\filebeat-oss-6.8.5-windows-x86_64\filebeat-6.8.5-windows-x86_64\ "c:\Program files\filebeat"
+      mv c:\Users\Administrator\Downloads\filebeat-oss-7.6.1-windows-x86_64\filebeat-7.6.1-windows-x86_64\ "c:\Program files\filebeat"
 
    5. In the Powershell, go to filebeat folder and run install script:
       cd "c:\Program files\filebeat" 
@@ -67,7 +67,7 @@
         "@metadata": {
           "beat": "filebeat",
           "type": "doc",
-          "version": "6.8.5"
+          "version": "7.6.1"
         },
         "message":
       ...

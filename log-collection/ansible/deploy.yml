@@ -18,7 +18,7 @@
       private: no
 
   vars:
-    filebeat_version: "oss-6.8.5"
+    filebeat_version: "oss-7.6.1"
     prometheus_pushgateway_enable: True
     configs_list: "{{ configs.split(',') }}"
     table: "logs"
