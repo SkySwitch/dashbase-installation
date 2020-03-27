@@ -10,7 +10,6 @@
   symlinks: true
   clean_removed: true
   fields:
-    x-dashbase-component: heplify
     _message_parser:
       type: multi
       parsers_list:
