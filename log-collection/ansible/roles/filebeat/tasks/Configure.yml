@@ -26,6 +26,14 @@
     src: "templates/configs/{{ item }}.yml"
     dest: "/etc/filebeat/configs/{{ item }}.yml"
   with_items:
+    "{{ configs_list | difference(filebeat_modules) }}"
+
+## Delete existed app related config file which is already defined in modules
+- name: Delete redundant filebeat app config files
+  file:
+    path: "/etc/filebeat/configs/{{ item }}.yml"
+    state: absent
+  with_items:
     "{{ configs_list | intersect(filebeat_modules) }}"
 
 ## Copy module related config files
