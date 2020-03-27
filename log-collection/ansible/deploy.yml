@@ -29,5 +29,5 @@
     nightwatch_configs: ""
     heplify_version: 1.56
 
-    # builtin vars, do not override by "-e"
+    # builtin var, app config which is in this list will use Filebeat module instead of simple configuration file.
     filebeat_modules: ["freeswitch"]
