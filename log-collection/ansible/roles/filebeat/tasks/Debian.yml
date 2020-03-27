@@ -12,13 +12,13 @@
 - name: Copy filebeat package
   copy:
     src: 
-         filebeat-{{ filebeat_version }}-amd64.deb
-    dest: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
+         filebeat-oss-{{ filebeat_version }}-amd64.deb
+    dest: /opt/scripts/filebeat-oss-{{ filebeat_version }}-amd64.deb
     owner: root
     group: root
     mode: 0644
 
 - name: Install Filebeat
   apt:
-    deb: /opt/scripts/filebeat-{{ filebeat_version }}-amd64.deb
+    deb: /opt/scripts/filebeat-oss-{{ filebeat_version }}-amd64.deb
     state: present

@@ -70,7 +70,7 @@ output.elasticsearch:
   index: "{{ table }}"
   ssl.verification_mode: none
   pipelines:
-  - pipeline: "filebeat-7.6.1-freeswitch-cdr-pipeline"
+  - pipeline: "filebeat-{{ filebeat_version }}-freeswitch-cdr-pipeline"
     when.equals:
       event.dataset: freeswitch.cdr
 

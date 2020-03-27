@@ -12,15 +12,15 @@
 - name: Copy filebeat package
   copy:
     src: 
-         filebeat-{{ filebeat_version }}-x86_64.rpm
-    dest: /opt/scripts/filebeat-{{ filebeat_version }}-x86_64.rpm
+         filebeat-oss-{{ filebeat_version }}-x86_64.rpm
+    dest: /opt/scripts/filebeat-oss-{{ filebeat_version }}-x86_64.rpm
     owner: root
     group: root
     mode: 0644
 
 - name: Install Filebeat
   yum:
-    name: /opt/scripts/filebeat-{{ filebeat_version }}-x86_64.rpm
+    name: /opt/scripts/filebeat-oss-{{ filebeat_version }}-x86_64.rpm
     state: present
 
 - name: Install RHEL initscripts
