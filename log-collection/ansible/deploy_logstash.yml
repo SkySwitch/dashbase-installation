@@ -1,0 +1,27 @@
+---
+- name: Transfer and execute a script.
+  hosts: "logstash_hosts"
+  become: yes
+  become_method: sudo
+  roles:
+    - logstash
+
+  vars_prompt:
+    - name: "dashbase_url"
+      prompt: "Enter Dashbase Table URL"
+      private: no
+    - name: "configs"
+      prompt: "Enter comma separated list of logstash input plugins which needs dependencies to install (for example: mysql)"
+      private: no
+
+  vars:
+    logstash_version: "oss-7.6.1"
+    configs_list: "{{ configs.split(',') }}"
+    table: "logs"
+
+    mysql:
+      connection_string: jdbc:mysql://localhost:3306/database
+      user: logstash
+      password: logstash
+      statement: SELECT * FROM table;
+      schedule: "* * * * *"

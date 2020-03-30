@@ -1,0 +1,32 @@
+## Copy app related config files
+- name: Copy Logstash app config files
+  template:
+    src: "templates/configs/{{ item }}.logstash.conf.j2"
+    dest: "/etc/logstash/conf.d/{{ item }}.logstash.conf"
+    owner: logstash
+    group: logstash
+    mode: 0600
+  with_items:
+    "{{ configs_list }}"
+
+## Copy the Logstash config file
+- name: Copy logstash.yml file
+  template:
+    src: logstash.conf.j2
+    dest: /etc/logstash/conf.d/logstash.conf
+    owner: logstash
+    group: logstash
+    mode: 0600
+
+- name: Stop Logstash Service
+  service:
+    name: logstash
+    state: stopped
+
+- name: Wait for monitoring port to stop listening
+  shell: sleep 5
+
+- name: Restart Logstash Service
+  service:
+    name: logstash
+    state: started

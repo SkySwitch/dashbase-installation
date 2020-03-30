@@ -1,0 +1,26 @@
+---
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+
+- name: Copy Logstash package
+  copy:
+    src: logstash-{{ logstash_version }}.deb
+    dest: /opt/scripts/logstash-{{ logstash_version }}.deb
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Logstash
+  apt:
+    deb: /opt/scripts/logstash-{{ logstash_version }}.deb
+    state: present
+
+- include_tasks: mysql/Debian.yml
+  when: '"mysql" in vars.configs.split(",")'
