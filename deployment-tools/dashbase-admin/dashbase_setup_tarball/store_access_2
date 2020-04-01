@@ -1,0 +1,3 @@
+      environment:
+        AWS_ACCESS_KEY_ID: "STOREACCOUNT"
+        AWS_SECRET_ACCESS_KEY: "STOREKEY"

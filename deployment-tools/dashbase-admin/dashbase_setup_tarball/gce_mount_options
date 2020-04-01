@@ -1,0 +1,3 @@
+  mountOptions:
+    - --endpoint
+    - https://storage.googleapis.com

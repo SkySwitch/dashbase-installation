@@ -21,12 +21,18 @@
      --authusername
      --authpassword
   
-     ./aws_eks_dashbase_install.sh  --aws_access_key=YOURAWSACCESSKEY \
+     ./aws_eks_dashbase_install.sh   --aws_access_key=YOURAWSACCESSKEY \
                                      --aws_secret_access_key=YOURACESSSECRETACCESSKEY \
                                      --region=YOURREGION --subdomain=YOURSUBDOMAIN --install_dashbase \
                                      --basic_auth
                                      --authusername=admin
                                      --authpassword=dashbase
+                                     
+     For V2 setup
+     
+     ./aws_eks_dashbase_install.sh   --v2 --aws_access_key=YOURAWSACCESSKEY \
+                                     --aws_secret_access_key=YOURACESSSECRETACCESSKEY \
+                                     --region=YOURREGION --subdomain=YOURSUBDOMAIN --install_dashbase
       
 
 ```
@@ -88,10 +94,28 @@ install script options
                    e.g. --license=Aertyujk8903HJKLBNMLOP34erTui
     --basic_auth   enable basic authentication via default ingress controller
     --authusername basic auth username
-                   e.g. --authusername=
+                   e.g. --authusername=admin
+    --authpassword basic auth password
+                   e.g. --authpassword=dashbase
+    --valuefile    specifiy a custom dashbase values yaml file. 
+                   dashbase setup will base on provided custom values yaml file only.
+                   e.g. --valuefile=/tmp/my-dashbase-values.yaml
+                   
+    The following options only be valid on V2 dashbase
+    
+    --v2               setup dashbase V2
+    --bucketname       cloud object storage bucketname
+                       e.g. --bucketname=my-s3-dashbase
+    --storgae_account  cloud storage account value, in AWS is the ACCESS KEY
+                       e.g. --storage_account=MYSTORAGEACCOUNTSTRING"
+    --storage_key      cloud object storage key, in AWS is the ACCESS SECRET
+                       e.g. --storage_key=MYSTORAGEACCOUNTACCESSKEY"
     
     
-examples of using ingress, on AWS platform
+    
+###Examples of using ingress, on AWS platform
+
+By default the dashbase-installer.sh script will use Load Balancer on K8s to expose the web and table endpoints. If you like to expose these endpoints using nginx ingress controller, then use the ingress flag, see below.
 
     ./dashbase-installer.sh --subdomain=raytest.dashbase.io --ingress --platform=aws
 

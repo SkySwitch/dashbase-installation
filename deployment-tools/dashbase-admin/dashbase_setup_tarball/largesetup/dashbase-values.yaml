@@ -63,6 +63,7 @@ services:
   api:
     enabled: true
   web:
+    expose: true
     enabled: true
   prometheus:
     enabled: true
