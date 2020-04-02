@@ -9,7 +9,7 @@
       parsers:
         grok:
           type: grok
-          pattern: '%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}\|%{DATA:component:meta}\[%{INT:lwp:int}\]\|(?:%{DATA:call-id})\|%{DATA:val1}\|%{INT:val2:int}\|%{GREEDYDATA:message}'
+          pattern: '%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}\|%{DATA:component:meta}\[%{INT:lwp:int}\]\|(?:%{DATA:call-id:meta})\|%{DATA:val1}\|%{INT:val2:int}\|%{GREEDYDATA:message}'
         sip:
           type: sip
           sortedFields: call-id,user-agent
