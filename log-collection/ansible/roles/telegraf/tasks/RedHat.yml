@@ -80,6 +80,6 @@
 - name: Create Prometheus pushgateway crontab
   cron:
     name: "telegraf pushgateway"
-    job: "curl -s {{ prometheus_local_exporter_url }} | curl --connect-timeout 10 --data-binary @- {{ prometheus_pushgateway_url }} &> /dev/null"
+    job: "curl -s {{ prometheus_local_exporter_url }} | curl -k --connect-timeout 10 --data-binary @- {{ prometheus_pushgateway_url }} &> /dev/null"
   when:
     - prometheus_pushgateway_enable
