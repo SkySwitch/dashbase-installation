@@ -26,13 +26,13 @@ default:
     containerConfig:
       resources:
         requests:
-          cpu: 7.3
-          memory: 26G
+          cpu: 7.5
+          memory: 60G
         limits:
           cpu: 7.5
-          memory: 28G
+          memory: 60G
     environment:
-      JAVA_OPTS: "-Xmx20g -Xms16g"
+      JAVA_OPTS: "-Xmx20g -Xms20g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "14"
