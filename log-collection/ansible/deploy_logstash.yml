@@ -23,5 +23,5 @@
       connection_string: jdbc:mysql://localhost:3306/database
       user: logstash
       password: logstash
-      statement: SELECT * FROM table;
-      schedule: "* * * * *"
+      table: table_name
+      schedule: "*/10 * * * *"

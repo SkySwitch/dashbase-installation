@@ -44,7 +44,7 @@ processors:
         - from: "agent.hostname"
           to: "hostname"
   - drop_fields:
-      fields: ["offset", "beat", "prospector", "host", "input", "ecs", "agent", "event"]
+      fields: ["host", "input", "ecs", "agent", "event"]
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
