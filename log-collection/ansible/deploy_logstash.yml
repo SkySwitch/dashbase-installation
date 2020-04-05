@@ -20,8 +20,8 @@
     table: "logs"
 
     mysql:
-      connection_string: jdbc:mysql://localhost:3306/database
-      user: logstash
-      password: logstash
-      table: table_name
+      connection_string: "jdbc:mysql://localhost:3306/database"
+      user: "logstash"
+      password: "logstash"
+      table: "table_name"
       schedule: "*/10 * * * *"

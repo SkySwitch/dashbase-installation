@@ -1,10 +1,70 @@
 ---
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
 
-- include_tasks: Debian.yml
-  when:
-    - ansible_os_family == "Debian"
+- name: Copy Logstash package
+  copy:
+    src: logstash-{{ logstash_version }}.deb
+    dest: /opt/scripts/logstash-{{ logstash_version }}.deb
+    owner: root
+    group: root
+    mode: 0644
 
-- include_tasks: Configure.yml
-  when:
-    - ansible_os_family == "Debian"
+- name: Install Logstash
+  apt:
+    deb: /opt/scripts/logstash-{{ logstash_version }}.deb
+    state: present
 
+- name: Copy MySQL java connector
+  copy:
+    src: mysql-connector-java_8.0.19-1ubuntu16.04_all.deb
+    dest: /opt/scripts/mysql-connector-java_8.0.19-1ubuntu16.04_all.deb
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install MySQL java connector
+  apt:
+    deb: /opt/scripts/mysql-connector-java_8.0.19-1ubuntu16.04_all.deb
+    state: present
+
+## Copy app related config files
+- name: Copy Logstash app config files
+  template:
+    src: "templates/configs/{{ item }}.logstash.conf.j2"
+    dest: "/etc/logstash/conf.d/{{ item }}.logstash.conf"
+    owner: logstash
+    group: logstash
+    mode: 0600
+  with_items:
+    "{{ configs_list }}"
+
+## Copy the Logstash config file
+- name: Copy logstash.yml file
+  template:
+    src: logstash.conf.j2
+    dest: /etc/logstash/conf.d/logstash.conf
+    owner: logstash
+    group: logstash
+    mode: 0600
+
+- name: Stop Logstash Service
+  service:
+    name: logstash
+    #state: stopped
+    state: restarted
+
+- name: Wait for monitoring port to stop listening
+  shell: sleep 5
+
+- name: Restart Logstash Service
+  service:
+    name: logstash
+    state: started
