@@ -8,13 +8,15 @@ UCAAS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.3.2"
+DASHVERSION="1.4.0-rc10"
 AUTHUSERNAME="undefined"
 AUTHPASSWORD="undefined"
 BUCKETNAME="undefined"
 STORAGE_ACCOUNT="undefined"
 STORAGE_KEY="undefined"
 PRESTO_FLAG="false"
+TABLENAME="logs"
+CDR_FLAG="false "
 
 echo "Installer script version is $INSTALLER_VERSION poc setup"
 
@@ -27,7 +29,7 @@ display_help() {
   echo "     --ingress      exposed dashbase services using ingress controller  e.g. --ingress"
   echo "     --subdomain    use together with ingress option e.g.  --subdomain=test.dashbase.io"
   echo "     --username     dashbase license username e.g. --username=myname"
-  echo "     --license      dashbase license string  e.g. --license=zxcv6er3tySdfgjejejllwlw"
+  echo "     --license      dashbase license string  e.g. --license=my_license_string"
   echo "     --exposemon    expose dashbase prometheus and pushgateway endpoints when using LB (not ingress)"
   echo "                    e.g.  --exposemon"
   echo "     --basic_auth   use basic auth to secure dashbase web UX e.g.  --basic_auth"
@@ -39,6 +41,9 @@ display_help() {
   echo "     --valuefile    specify a custom values yaml file"
   echo "                    e.g. --valuefile=/tmp/mydashbase_values.yaml"
   echo "     --presto       enable presto component e.g. --presto"
+  echo "     --tablename        dashbase table name, default table name is logs"
+  echo "                        e.g. --tablename=freeswitch"
+  echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
   echo "     --help         display command options and usage example"
   echo ""
   echo "   The following options only be used on V2 dashbase"
@@ -46,18 +51,18 @@ display_help() {
   echo "     --bucketname       cloud object storage bucketname"
   echo "                        e.g. --bucketname=my-s3-bucket"
   echo "     --storage_account  cloud object storage account value, in AWS is the ACCESS KEY"
-  echo "                        e.g. --storage_account=GOOGBZRBBY5CDTMVEN4E"
+  echo "                        e.g. --storage_account=MYSTORAGEACCOUNTSTRING"
   echo "     --storage_key      cloud object storage key, in AWS is the ACCESS SECRET"
-  echo "                        e.g. --storage_key=jIgJUyNW7eiMFItbwfDWrnsNkTCsLvlPc"
+  echo "                        e.g. --storage_key=MYSTORAGEACCOUNTACCESSKEY"
   echo ""
   echo "   Command example in V1"
-  echo "   ./dashbase-installer.sh --platform=aws --ingress --subdomain=test.dashbase.io"
+  echo "   ./dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=test.dashbase.io"
   echo ""
   echo "   Command example in V2"
-  echo "   ./dashbase-installer.sh --platform=aws --v2 --ingress \ "
-  echo "                           --subdomain=test.dashase.io --bucketname=my-s3-bucket \ "
-  echo "                           --storage_account=GOOGBZRBBY5CDTMVEN4E \ "
-  echo "                           --storage_key=jIgJUyNW7eiMFItbwfDWrnsNkTCsLvlPc \ "
+  echo "   ./dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress \ "
+  echo "                                      --subdomain=test.dashase.io --bucketname=my-s3-bucket \ "
+  echo "                                      --storage_account=MYSTORAGEACCOUNTSTRING \ "
+  echo "                                      --storage_key=MYSTORAGEACCOUNTACCESSKEY \ "
   echo ""
   exit 0
 }
@@ -122,8 +127,15 @@ while [[ $# -gt 0 ]]; do
     fail_if_empty "$PARAM" "$VALUE"
     BUCKETNAME=$VALUE
     ;;
+  --tablename)
+    fail_if_empty "$PARAM" "$VALUE"
+    TABLENAME=$VALUE
+    ;;
   --v2)
     V2_FLAG="true"
+    ;;
+  --cdr)
+    CDR_FLAG="true"
     ;;
   --authusername)
     fail_if_empty "$PARAM" "$VALUE"
@@ -560,14 +572,22 @@ update_dashbase_valuefile() {
     log_info "update dashbase-values.yaml file for basic auth"
     kubectl exec -it admindash-0 -n dashbase -- sed -i '/web\:/!b;n;c\ \ \ \ expose\: false' /data/dashbase-values.yaml
   fi
+  # update table name
+  log_info "update dashbase-values.yaml file with table name = $TABLENAME"
+  kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME" /data/dashbase-values.yaml
+
   # update ucaas feature
   if [ "$UCAAS_FLAG" == "true" ]; then
     log_info "update dashbase-values.yaml file to enable UCAAS features"
     kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_UCAAS\:\ \"false\"/ENABLE_UCAAS\:\ \"true\"/' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_CALL\:\ \"false\"/ENABLE_CALL\:\ \"true\"/' /data/dashbase-values.yaml
-    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_CDR\:\ \"false\"/ENABLE_CDR\:\ \"true\"/' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_INSIGHTS\:\ \"false\"/ENABLE_INSIGHTS\:\ \"true\"/' /data/dashbase-values.yaml
+  fi
+  # update CDR log data for insight
+  if [ "$CDR_FLAG" == "true" ]; then
+     log_info "update dashbase-values.yaml file for CDR data in insights page"
+     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/INSIGHTS_IS_CDR\:\ \"false\"/INSIGHTS_IS_CDR\:\ \"true\"/' /data/dashbase-values.yaml
   fi
   # update bucket name and storage access
   if [ "$V2_FLAG" == "true" ]; then

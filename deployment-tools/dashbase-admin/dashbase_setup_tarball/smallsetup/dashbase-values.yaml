@@ -41,7 +41,7 @@ ingress:
   host: test.dashbase.io
 
 tables:
-  logs:
+  LOGS:
       replicas: 1
 
 presto:
@@ -63,7 +63,42 @@ services:
   api:
     enabled: true
   web:
+    expose: true
     enabled: true
+    secrets:
+      presto-cert:
+        dir: /run/prestojks/
+        file: presto-cert.pem
+      presto-key:
+        dir: /run/prestojks/
+        file: presto-key.pem
+      presto-keystore:
+        dir: /run/prestojks/
+        file: presto-keystore
+      presto-keystore-password:
+        dir: /run/prestojks/
+        file: presto-keystore-password
+    containerConfig:
+      resources:
+        limits:
+          cpu: 1
+          memory: 2G
+        requests:
+          cpu: 500m
+          memory: 2G
+    environment:
+      ENABLE_SEARCH_SCHEDULER: "true"
+      ENABLE_CHRONOLOGICAL_SORT: "true"
+      ENABLE_SCHEDULED_METRICS: "true"
+      DISPLAY_COLOREDFIELDS: "from.sip-uri.user,to.sip-uri.user,call-id,level"
+      ENABLE_UCAAS: "false"
+      ENABLE_CALL: "false"
+      ENABLE_INSIGHTS: "false"
+      CALL_TABLES: "LOGS"
+      INSIGHTS_IS_CDR: "false"
+      UCAAS_PROMETHEUS_URL: "http://prometheus:9090"
+#     UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
+
   prometheus:
     enabled: true
     image: "dashbase/prometheus:nightly"
@@ -73,3 +108,14 @@ services:
     enabled: false
   pushgateway:
     enabled: true
+  exporter:
+    enabled: false
+    config:
+      metrics:
+        ucaas_unique_leg_count:
+          description: "ucaas unique call legs"
+          table: "LOGS"
+          accumulate: false
+          filter: "type:sip AND _missing_:to.tag AND method:invite"
+          aggregation: "topn(hostname, 100, topn(user-agent, 100, cardinality(call-id)))"
+

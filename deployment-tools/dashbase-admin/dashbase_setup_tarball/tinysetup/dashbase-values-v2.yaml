@@ -50,11 +50,11 @@ ingress:
   host: test.dashbase.io
 
 #tables:
-#  logs:
+#  LOGS:
 #      replicas: 1
 
 tablesv2:
-  logs:
+  LOGS:
     table_manager:
       replicas: 1
       containerConfig:
@@ -113,10 +113,11 @@ services:
       DISPLAY_COLOREDFIELDS: "from.sip-uri.user,to.sip-uri.user,call-id,level"
       ENABLE_UCAAS: "false"
       ENABLE_CALL: "false"
-#      UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
-      ENABLE_CDR: "false"
-      CDR_TABLES: "logs"
       ENABLE_INSIGHTS: "false"
+      CALL_TABLES: "LOGS"
+      INSIGHTS_IS_CDR: "false"
+      UCAAS_PROMETHEUS_URL: "http://prometheus:9090"
+#     UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
 
   prometheus:
     enabled: true
@@ -131,12 +132,12 @@ services:
     enabled: false
     config:
       metrics:
-        error_count:
-          description: "count of logs with level:error"
-          table: "logs"
-          filter: "level:error"
-          aggregation: "count(*)"
-          accumulate: true
+        ucaas_unique_leg_count:
+          description: "ucaas unique call legs"
+          table: "LOGS"
+          accumulate: false
+          filter: "type:sip AND _missing_:to.tag AND method:invite"
+          aggregation: "topn(hostname, 100, topn(user-agent, 100, cardinality(call-id)))"
   searcher:
     enabled: true
     replicas: 1

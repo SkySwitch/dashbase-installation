@@ -41,11 +41,11 @@ ingress:
   host: test.dashbase.io
 
 tables:
-  logs:
+  LOGS:
       replicas: 1
 
 presto:
-  enabled: true
+  enabled: false
   presto:
     prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
     dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
@@ -62,8 +62,8 @@ services:
     enabled: true
   api:
     enabled: true
-
   web:
+    expose: true
     enabled: true
     secrets:
       presto-cert:
@@ -89,38 +89,33 @@ services:
     environment:
       ENABLE_SEARCH_SCHEDULER: "true"
       ENABLE_CHRONOLOGICAL_SORT: "true"
-#      INTERNAL_TOKEN: "internal-token-XXXXXXXXXXXXXXXXX"
-#      AUTH_URL: "https://auth.mynamespace.domain.com"
       ENABLE_SCHEDULED_METRICS: "true"
-#      ENABLE_BANNER_MESSAGE: "Welcome to Dashbase Staging environment where things break more often than not. Don't try to use this for a demo unless you know the consequences. https://web.release.dashbase.io"
-#      JAVA_OPTS: -Xmx1500m -Xms1500m
-#      SMTP_HOST: "smtp.gmail.com"
-#      SMTP_USERNAME: "no-reply@dashbase.io"
-#      SMTP_PASSWORD: "dashbasenoreplyemail"
-#      SMTP_PROTOCOL: "smtps"
-      DISPLAY_COLOREDFIELDS: "traceId,spanId,level"
-      ENABLE_UCAAS: "true"
-      UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
-      ENABLE_CDR: "true"
-      CDR_TABLES: "logs"
+      DISPLAY_COLOREDFIELDS: "from.sip-uri.user,to.sip-uri.user,call-id,level"
+      ENABLE_UCAAS: "false"
+      ENABLE_CALL: "false"
+      ENABLE_INSIGHTS: "false"
+      CALL_TABLES: "LOGS"
+      INSIGHTS_IS_CDR: "false"
+      UCAAS_PROMETHEUS_URL: "http://prometheus:9090"
+#     UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
 
   prometheus:
     enabled: true
     image: "dashbase/prometheus:nightly"
   grafana:
     enabled: true
-    image: dashbase/grafana:23dfde
   alertmanager:
     enabled: false
   pushgateway:
     enabled: true
   exporter:
-    enabled: true
+    enabled: false
     config:
       metrics:
-        error_count:
-          description: "count of logs with level:error"
-          table: "logs"
-          filter: "level:error"
-          aggregation: "count(*)"
-          accumulate: true
+        ucaas_unique_leg_count:
+          description: "ucaas unique call legs"
+          table: "LOGS"
+          accumulate: false
+          filter: "type:sip AND _missing_:to.tag AND method:invite"
+          aggregation: "topn(hostname, 100, topn(user-agent, 100, cardinality(call-id)))"
+
