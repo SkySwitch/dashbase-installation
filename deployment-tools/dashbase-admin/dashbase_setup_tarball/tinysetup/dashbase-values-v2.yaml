@@ -31,7 +31,7 @@ default:
       JAVA_OPTS: "-Xmx20g -Xms16g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
-      RETENTION_NUM_DAYS: "14"
+      RETENTION_NUM_DAYS: "7"
       RETENTION_SIZE_GB: "850"
       IN_MEMORY_BUFFER: "true"
       READER_CACHE_MEM_PERCENT: "60"
@@ -136,7 +136,7 @@ services:
           description: "ucaas unique call legs"
           table: "LOGS"
           accumulate: false
-          filter: "type:sip AND _missing_:to.tag AND method:invite"
+          filter: "type:sip"
           aggregation: "topn(hostname, 100, topn(user-agent, 100, cardinality(call-id)))"
   searcher:
     enabled: true
