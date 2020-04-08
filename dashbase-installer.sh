@@ -574,7 +574,7 @@ update_dashbase_valuefile() {
   fi
   # update table name
   log_info "update dashbase-values.yaml file with table name = $TABLENAME"
-  kubectl exec -it admindash-0 -n dashbase -- sed -i "s/LOGS/$TABLENAME" /data/dashbase-values.yaml
+  kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/dashbase-values.yaml
 
   # update ucaas feature
   if [ "$UCAAS_FLAG" == "true" ]; then
