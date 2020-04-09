@@ -49,11 +49,3 @@
   clean_removed: true
   fields:
     type: cdr
-
-  processors:
-    - copy_fields:
-        fields:
-          - from: variables.sip_user_agent
-            to: user-agent
-        fail_on_error: false
-        ignore_missing: true
