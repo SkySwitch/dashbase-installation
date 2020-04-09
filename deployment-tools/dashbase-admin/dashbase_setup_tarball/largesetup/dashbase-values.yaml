@@ -27,10 +27,10 @@ default:
       resources:
         requests:
           cpu: 7.5
-          memory: 60G
+          memory: 52G
         limits:
           cpu: 7.5
-          memory: 60G
+          memory: 52G
     environment:
       JAVA_OPTS: "-Xmx20g -Xms20g"
       BLOOM_FILTER_SIZE: "400"
