@@ -79,6 +79,10 @@ create_s3() {
 
 # update bucket policy json with BUCKETNAME
 update_s3_policy_json() {
+   # remove any previous mydash-s3.json file if exists
+   rm -rf mydash-s3.json
+   # download the mydash-s3.json from github
+   curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/mydash-s3.json -o mydash-s3.json
    sed -i "s/MYDASHBUCKET/$BUCKETNAME/" mydash-s3.json
 }
 

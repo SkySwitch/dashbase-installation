@@ -8,7 +8,7 @@ UCAAS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.4.0-rc12"
+DASHVERSION="1.4.0"
 AUTHUSERNAME="undefined"
 AUTHPASSWORD="undefined"
 BUCKETNAME="undefined"
@@ -43,6 +43,7 @@ display_help() {
   echo "     --presto       enable presto component e.g. --presto"
   echo "     --tablename        dashbase table name, default table name is logs"
   echo "                        e.g. --tablename=freeswitch"
+  echo "     --ucaas        enable ucaas feature  e.g. --ucaas"
   echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
   echo "     --help         display command options and usage example"
   echo ""
@@ -505,10 +506,10 @@ download_dashbase() {
   # get the custom values yaml file
   if [ "$V2_FLAG" == "true" ]; then
     log_info "Download dashbase-values-v2.yaml file for v2 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase-values-v2.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/tinysetup/dashbase-values-v2.yaml"
   else
     log_info "Download dashbase-values.yaml file for v1 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/tinysetup/dashbase-values.yaml"
   fi
 
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
