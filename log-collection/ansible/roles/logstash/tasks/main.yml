@@ -1,4 +1,13 @@
 ---
+- name: Download Logstash package locally
+  become: no
+  get_url:
+    url: https://dashbase-public.s3-us-west-1.amazonaws.com/lapp/logstash-{{ logstash_version }}.deb
+    dest: roles/logstash/files/logstash-{{ logstash_version }}.deb
+    checksum: sha1:2ded8b333f0aedbeacfb6f78c994fd43cb5391e7
+  delegate_to: localhost
+  run_once: true
+
 - name: Create Directories
   file:
     path: "{{ item }}"

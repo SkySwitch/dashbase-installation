@@ -4,3 +4,5 @@
 *.pyc
 .python-version
 inventory
+
+logstash-oss-7.6.1.deb
