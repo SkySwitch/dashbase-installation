@@ -18,7 +18,9 @@ RUN apk add --no-cache ca-certificates bash git openssh curl \
     && wget -q https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl \
     && wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
-    && chmod +x /usr/local/bin/helm
+    && chmod +x /usr/local/bin/helm \
+    && /usr/local/bin/helm repo add dashbase https://charts.dashbase.io \
+    && /usr/local/bin/helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 RUN pip install --upgrade pip
 
@@ -42,6 +44,7 @@ RUN apk add --update openjdk8-jre
 RUN apk add --update openssl
 RUN apk add --update coreutils
 RUN apk add --update apache2-utils
+RUN apk add --update busybox-extras
 
 ADD validate-license.py /dashbase
 RUN chmod +x /dashbase/validate-license.py

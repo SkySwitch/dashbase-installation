@@ -14,6 +14,8 @@ fi
 curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "/tmp/awscli-bundle.zip"
 unzip /tmp/awscli-bundle.zip
 /dashbase/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+/usr/local/bin/helm repo add dashbase https://charts.dashbase.io
+/usr/local/bin/helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 ln -s /usr/local/lib/dashbase/.aws /root/.aws
 
