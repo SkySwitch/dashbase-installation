@@ -19,9 +19,7 @@
     configs_list: "{{ configs.split(',') }}"
     table: "logs"
 
-    mysql:
-      connection_string: "jdbc:mysql://localhost:3306/database"
+    netsapiens_1:
+      connection_string: "jdbc:mysql://localhost:3306/DiagDomain"
       user: "logstash"
       password: "logstash"
-      table: "table_name"
-      schedule: "*/10 * * * *"
