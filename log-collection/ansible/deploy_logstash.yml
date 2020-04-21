@@ -20,6 +20,11 @@
     table: "logs"
 
     netsapiens_1:
-      connection_string: "jdbc:mysql://localhost:3306/DiagDomain"
+      connection_string: "jdbc:mysql://localhost:3306/database"
+      user: "logstash"
+      password: "logstash"
+
+    netsapiens_2:
+      connection_string: "jdbc:mysql://localhost:3306/database"
       user: "logstash"
       password: "logstash"

@@ -7,12 +7,11 @@ input {
 		jdbc_user => "{{ netsapiens_2.user}}"
 		jdbc_password => "{{ netsapiens_2.password }}"
 
-        last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_netsapiens_2"
-		statement => "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM {{ netsapiens_2.table }} WHERE event_type='responder' AND event_index > :sql_last_value"
-
-        schedule => "*/10 * * * *"
-        use_column_value => true
-        tracking_column => "event_index"
+                last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_netsapiens_2"
+                statement_filepath => "/etc/logstash/conf.d/netsapiens_mysql_statement"
+                schedule => "*/10 * * * *"
+                use_column_value => true
+                tracking_column => "event_index"
 	}
 }
 
