@@ -95,7 +95,7 @@
 - name: Create mysql_statement file
   shell: |-
     echo "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM event_$(date +\%Y\%m\%d) WHERE event_type='responder' AND event_index > :sql_last_value">/etc/logstash/conf.d/netsapiens_mysql_statement
-  when: "'netsapiens' in configs_list"
+  #when: "'netsapiens' in configs_list"
 
 - name: Create cron job to update mysql statement based on current date
   cron:
@@ -104,4 +104,4 @@
     hour: "0"
     job: |-
       systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run*; echo "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM event_$(date +\%Y\%m\%d) WHERE event_type='responder' AND event_index > :sql_last_value">/etc/logstash/conf.d/netsapiens_mysql_statement; systemctl start logstash
-  when: "'netsapiens' in configs_list"
+  #when: "'netsapiens' in configs_list"
