@@ -1,0 +1,107 @@
+dashbase_version: 1.4.0
+
+https: true
+
+default_storageclass_provider:
+  platform: "aws"
+
+v2:
+  bucket: MYBUCKET
+
+default:
+  storage:
+    class: "dashbase-meta"
+    size: 10Gi
+  environment:
+    ETCD_HOST: etcd-cluster.dashbase.svc.cluster.virginia
+  table:
+    priorityClassName: dashbase-high-priority
+    storage:
+      class: "dashbase-data"
+      size: "3000Gi"
+
+    containerConfig:
+      resources:
+        requests:
+          cpu: 7.5
+          memory: 52G
+        limits:
+          cpu: 7.5
+          memory: 52G
+    environment:
+      JAVA_OPTS: "-Xmx52g -Xms52g"
+      BLOOM_FILTER_SIZE: "400"
+      MAX_BUFFER_DELAY_IN_SEC: "1000"
+      RETENTION_NUM_DAYS: "7"
+      RETENTION_SIZE_GB: "2500"
+      IN_MEMORY_BUFFER: "true"
+      READER_CACHE_MEM_PERCENT: "60"
+      NUM_INDEXING_THREADS: "2"
+      MIN_BUFFER_SIZE_MB: "200"
+
+
+ingress:
+  enabled: true
+  certmanager: false
+  host: test.dashbase.dashbase.io
+
+#tables:
+#  LOGSv1:
+#      replicas: 1
+
+tablesv2:
+  rlogs:
+    table_manager:
+      environment:
+        ETCD_HOST: etcd-cluster.dashbase.svc.cluster.virginia
+      replicas: 1
+      containerConfig:
+        resources:
+          requests:
+            cpu: 1
+            memory: 6G
+          limits:
+            cpu: 1
+            memory: 6G
+    indexer:
+      environment:
+        ETCD_HOST: etcd-cluster.dashbase.svc.cluster.virginia
+      containerConfig:
+        resources:
+          requests:
+            cpu: 5
+            memory: 32G
+          limits:
+            cpu: 5
+            memory: 32G
+
+services:
+  etcd:
+    enabled: false
+  api:
+    enabled: false
+  web:
+    enabled: false
+  prometheus:
+    enabled: false
+  grafana:
+    enabled: false
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+  exporter:
+    enabled: false
+  searcher:
+    environment:
+      ETCD_HOST: etcd-cluster.dashbase.svc.cluster.virginia
+    enabled: true
+    replicas: 2
+    containerConfig:
+      resources:
+        requests:
+          cpu: 1
+          memory: 5G
+        limits:
+          cpu: 1
+          memory: 5G

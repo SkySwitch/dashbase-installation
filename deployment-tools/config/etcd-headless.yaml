@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dashbase
+    component: etcd
+  name: etcd-cluster
+spec:
+  clusterIP: None
+  ports:
+  - name: client
+    port: 2379
+    protocol: TCP
+    targetPort: 2379
+  selector:
+    app: dashbase
+    component: etcd
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
