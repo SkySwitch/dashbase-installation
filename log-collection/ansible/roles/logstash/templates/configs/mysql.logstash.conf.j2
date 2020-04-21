@@ -11,3 +11,11 @@ input {
 		schedule => "{{ mysql.schedule }}"
 	}
 }
+
+output {
+    elasticsearch {
+        hosts => "{{ dashbase_url }}"
+        index => "{{ table }}"
+        ssl_certificate_verification => false
+    }
+}

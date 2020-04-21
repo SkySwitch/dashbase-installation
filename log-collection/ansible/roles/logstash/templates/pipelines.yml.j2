@@ -1,0 +1,9 @@
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+
+{% for config in configs_list %}
+- pipeline.id: {{ config }}
+  path.config: "/etc/logstash/conf.d/{{ config }}.logstash.conf"
+  pipeline.workers: 1
+{% endfor %}

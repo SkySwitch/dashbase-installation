@@ -44,6 +44,13 @@
     deb: /opt/scripts/mysql-connector-java_8.0.19-1ubuntu16.04_all.deb
     state: present
 
+- name: Change User of logstash config directory
+  file:
+    path: /etc/logstash/conf.d
+    owner: logstash
+    group: logstash
+    mode: 0755
+
 ## Copy app related config files
 - name: Copy Logstash app config files
   template:
@@ -55,11 +62,11 @@
   with_items:
     "{{ configs_list }}"
 
-## Copy the Logstash config file
-- name: Copy logstash.yml file
+## Copy the Logstash pipeline config file
+- name: Copy pipelines.yml file
   template:
-    src: logstash.conf.j2
-    dest: /etc/logstash/conf.d/logstash.conf
+    src: pipelines.yml.j2
+    dest: /etc/logstash/pipelines.yml
     owner: logstash
     group: logstash
     mode: 0600
