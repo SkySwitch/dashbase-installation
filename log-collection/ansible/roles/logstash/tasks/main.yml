@@ -71,13 +71,6 @@
     group: logstash
     mode: 0600
 
-- name: Change User of logstash config directory
-  file:
-    path: /etc/logstash/conf.d
-    owner: logstash
-    group: logstash
-    mode: 0755
-
 - name: Stop Logstash Service
   service:
     name: logstash
