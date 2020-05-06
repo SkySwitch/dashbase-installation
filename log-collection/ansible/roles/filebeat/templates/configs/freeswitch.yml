@@ -29,7 +29,7 @@
              format: HH:mm:ss.SSSSSS
            sip_sip:
              type: sip
-             sortedFields: "call-id"
+             sortedFields: call-id,user-agent
      - name: universal
        config:
          type: grok

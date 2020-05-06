@@ -15,32 +15,30 @@ default:
         cpu: 1
         memory: 2G
       limits:
-        cpu: 2
+        cpu: 1
         memory: 2G
   table:
     priorityClassName: dashbase-high-priority
     storage:
       class: "dashbase-data"
-      size: "3000Gi"
+      size: "1500Gi"
 
     containerConfig:
       resources:
         requests:
-          cpu: 7.5
-          memory: 52G
+          cpu: 3.5
+          memory: 26G
         limits:
-          cpu: 7.5
-          memory: 52G
+          cpu: 3.5
+          memory: 26G
     environment:
-      JAVA_OPTS: "-Xmx32g -Xms32g"
+      JAVA_OPTS: "-Xmx20g -Xms20g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "7"
-      RETENTION_SIZE_GB: "2500"
-      IN_MEMORY_BUFFER: "true"
+      RETENTION_SIZE_GB: "1250"
       READER_CACHE_MEM_PERCENT: "60"
       NUM_INDEXING_THREADS: "2"
-      MIN_BUFFER_SIZE_MB: "200"
 
 presto:
   enabled: false
@@ -55,7 +53,7 @@ ingress:
 
 tables:
   LOGS:
-      replicas: 1
+      replicas: 2
 
 services:
   etcd:

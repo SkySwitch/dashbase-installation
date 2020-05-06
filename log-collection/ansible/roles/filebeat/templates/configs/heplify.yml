@@ -25,7 +25,7 @@
                   format: iso
               heplify_sip:
                 type: sip
-                sortedFields: call-id
+                sortedFields: call-id,user-agent
         - name: basic
           config:
             type: timestamp

@@ -32,14 +32,14 @@ processors:
       when:
         has_fields: ['fields._message_parser']
       fields:
-        - from: "beat.timezone"
+        - from: "event.timezone"
           to: "fields._message_parser.defaultTimeZone"
   - rename:
       fields:
-        - from: "beat.hostname"
+        - from: "agent.hostname"
           to: "hostname"
   - drop_fields:
-      fields: ["offset", "beat", "prospector", "host", "input"]
+      fields: ["host", "input", "ecs", "agent", "event"]
 
 #==================== Elasticsearch template setting ==========================
 setup.template:
