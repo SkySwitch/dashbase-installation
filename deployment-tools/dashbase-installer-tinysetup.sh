@@ -535,25 +535,6 @@ update_dashbase_valuefile() {
     log_info "update platform type azure in dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/azure/' /data/dashbase-values.yaml
   fi
-  # update dashbase license information
-  if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
-    USERNAME="dashuser"
-    log_warning "No License information is entered, install default 60 days trial license"
-    kubectl exec -it admindash-0 -n dashbase -- wget -q https://dashbase-public.s3-us-west-1.amazonaws.com/lapp/dash-lapp-1.0.0-rc9.jar -O dash-lapp-1.0.0-rc9.jar
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "/usr/bin/java -jar dash-lapp-1.0.0-rc9.jar -u $USERNAME -d 60 > 60dlicensestring"
-    LICENSE=$(kubectl exec -it admindash-0 -n dashbase -- cat 60dlicensestring)
-    echo "username: \"$USERNAME\"" > dashbase-license.txt
-    echo "license: \"$LICENSE\"" >> dashbase-license.txt
-    kubectl cp dashbase-license.txt dashbase/admindash-0:/data/
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/dashbase-license.txt >> /data/dashbase-values.yaml"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "rm -rf dash-lapp-1.0.0-rc9.jar"
-  else
-    log_info "update default dashbase-values.yaml file with entered license information"
-    echo "username: \"$USERNAME\"" > dashbase-license.txt
-    echo "license: \"$LICENSE\"" >> dashbase-license.txt
-    kubectl cp dashbase-license.txt dashbase/admindash-0:/data/
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/dashbase-license.txt >> /data/dashbase-values.yaml"
-  fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
     log_info "use default version $DASHVERSION in dashbase_version on dashbase-values.yaml"
@@ -576,6 +557,7 @@ update_dashbase_valuefile() {
   # update table name
   log_info "update dashbase-values.yaml file with table name = $TABLENAME"
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/dashbase-values.yaml
+  kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/exporter_metric.yaml
 
   # update ucaas feature
   if [ "$UCAAS_FLAG" == "true" ]; then
@@ -589,6 +571,7 @@ update_dashbase_valuefile() {
   if [ "$CDR_FLAG" == "true" ]; then
      log_info "update dashbase-values.yaml file for CDR data in insights page"
      kubectl exec -it admindash-0 -n dashbase -- sed -i 's/INSIGHTS_IS_CDR\:\ \"false\"/INSIGHTS_IS_CDR\:\ \"true\"/' /data/dashbase-values.yaml
+     kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/exporter_metric.yaml >> /data/dashbase-values.yaml"
   fi
   # update bucket name and storage access
   if [ "$V2_FLAG" == "true" ]; then
@@ -623,6 +606,27 @@ update_dashbase_valuefile() {
   # update keystore passwords for both dashbase and presto
   log_info "update dashbase and presto keystore password in dashbase-values.yaml"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/configure_presto.sh"
+
+  # update dashbase license information
+  if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
+    USERNAME="dashuser"
+    log_warning "No License information is entered, install default 60 days trial license"
+    kubectl exec -it admindash-0 -n dashbase -- wget -q https://dashbase-public.s3-us-west-1.amazonaws.com/lapp/dash-lapp-1.0.0-rc9.jar -O dash-lapp-1.0.0-rc9.jar
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "/usr/bin/java -jar dash-lapp-1.0.0-rc9.jar -u $USERNAME -d 60 > 60dlicensestring"
+    LICENSE=$(kubectl exec -it admindash-0 -n dashbase -- cat 60dlicensestring)
+    echo "username: \"$USERNAME\"" > dashbase-license.txt
+    echo "license: \"$LICENSE\"" >> dashbase-license.txt
+    kubectl cp dashbase-license.txt dashbase/admindash-0:/data/
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/dashbase-license.txt >> /data/dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "rm -rf dash-lapp-1.0.0-rc9.jar"
+  else
+    log_info "update default dashbase-values.yaml file with entered license information"
+    echo "username: \"$USERNAME\"" > dashbase-license.txt
+    echo "license: \"$LICENSE\"" >> dashbase-license.txt
+    kubectl cp dashbase-license.txt dashbase/admindash-0:/data/
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/dashbase-license.txt >> /data/dashbase-values.yaml"
+  fi
+
 }
 
 create_sslcert() {

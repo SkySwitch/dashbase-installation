@@ -28,15 +28,13 @@ default:
           cpu: 1
           memory: 2G
     environment:
-      JAVA_OPTS: "-Xmx20g -Xms16g"
+      JAVA_OPTS: "-Xmx20g -Xms20g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "7"
       RETENTION_SIZE_GB: "850"
-      IN_MEMORY_BUFFER: "true"
       READER_CACHE_MEM_PERCENT: "60"
       NUM_INDEXING_THREADS: "2"
-      MIN_BUFFER_SIZE_MB: "200"
 
 presto:
   enabled: false
@@ -61,10 +59,10 @@ tablesv2:
         resources:
           requests:
             cpu: 1
-            memory: 2G
+            memory: 1G
           limits:
             cpu: 1
-            memory: 2G
+            memory: 1G
     indexer:
       containerConfig:
         resources:
@@ -128,6 +126,17 @@ services:
     enabled: false
   pushgateway:
     enabled: true
+  searcher:
+    enabled: true
+    replicas: 1
+    containerConfig:
+      resources:
+        requests:
+          cpu: 1
+          memory: 1G
+        limits:
+          cpu: 1
+          memory: 1G
   exporter:
     enabled: false
     config:
@@ -138,14 +147,4 @@ services:
           accumulate: false
           filter: "type:sip"
           aggregation: "topn(hostname, 100, topn(user-agent, 100, cardinality(call-id)))"
-  searcher:
-    enabled: true
-    replicas: 1
-    containerConfig:
-      resources:
-        requests:
-          cpu: 1
-          memory: 2G
-        limits:
-          cpu: 1
-          memory: 2G
+
