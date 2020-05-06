@@ -1,0 +1,634 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: freeswitch-filebeat-config
+data:
+  freeswitch.yml: |-
+    - paths:
+       - /var/log/freeswitch/freeswitch.log
+       - /usr/local/freeswitch/log/freeswitch.log
+      type: log
+      multiline.pattern: '^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?\d{4}-\d{2}-\d{2}|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?EXECUTE|^(?:[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12} )?Dialplan|^recv|^send'
+      multiline.negate: true
+      multiline.match: after
+      close_inactive: 90s
+      harvester_limit: 1000
+      scan_frequency: 1s
+      symlinks: true
+      clean_removed: true
+      fields:
+        _message_parser:
+          type: multi
+          parsers_list:
+          - name: freeswitch
+            config:
+              type: grok
+              pattern: "(?:%{UUID:uuid:text} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} \\[%{WORD:level:meta}\\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}"
+          - name: sip
+            config:
+              type: multi
+              applyAll: 'true'
+              parsers:
+                sip_timestamp:
+                  type: timestamp
+                  scan: 'true'
+                  format: HH:mm:ss.SSSSSS
+                sip_sip:
+                  type: sip
+                  sortedFields: call-id,user-agent
+          - name: universal
+            config:
+              type: grok
+              pattern: "(?:%{UUID:uuid:text} |)%{GREEDYDATA:message}"
+
+    - paths:
+       - /var/log/freeswitch/json_cdr/*/*.cdr.json
+       - /usr/local/freeswitch/log/json_cdr/*/*.cdr.json
+      type: log
+      fields_under_root: true
+      json.keys_under_root: true
+      json.add_error_key: true
+      close_inactive: 90s
+      harvester_limit: 1000
+      scan_frequency: 1s
+      symlinks: true
+      clean_removed: true
+      fields:
+        type: cdr
+
+      processors:
+      - script:
+          lang: javascript
+          id: my_filter
+          source: >
+            function process(event) {
+                var R;
+                var agent = event.Get("variables.sip_user_agent");
+                if (agent !== null && String(agent).substring(0, 6) === "Zoiper") {
+                  R = round(0, 58);
+                } else {
+                  R = round(80, 100);
+                }
+                var mos = Number((1 + (0.035) * R + (.000007) * R * (R - 60) * (100 - R)).toFixed(6));
+                event.Put("callStats.audio.inbound.quality_percentage", R);
+                event.Put("variables.rtp_audio_in_quality_percentage", R.toFixed(2));
+                event.Put("callStats.audio.inbound.mos", mos);
+                event.Put("variables.rtp_audio_in_mos", mos.toFixed(2));
+                event.Put("hacked", "true");
+            }
+
+            function round(min, max) {
+              return Math.ceil(Math.random() * (max - min)) + min;
+            }
+
+  heplify.yml: |-
+    - paths:
+       - /var/log/heplify.log
+      type: log
+      multiline.pattern: '^20'
+      multiline.negate: true
+      multiline.match: after
+      close_inactive: 90s
+      harvester_limit: 1000
+      scan_frequency: 1s
+      symlinks: true
+      clean_removed: true
+      fields:
+        _message_parser:
+          type: multi
+          parsers_list:
+            - name: heplify
+              config:
+                type: multi
+                applyAll: 'true'
+                parsers:
+                  heplify_grok:
+                    type: grok
+                    pattern: "%{DATA:timestamp:datetime} %{WORD:level:meta} HEP packet:\\{Version:%{WORD:capture.version:text},Protocol:%{WORD:capture.protocol:text},SrcIP:%{IPORHOST:capture.src.ip:text},DstIP:%{IPORHOST:capture.dst.ip:text},SrcPort:%{INT:capture.src.port:text},DstPort:%{INT:capture.dst.port:text},Tsec:%{INT:capture.tsec:int},Tmsec:%{INT:capture.tmsec:int},ProtoType:%{WORD:capture.proto.type:text},NodeID:%{WORD:capture.node.id:text},NodePW:(?:%{DATA:capture.node.pw:text}|),CID:(?:%{DATA:capture.cid:text}|),Vlan:(?:%{WORD:capture.vlan:text}|)\\} with Payload:%{GREEDYDATA:message}"
+                    timestamp:
+                      format: iso
+                  heplify_sip:
+                    type: sip
+                    sortedFields: call-id,user-agent
+            - name: basic
+              config:
+                type: timestamp
+                scan: 'true'
+                format: iso
+
+
+  filebeat.yml: |-
+    # This file is an example configuration file highlighting only the most common
+    # options. The filebeat.full.yml file from the same directory contains all the
+    # supported options with more comments. You can use it as a reference.
+    #
+    # You can find the full configuration reference here:
+    # https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+    #=========================== Filebeat prospectors =============================
+
+    filebeat.registry.flush: 30s
+    filebeat.config.inputs:
+      path: configs/*.yml
+      reload.enabled: true
+      reload.period: 10s
+
+    fields:
+      customer_id: homedepot
+
+    #=========================== HTTP health endpoint =============================
+
+    http.enabled: true
+    http.port: 1050
+
+    queue.mem:
+      events: 180000
+      flush.min_events: 3000
+
+    #================================ Outputs =====================================
+
+    # Drop metadata added by Filebeat to save bandwidth as it's unnecessary
+
+    processors:
+      - add_locale: ~
+      - rename:
+          when:
+            has_fields: ['fields._message_parser']
+          fields:
+            - from: "event.timezone"
+              to: "fields._message_parser.defaultTimeZone"
+      - rename:
+          fields:
+            - from: "agent.hostname"
+              to: "hostname"
+      - drop_fields:
+          fields: ["offset", "beat", "prospector", "host", "input"]
+
+    # Configure what outputs to use when sending the data collected by the beat.
+    # Multiple outputs may be used.
+
+    setup.template:
+      name: "freeswitch"
+      pattern: "freeswitch"
+      fields: "/etc/fields.yml"
+      overwrite: false
+
+    #-------------------------- Elasticsearch output ------------------------------
+
+    output.elasticsearch:
+      bulk_max_size: 3000
+      worker: 30
+      compression_level: 5
+      hosts: "FILEBEAT_ES_HOSTS"
+      index: "freeswitch"
+      ssl.verification_mode: "none"
+      pipelines:
+      - pipeline: "filebeat-7.6.1-freeswitch-cdr-pipeline"
+        when.equals:
+          type: cdr
+
+    #================================ Logging =====================================
+
+    # Sets log level. The default log level is info.
+    # Available log levels are: critical, error, warning, info, debug
+    #logging.level: debug
+
+    # At debug level, you can selectively enable logging only for some components.
+    # To enable all selectors use ["*"]. Examples of other selectors are "beat",
+    # "publish", "service".
+    #logging.selectors: ["publish"]
+    #logging.selectors: ["*"]
+    logging.metrics.enabled: false
+    logging.level: info
+    logging.to_files: true
+    logging.files:
+      path: /var/log/filebeat
+      name: filebeat
+      keepfiles: 5
+      permissions: 0644
+
+  fields.yml: |-
+    - key: freeswitch
+      title: FreeSWITCH log content
+      description: >
+        Template for FreeSWITCH logs including cdr logs.
+      fields:
+        - name: channel_data.state_number
+          type: integer
+
+        - name: variables
+          type: group
+          fields:
+            - name: sip_user_agent
+              type: keyword
+
+            - name: call_timeout
+              type: integer
+
+            - name: max_forwards
+              type: integer
+
+            - name: start_epoch
+              type: integer
+
+            - name: start_uepoch
+              type: integer
+
+            - name: profile_start_epoch
+              type: integer
+
+            - name: profile_start_uepoch
+              type: integer
+
+            - name: answer_epoch
+              type: integer
+
+            - name: answer_uepoch
+              type: integer
+
+            - name: bridge_epoch
+              type: integer
+
+            - name: bridge_uepoch
+              type: integer
+
+            - name: last_hold_epoch
+              type: integer
+
+            - name: last_hold_uepoch
+              type: integer
+
+            - name: hold_accum_seconds
+              type: integer
+
+            - name: hold_accum_usec
+              type: integer
+
+            - name: hold_accum_ms
+              type: integer
+
+            - name: resurrect_epoch
+              type: integer
+
+            - name: resurrect_uepoch
+              type: integer
+
+            - name: progress_epoch
+              type: integer
+
+            - name: progress_uepoch
+              type: integer
+
+            - name: progress_media_epoch
+              type: integer
+
+            - name: progress_media_uepoch
+              type: integer
+
+            - name: end_epoch
+              type: integer
+
+            - name: end_uepoch
+              type: integer
+
+            - name: duration
+              type: integer
+
+            - name: billsec
+              type: integer
+
+            - name: progresssec
+              type: integer
+
+            - name: answersec
+              type: integer
+
+            - name: waitsec
+              type: integer
+
+            - name: progress_mediasec
+              type: integer
+
+            - name: flow_billsec
+              type: integer
+
+            - name: mduration
+              type: integer
+
+            - name: billmsec
+              type: integer
+
+            - name: progressmsec
+              type: integer
+
+            - name: answermsec
+              type: integer
+
+            - name: waitmsec
+              type: integer
+
+            - name: progress_mediamsec
+              type: integer
+
+            - name: flow_billmsec
+              type: integer
+
+            - name: uduration
+              type: integer
+
+            - name: billusec
+              type: integer
+
+            - name: progressusec
+              type: integer
+
+            - name: answerusec
+              type: integer
+
+            - name: waitusec
+              type: integer
+
+            - name: progress_mediausec
+              type: integer
+
+            - name: flow_billusec
+              type: integer
+
+            - name: sip_cseq
+              type: integer
+
+            - name: sip_from_port
+              type: integer
+
+            - name: sip_invite_stamp
+              type: integer
+
+            - name: sip_network_port
+              type: integer
+
+            - name: sip_received_port
+              type: integer
+
+            - name: sip_req_port
+              type: integer
+
+            - name: sip_contact_port
+              type: integer
+
+            - name: sip_via_port
+              type: integer
+
+            - name: sip_via_rport
+              type: integer
+
+            - name: sip_term_status
+              type: integer
+
+            - name: sip_invite_failure_status
+              type: integer
+
+            - name: rtp_remote_audio_rtcp_port
+              type: integer
+
+            - name: local_media_port
+              type: integer
+
+            - name: remote_media_port
+              type: integer
+
+            - name: remote_audio_port_reported
+              type: integer
+
+            - name: remote_audio_port
+              type: integer
+
+            - name: rtp_audio_in_raw_bytes
+              type: integer
+
+            - name: rtp_audio_in_media_bytes
+              type: integer
+
+            - name: rtp_audio_in_packet_count
+              type: integer
+
+            - name: rtp_audio_in_media_packet_count
+              type: integer
+
+            - name: rtp_audio_in_skip_packet_count
+              type: integer
+
+            - name: rtp_audio_in_jitter_packet_count
+              type: integer
+
+            - name: rtp_audio_in_dtmf_packet_count
+              type: integer
+
+            - name: rtp_audio_in_cng_packet_count
+              type: integer
+
+            - name: rtp_audio_in_flush_packet_count
+              type: integer
+
+            - name: rtp_audio_in_largest_jb_size
+              type: integer
+
+            - name: rtp_audio_in_jitter_min_variance
+              type: double
+
+            - name: rtp_audio_in_jitter_max_variance
+              type: double
+
+            - name: rtp_audio_in_jitter_loss_rate
+              type: double
+
+            - name: rtp_audio_in_jitter_burst_rate
+              type: double
+
+            - name: rtp_audio_in_mean_interval
+              type: double
+
+            - name: rtp_audio_in_flaw_total
+              type: integer
+
+            - name: rtp_audio_in_quality_percentage
+              type: double
+
+            - name: rtp_audio_in_mos
+              type: double
+
+            - name: rtp_audio_out_raw_bytes
+              type: integer
+
+            - name: rtp_audio_out_media_bytes
+              type: integer
+
+            - name: rtp_audio_out_packet_count
+              type: integer
+
+            - name: rtp_audio_out_media_packet_count
+              type: integer
+
+            - name: rtp_audio_out_skip_packet_count
+              type: integer
+
+            - name: rtp_audio_out_dtmf_packet_count
+              type: integer
+
+            - name: rtp_audio_out_cng_packet_count
+              type: integer
+
+            - name: rtp_audio_rtcp_packet_count
+              type: integer
+
+            - name: rtp_audio_rtcp_octet_count
+              type: integer
+
+            - name: rtp_use_codec_channels
+              type: integer
+
+            - name: rtp_audio_recv_pt
+              type: integer
+
+            - name: rtp_use_codec_ptime
+              type: integer
+
+            - name: Event-Date-Timestamp
+              type: integer
+
+            - name: Event-Sequence
+              type: integer
+
+            - name: playback_ms
+              type: integer
+
+            - name: playback_seconds
+              type: integer
+
+        - name: callflow
+          type: group
+          fields:
+            - name: times
+              type: group
+              fields:
+                - name: created_time
+                  type: integer
+
+                - name: profile_created_time
+                  type: integer
+
+                - name: progress_time
+                  type: integer
+
+                - name: progress_media_time
+                  type: integer
+
+                - name: answered_time
+                  type: integer
+
+                - name: bridged_time
+                  type: integer
+
+                - name: last_hold_time
+                  type: integer
+
+                - name: hold_accum_time
+                  type: integer
+
+                - name: hangup_time
+                  type: integer
+
+                - name: resurrect_time
+                  type: integer
+
+                - name: transfer_time
+                  type: integer
+
+        - name: callStats.audio
+          type: group
+          fields:
+            - name: inbound
+              type: group
+              fields:
+                - name: raw_bytes
+                  type: integer
+
+                - name: media_bytes
+                  type: integer
+
+                - name: packet_count
+                  type: integer
+
+                - name: media_packet_count
+                  type: integer
+
+                - name: skip_packet_count
+                  type: integer
+
+                - name: jitter_packet_count
+                  type: integer
+
+                - name: dtmf_packet_count
+                  type: integer
+
+                - name: cng_packet_count
+                  type: integer
+
+                - name: flush_packet_count
+                  type: integer
+
+                - name: largest_jb_size
+                  type: integer
+
+                - name: jitter_min_variance
+                  type: double
+
+                - name: jitter_max_variance
+                  type: double
+
+                - name: jitter_loss_rate
+                  type: integer
+
+                - name: jitter_burst_rate
+                  type: integer
+
+                - name: mean_interval
+                  type: double
+
+                - name: flaw_total
+                  type: integer
+
+                - name: quality_percentage
+                  type: double
+
+                - name: mos
+                  type: double
+
+            - name: outbound
+              type: group
+              fields:
+                - name: raw_bytes
+                  type: integer
+
+                - name: media_bytes
+                  type: integer
+
+                - name: packet_count
+                  type: integer
+
+                - name: media_packet_count
+                  type: integer
+
+                - name: skip_packet_count
+                  type: integer
+
+                - name: dtmf_packet_count
+                  type: integer
+
+                - name: cng_packet_count
+                  type: integer
+
+                - name: rtcp_packet_count
+                  type: integer
+
+                - name: rtcp_octet_count
+                  type: integer

@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: freeswitch
+    component: pbx
+  name: freeswitch
+spec:
+  replicas: 1
+  serviceName: freeswitch
+  selector:
+    matchLabels:
+      app: freeswitch
+      component: pbx
+  template:
+    metadata:
+      labels:
+        app: freeswitch
+        component: pbx
+    spec:
+      initContainers:
+        - name: create-cdr-dir
+          command: [
+            "mkdir",
+            "-p",
+            "/var/log/freeswitch/json_cdr"
+          ]
+          image: busybox
+          volumeMounts:
+            - mountPath: /var/log
+              name: freeswitch-log
+      containers:
+        - image: dashbase/freeswitch
+          imagePullPolicy: Always
+          name: freeswitch
+          volumeMounts:
+            - mountPath: /var/log
+              name: freeswitch-log
+            - mountPath: /etc/freeswitch/autoload_configs/json_cdr.conf.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: json_cdr.conf.xml
+            - mountPath: /etc/freeswitch/autoload_configs/event_socket.conf.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: event_socket.conf.xml
+            - mountPath: /etc/freeswitch/autoload_configs/sofia.conf.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: sofia.conf.xml
+            - mountPath: /etc/freeswitch/autoload_configs/switch.conf.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: switch.conf.xml
+            - mountPath: /etc/freeswitch/autoload_configs/modules.conf.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: modules.conf.xml
+            - mountPath: /etc/freeswitch/sip_profiles/external.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: external.xml
+            - mountPath: /etc/freeswitch/sip_profiles/internal.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: internal.xml
+            - mountPath: /etc/freeswitch/sip_profiles/external-ipv6.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: external-ipv6.xml
+            - mountPath: /etc/freeswitch/sip_profiles/internal-ipv6.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: internal-ipv6.xml
+            - mountPath: /etc/freeswitch/vars.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: vars.xml
+            - mountPath: /etc/freeswitch/directory/default/dashbase-accounts.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: dashbase-accounts.xml
+            - mountPath: /etc/freeswitch/dialplan/default.xml
+              name: freeswitch-custom-config
+              readOnly: true
+              subPath: default.xml
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat-oss:7.6.0
+          args: [
+            "-c", "/etc/filebeat/filebeat.yml",
+            "-e"
+          ]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /var/log
+              name: freeswitch-log
+            - mountPath: /usr/share/filebeat/data
+              name: filebeat-data
+            - mountPath: /etc/filebeat/filebeat.yml
+              name: freeswitch-filebeat-config
+              readOnly: true
+              subPath: filebeat.yml
+            - mountPath: /usr/share/filebeat/configs/freeswitch.yml
+              name: freeswitch-filebeat-config
+              readOnly: true
+              subPath: freeswitch.yml
+            - mountPath: /usr/share/filebeat/configs/heplify.yml
+              name: freeswitch-filebeat-config
+              readOnly: true
+              subPath: heplify.yml
+            - mountPath: /etc/fields.yml
+              name: freeswitch-filebeat-config
+              readOnly: true
+              subPath: fields.yml
+        - name: heplify
+          image: dashbase/heplify:latest
+          imagePullPolicy: Always
+          command: [
+            "./heplify",
+            "-m", "SIP",
+            "-pr", "15060-15060",
+            "-hs", "",
+            "-n", "/var/log/heplify.log",
+            # "-e"
+          ]
+          volumeMounts:
+            - mountPath: /var/log
+              name: freeswitch-log
+      volumes:
+        - configMap:
+            defaultMode: 0600
+            name: freeswitch-custom-config
+          name: freeswitch-custom-config
+        - configMap:
+            defaultMode: 0600
+            name: freeswitch-filebeat-config
+          name: freeswitch-filebeat-config
+  volumeClaimTemplates:
+    - metadata:
+        name: freeswitch-log
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: dashbase-meta
+    - metadata:
+        name: filebeat-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: dashbase-meta

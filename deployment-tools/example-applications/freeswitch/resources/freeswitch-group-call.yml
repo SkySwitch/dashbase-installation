@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: freeswitch
+    component: call
+  name: freeswitch-group-call
+spec:
+  selector:
+    matchLabels:
+      app: freeswitch
+      component: call
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: freeswitch
+        component: call
+    spec:
+      containers:
+        - name: caller
+          image: dashbase/sip-cmd-phone
+          args: [
+            "-u", "1018", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--call", "2000"
+          ]
+        - name: receiver-1
+          image: dashbase/sip-cmd-phone
+          args: [
+            "-u", "1001", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--auto-answer"
+          ]
+        - name: receiver-2
+          image: dashbase/sip-cmd-phone
+          args: [
+            "-u", "1002", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--stand-by"
+          ]

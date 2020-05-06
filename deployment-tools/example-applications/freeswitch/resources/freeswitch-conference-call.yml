@@ -1,0 +1,31 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    app: freeswitch
+    component: conference-call
+  name: freeswitch-conference-call
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: freeswitch
+            component: conference-call
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: caller-1
+              image: dashbase/sip-cmd-phone
+              imagePullPolicy: Always
+              args: [
+                "-u", "1013", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--call", "3000", "--once"
+              ]
+            - name: caller-2
+              image: dashbase/sip-cmd-phone
+              imagePullPolicy: Always
+              args: [
+                "-u", "1014", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--call", "3000", "--once"
+              ]

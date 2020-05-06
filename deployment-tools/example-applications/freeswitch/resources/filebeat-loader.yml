@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-loader-config
+data:
+  manifest.yml: |-
+    module_version: 1.0
+
+    ingest_pipeline: ingest/pipeline.json
+    input: config/cdr.yml
+
+  cdr.yml: |-
+
+  pipeline.json: |-
+    {
+        "description": "cdr pipeline",
+        "processors": [
+            {
+                "urldecode": {
+                    "field": "variables.sip_user_agent",
+                    "target_field": "user-agent",
+                    "ignore_missing": true
+                }
+            }
+        ]
+    }
+
+  filebeat.yml: |-
+    # This file is an example configuration file highlighting only the most common
+    # options. The filebeat.full.yml file from the same directory contains all the
+    # supported options with more comments. You can use it as a reference.
+    #
+    # You can find the full configuration reference here:
+    # https://www.elastic.co/guide/en/beats/filebeat/index.html
+
+    #=========================== Filebeat prospectors =============================
+
+    filebeat.registry.flush: 30s
+    filebeat.config.inputs:
+      path: configs/*.yml
+      reload.enabled: true
+      reload.period: 10s
+
+    #================================ Outputs =====================================
+
+    # Drop metadata added by Filebeat to save bandwidth as it's unnecessary
+
+    # Configure what outputs to use when sending the data collected by the beat.
+    # Multiple outputs may be used.
+
+    #-------------------------- Elasticsearch output ------------------------------
+
+    output.elasticsearch:
+      hosts: "FILEBEAT_ES_HOSTS"
+      ssl.verification_mode: "none"
+
+    #================================ Logging =====================================
+
+    # Sets log level. The default log level is info.
+    # Available log levels are: critical, error, warning, info, debug
+    #logging.level: debug
+
+    # At debug level, you can selectively enable logging only for some components.
+    # To enable all selectors use ["*"]. Examples of other selectors are "beat",
+    # "publish", "service".
+    #logging.selectors: ["publish"]
+    #logging.selectors: ["*"]
+    logging.metrics.enabled: false
+    logging.level: info
+    logging.to_files: true
+    logging.files:
+      path: /var/log/filebeat
+      name: filebeat
+      keepfiles: 5
+      permissions: 0644
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: filebeat
+    component: loader
+  name: filebeat-loader
+spec:
+  serviceName: filebeat-loader
+  selector:
+    matchLabels:
+      app: filebeat
+      component: loader
+  template:
+    metadata:
+      labels:
+        app: filebeat
+        component: loader
+    spec:
+      containers:
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat-oss:7.6.1
+          command: ["/bin/bash"]
+          args: [
+            "-c",
+            "filebeat setup --pipelines --modules freeswitch -c /etc/filebeat/filebeat.yml -e && tail -f /dev/null"
+          ]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /usr/share/filebeat/module/freeswitch/cdr/manifest.yml
+              name: filebeat-loader-config
+              readOnly: true
+              subPath: manifest.yml
+            - mountPath: /usr/share/filebeat/module/freeswitch/cdr/config/cdr.yml
+              name: filebeat-loader-config
+              readOnly: true
+              subPath: cdr.yml
+            - mountPath: /usr/share/filebeat/module/freeswitch/cdr/ingest/pipeline.json
+              name: filebeat-loader-config
+              readOnly: true
+              subPath: pipeline.json
+            - mountPath: /etc/filebeat/filebeat.yml
+              name: filebeat-loader-config
+              readOnly: false
+              subPath: filebeat.yml
+      volumes:
+        - configMap:
+            defaultMode: 0600
+            name: filebeat-loader-config
+          name: filebeat-loader-config
+

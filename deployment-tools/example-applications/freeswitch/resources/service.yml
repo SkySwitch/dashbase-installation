@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: freeswitch
+    component: pbx
+  name: freeswitch-internal
+spec:
+  ports:
+  - name: "15060"
+    port: 15060
+    protocol: UDP
+    targetPort: 15060
+  - name: "27384"
+    port: 27384
+    protocol: UDP
+    targetPort: 27384
+  - name: "27385"
+    port: 27385
+    protocol: UDP
+    targetPort: 27385
+  - name: "27386"
+    port: 27386
+    protocol: UDP
+    targetPort: 27386
+  - name: "27387"
+    port: 27387
+    protocol: UDP
+    targetPort: 27387
+  - name: "27388"
+    port: 27388
+    protocol: UDP
+    targetPort: 27388
+  - name: "27389"
+    port: 27389
+    protocol: UDP
+    targetPort: 27389
+  - name: "27390"
+    port: 27390
+    protocol: UDP
+    targetPort: 27390
+  - name: "27391"
+    port: 27391
+    protocol: UDP
+    targetPort: 27391
+  - name: "27392"
+    port: 27392
+    protocol: UDP
+    targetPort: 27392
+  - name: "27393"
+    port: 27393
+    protocol: UDP
+    targetPort: 27393
+  - name: "27394"
+    port: 27394
+    protocol: UDP
+    targetPort: 27394
+  - name: "27395"
+    port: 27395
+    protocol: UDP
+    targetPort: 27395
+  - name: "27396"
+    port: 27396
+    protocol: UDP
+    targetPort: 27396
+  - name: "27397"
+    port: 27397
+    protocol: UDP
+    targetPort: 27397
+  - name: "27398"
+    port: 27398
+    protocol: UDP
+    targetPort: 27398
+  - name: "27399"
+    port: 27399
+    protocol: UDP
+    targetPort: 27399
+  - name: "27400"
+    port: 27400
+    protocol: UDP
+    targetPort: 27400
+  - name: "27401"
+    port: 27401
+    protocol: UDP
+    targetPort: 27401
+  - name: "27402"
+    port: 27402
+    protocol: UDP
+    targetPort: 27402
+  - name: "27403"
+    port: 27403
+    protocol: UDP
+    targetPort: 27403
+  - name: "27404"
+    port: 27404
+    protocol: UDP
+    targetPort: 27404
+  - name: "27405"
+    port: 27405
+    protocol: UDP
+    targetPort: 27405
+  - name: "27406"
+    port: 27406
+    protocol: UDP
+    targetPort: 27406
+  - name: "27407"
+    port: 27407
+    protocol: UDP
+    targetPort: 27407
+  - name: "27408"
+    port: 27408
+    protocol: UDP
+    targetPort: 27408
+  - name: "27409"
+    port: 27409
+    protocol: UDP
+    targetPort: 27409
+  - name: "27410"
+    port: 27410
+    protocol: UDP
+    targetPort: 27410
+  - name: "27411"
+    port: 27411
+    protocol: UDP
+    targetPort: 27411
+  - name: "27412"
+    port: 27412
+    protocol: UDP
+    targetPort: 27412
+  - name: "27413"
+    port: 27413
+    protocol: UDP
+    targetPort: 27413
+  - name: "27414"
+    port: 27414
+    protocol: UDP
+    targetPort: 27414
+  - name: "27415"
+    port: 27415
+    protocol: UDP
+    targetPort: 27415
+  - name: "27416"
+    port: 27416
+    protocol: UDP
+    targetPort: 27416
+  - name: "27417"
+    port: 27417
+    protocol: UDP
+    targetPort: 27417
+  - name: "27418"
+    port: 27418
+    protocol: UDP
+    targetPort: 27418
+  - name: "27419"
+    port: 27419
+    protocol: UDP
+    targetPort: 27419
+  - name: "27420"
+    port: 27420
+    protocol: UDP
+    targetPort: 27420
+  - name: "27421"
+    port: 27421
+    protocol: UDP
+    targetPort: 27421
+  - name: "27422"
+    port: 27422
+    protocol: UDP
+    targetPort: 27422
+  - name: "27423"
+    port: 27423
+    protocol: UDP
+    targetPort: 27423
+  - name: "27424"
+    port: 27424
+    protocol: UDP
+    targetPort: 27424
+  - name: "27425"
+    port: 27425
+    protocol: UDP
+    targetPort: 27425
+  - name: "27426"
+    port: 27426
+    protocol: UDP
+    targetPort: 27426
+  - name: "27427"
+    port: 27427
+    protocol: UDP
+    targetPort: 27427
+  - name: "27428"
+    port: 27428
+    protocol: UDP
+    targetPort: 27428
+  - name: "27429"
+    port: 27429
+    protocol: UDP
+    targetPort: 27429
+  - name: "27430"
+    port: 27430
+    protocol: UDP
+    targetPort: 27430
+  - name: "27431"
+    port: 27431
+    protocol: UDP
+    targetPort: 27431
+  - name: "27432"
+    port: 27432
+    protocol: UDP
+    targetPort: 27432
+  - name: "27433"
+    port: 27433
+    protocol: UDP
+    targetPort: 27433
+  - name: "27434"
+    port: 27434
+    protocol: UDP
+    targetPort: 27434
+  - name: "27435"
+    port: 27435
+    protocol: UDP
+    targetPort: 27435
+  - name: "27436"
+    port: 27436
+    protocol: UDP
+    targetPort: 27436
+  - name: "27437"
+    port: 27437
+    protocol: UDP
+    targetPort: 27437
+  - name: "27438"
+    port: 27438
+    protocol: UDP
+    targetPort: 27438
+  - name: "27439"
+    port: 27439
+    protocol: UDP
+    targetPort: 27439
+  - name: "27440"
+    port: 27440
+    protocol: UDP
+    targetPort: 27440
+  - name: "27441"
+    port: 27441
+    protocol: UDP
+    targetPort: 27441
+  - name: "27442"
+    port: 27442
+    protocol: UDP
+    targetPort: 27442
+  - name: "27443"
+    port: 27443
+    protocol: UDP
+    targetPort: 27443
+  - name: "27444"
+    port: 27444
+    protocol: UDP
+    targetPort: 27444
+  - name: "27445"
+    port: 27445
+    protocol: UDP
+    targetPort: 27445
+  - name: "27446"
+    port: 27446
+    protocol: UDP
+    targetPort: 27446
+  - name: "27447"
+    port: 27447
+    protocol: UDP
+    targetPort: 27447
+  - name: "27448"
+    port: 27448
+    protocol: UDP
+    targetPort: 27448
+  - name: "27449"
+    port: 27449
+    protocol: UDP
+    targetPort: 27449
+  - name: "27450"
+    port: 27450
+    protocol: UDP
+    targetPort: 27450
+  - name: "27451"
+    port: 27451
+    protocol: UDP
+    targetPort: 27451
+  - name: "27452"
+    port: 27452
+    protocol: UDP
+    targetPort: 27452
+  - name: "27453"
+    port: 27453
+    protocol: UDP
+    targetPort: 27453
+  - name: "27454"
+    port: 27454
+    protocol: UDP
+    targetPort: 27454
+  - name: "27455"
+    port: 27455
+    protocol: UDP
+    targetPort: 27455
+  - name: "27456"
+    port: 27456
+    protocol: UDP
+    targetPort: 27456
+  - name: "27457"
+    port: 27457
+    protocol: UDP
+    targetPort: 27457
+  - name: "27458"
+    port: 27458
+    protocol: UDP
+    targetPort: 27458
+  - name: "27459"
+    port: 27459
+    protocol: UDP
+    targetPort: 27459
+  - name: "27460"
+    port: 27460
+    protocol: UDP
+    targetPort: 27460
+  - name: "27461"
+    port: 27461
+    protocol: UDP
+    targetPort: 27461
+  - name: "27462"
+    port: 27462
+    protocol: UDP
+    targetPort: 27462
+  - name: "27463"
+    port: 27463
+    protocol: UDP
+    targetPort: 27463
+  - name: "27464"
+    port: 27464
+    protocol: UDP
+    targetPort: 27464
+  - name: "27465"
+    port: 27465
+    protocol: UDP
+    targetPort: 27465
+  - name: "27466"
+    port: 27466
+    protocol: UDP
+    targetPort: 27466
+  - name: "27467"
+    port: 27467
+    protocol: UDP
+    targetPort: 27467
+  - name: "27468"
+    port: 27468
+    protocol: UDP
+    targetPort: 27468
+  - name: "27469"
+    port: 27469
+    protocol: UDP
+    targetPort: 27469
+  - name: "27470"
+    port: 27470
+    protocol: UDP
+    targetPort: 27470
+  - name: "27471"
+    port: 27471
+    protocol: UDP
+    targetPort: 27471
+  - name: "27472"
+    port: 27472
+    protocol: UDP
+    targetPort: 27472
+  - name: "27473"
+    port: 27473
+    protocol: UDP
+    targetPort: 27473
+  - name: "27474"
+    port: 27474
+    protocol: UDP
+    targetPort: 27474
+  - name: "27475"
+    port: 27475
+    protocol: UDP
+    targetPort: 27475
+  - name: "27476"
+    port: 27476
+    protocol: UDP
+    targetPort: 27476
+  - name: "27477"
+    port: 27477
+    protocol: UDP
+    targetPort: 27477
+  - name: "27478"
+    port: 27478
+    protocol: UDP
+    targetPort: 27478
+  - name: "27479"
+    port: 27479
+    protocol: UDP
+    targetPort: 27479
+  - name: "27480"
+    port: 27480
+    protocol: UDP
+    targetPort: 27480
+  - name: "27481"
+    port: 27481
+    protocol: UDP
+    targetPort: 27481
+  - name: "27482"
+    port: 27482
+    protocol: UDP
+    targetPort: 27482
+  - name: "27483"
+    port: 27483
+    protocol: UDP
+    targetPort: 27483
+  selector:
+    app: freeswitch
+    component: pbx

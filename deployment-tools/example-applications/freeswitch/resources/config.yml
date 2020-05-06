@@ -1,0 +1,2613 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: freeswitch-custom-config
+data:
+  dashbase-accounts.xml: |-
+    <include>
+        <user id="24000">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24000"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24000"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24000"/>
+                <variable name="effective_caller_id_number" value="24000"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24001">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24001"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24001"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24001"/>
+                <variable name="effective_caller_id_number" value="24001"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24002">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24002"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24002"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24002"/>
+                <variable name="effective_caller_id_number" value="24002"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24003">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24003"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24003"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24003"/>
+                <variable name="effective_caller_id_number" value="24003"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24004">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24004"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24004"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24004"/>
+                <variable name="effective_caller_id_number" value="24004"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24005">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24005"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24005"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24005"/>
+                <variable name="effective_caller_id_number" value="24005"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24006">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24006"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24006"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24006"/>
+                <variable name="effective_caller_id_number" value="24006"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24007">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24007"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24007"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24007"/>
+                <variable name="effective_caller_id_number" value="24007"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24008">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24008"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24008"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24008"/>
+                <variable name="effective_caller_id_number" value="24008"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24009">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24009"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24009"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24009"/>
+                <variable name="effective_caller_id_number" value="24009"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24010">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24010"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24010"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24010"/>
+                <variable name="effective_caller_id_number" value="24010"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24011">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24011"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24011"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24011"/>
+                <variable name="effective_caller_id_number" value="24011"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24012">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24012"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24012"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24012"/>
+                <variable name="effective_caller_id_number" value="24012"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24013">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24013"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24013"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24013"/>
+                <variable name="effective_caller_id_number" value="24013"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24014">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24014"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24014"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24014"/>
+                <variable name="effective_caller_id_number" value="24014"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24015">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24015"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24015"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24015"/>
+                <variable name="effective_caller_id_number" value="24015"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24016">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24016"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24016"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24016"/>
+                <variable name="effective_caller_id_number" value="24016"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24017">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24017"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24017"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24017"/>
+                <variable name="effective_caller_id_number" value="24017"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24018">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24018"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24018"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24018"/>
+                <variable name="effective_caller_id_number" value="24018"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24019">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24019"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24019"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24019"/>
+                <variable name="effective_caller_id_number" value="24019"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+        <user id="24020">
+            <params>
+                <param name="password" value="$${default_password}"/>
+                <param name="vm-password" value="24020"/>
+            </params>
+            <variables>
+                <variable name="toll_allow" value="domestic,international,local"/>
+                <variable name="accountcode" value="24020"/>
+                <variable name="user_context" value="default"/>
+                <variable name="effective_caller_id_name" value="Extension 24020"/>
+                <variable name="effective_caller_id_number" value="24020"/>
+                <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+                <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+                <variable name="callgroup" value="techsupport"/>
+            </variables>
+        </user>
+    </include>
+
+  default.xml: |-
+    <?xml version="1.0" encoding="utf-8"?>
+    <!--
+        NOTICE:
+
+        This context is usually accessed via authenticated callers on the sip profile on port 5060
+        or transfered callers from the public context which arrived via the sip profile on port 5080.
+
+        Authenticated users will use the user_context variable on the user to determine what context
+        they can access.  You can also add a user in the directory with the cidr= attribute acl.conf.xml
+        will build the domains ACL using this value.
+    -->
+    <!-- http://wiki.freeswitch.org/wiki/Dialplan_XML -->
+    <include>
+      <context name="default">
+
+        <extension name="unloop">
+          <condition field="${unroll_loops}" expression="^true$"/>
+          <condition field="${sip_looped_call}" expression="^true$">
+    	<action application="deflect" data="${destination_number}"/>
+          </condition>
+        </extension>
+
+        <!-- Example of doing things based on time of day.
+
+    	 year = 4 digit year. Example year="2009"
+    	 yday = 1-365
+    	 mon = 1-12
+    	 mday = 1-31
+    	 week = 1-52
+    	 mweek= 1-6
+    	 wday = 1-7
+    	 hour = 0-23
+    	 minute = 0-59
+    	 minute-of-day = 1-1440
+
+    	 Example:
+    	 <condition minute-of-day="540-1080"> (9am to 6pm EVERY day)
+    	 do something ...
+    	 </condition>
+        -->
+        <extension name="tod_example" continue="true">
+          <condition wday="2-6" hour="9-18">
+    	<action application="set" data="open=true"/>
+          </condition>
+        </extension>
+
+        <!-- Example of routing based on holidays
+
+    	This example covers all US Federal holidays except for inauguration day.
+        -->
+
+        <extension name="holiday_example" continue="true">
+          <condition mday="1" mon="1">
+    	<!-- new year's day -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition wday="2" mweek="3" mon="1">
+    	<!-- martin luther king day is the 3rd monday in january -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition wday="2" mweek="3" mon="2">
+    	<!-- president's day is the 3rd monday in february -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition wday="2" mon="5" mday="25-31">
+    	<!-- memorial day is the last monday in may (the only monday between the 25th and the 31st) -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition mday="4" mon="7">
+    	<!-- independence day -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition wday="2" mday="1-7" mon="9">
+    	<!-- labor day is the 1st monday in september (the only monday between the 1st and the 7th) -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition wday="2" mweek="2" mon="10">
+    	<!-- columbus day is the 2nd monday in october -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition mday="11" mon="11">
+    	<!-- veteran's day -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition wday="5-6" mweek="4" mon="11">
+    	<!-- thanksgiving is the 4th thursday in november and usually there's an extension for black friday -->
+    	<action application="set" data="open=false"/>
+          </condition>
+          <condition mday="25" mon="12">
+    	<!-- Christmas -->
+    	<action application="set" data="open=false"/>
+          </condition>
+        </extension>
+
+        <extension name="global-intercept">
+          <condition field="destination_number" expression="^886$">
+    	<action application="answer"/>
+    	<action application="intercept" data="${hash(select/${domain_name}-last_dial_ext/global)}"/>
+    	<action application="sleep" data="2000"/>
+          </condition>
+        </extension>
+
+        <extension name="group-intercept">
+          <condition field="destination_number" expression="^\*8$">
+    	<action application="answer"/>
+    	<action application="intercept" data="${hash(select/${domain_name}-last_dial_ext/${callgroup})}"/>
+    	<action application="sleep" data="2000"/>
+          </condition>
+        </extension>
+
+        <extension name="intercept-ext">
+          <condition field="destination_number" expression="^\*\*(\d+)$">
+    	<action application="answer"/>
+    	<action application="intercept" data="${hash(select/${domain_name}-last_dial_ext/$1)}"/>
+    	<action application="sleep" data="2000"/>
+          </condition>
+        </extension>
+
+        <extension name="redial">
+          <condition field="destination_number" expression="^(redial|870)$">
+    	<action application="transfer" data="${hash(select/${domain_name}-last_dial/${caller_id_number})}"/>
+          </condition>
+        </extension>
+
+        <extension name="global" continue="true">
+          <condition field="${call_debug}" expression="^true$" break="never">
+    	<action application="info"/>
+          </condition>
+
+          <condition field="${default_password}" expression="^1234$" break="never">
+    	<action application="log" data="CRIT WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING "/>
+    	<action application="log" data="CRIT Open $${conf_dir}/vars.xml and change the default_password."/>
+    	<action application="log" data="CRIT Once changed type 'reloadxml' at the console."/>
+    	<action application="log" data="CRIT WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING "/>
+    	<action application="sleep" data="10000"/>
+          </condition>
+          <!--
+    	  This is an example of how to auto detect if telephone-event is missing and activate inband detection
+          -->
+          <!--
+          <condition field="${switch_r_sdp}" expression="a=rtpmap:(\d+)\stelephone-event/8000" break="never">
+    	<action application="set" data="rtp_payload_number=$1"/>
+    	<anti-action application="start_dtmf"/>
+          </condition>
+          -->
+          <condition field="${rtp_has_crypto}" expression="^($${rtp_sdes_suites})$" break="never">
+    	<action application="set" data="rtp_secure_media=true"/>
+    	<!-- Offer SRTP on outbound legs if we have it on inbound. -->
+    	<!-- <action application="export" data="rtp_secure_media=true"/> -->
+          </condition>
+
+          <!--
+    	 Since we have inbound-late-negotation on by default now the
+    	 above behavior isn't the same so you have to do one extra step.
+    	-->
+          <condition field="${endpoint_disposition}" expression="^(DELAYED NEGOTIATION)"/>
+          <condition field="${switch_r_sdp}" expression="(AES_CM_128_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_80)" break="never">
+    	<action application="set" data="rtp_secure_media=true"/>
+    	<!-- Offer SRTP on outbound legs if we have it on inbound. -->
+    	<!-- <action application="export" data="rtp_secure_media=true"/> -->
+          </condition>
+
+
+          <condition>
+    	<action application="hash" data="insert/${domain_name}-spymap/${caller_id_number}/${uuid}"/>
+    	<action application="hash" data="insert/${domain_name}-last_dial/${caller_id_number}/${destination_number}"/>
+    	<action application="hash" data="insert/${domain_name}-last_dial/global/${uuid}"/>
+    	<action application="export" data="RFC2822_DATE=${strftime(%a, %d %b %Y %T %z)}"/>
+          </condition>
+        </extension>
+
+        <!-- If sip_req_host is not a local domain then this has to be an external sip uri -->
+        <!--
+        <extension name="external_sip_uri" continue="true">
+          <condition field="source" expression="mod_sofia"/>
+          <condition field="${outside_call}" expression="^$"/>
+          <condition field="${domain_exists(${sip_req_host})}" expression="true">
+    	<anti-action application="bridge" data="sofia/${use_profile}/${sip_to_uri}"/>
+          </condition>
+        </extension>
+        -->
+        <!--
+    	Snom button demo, call 9000 to make button 2 mapped to transfer the current call to a conference
+        -->
+
+        <extension name="snom-demo-2">
+          <condition field="destination_number" expression="^9001$">
+    	<action application="eval" data="${snom_bind_key(2 off DND ${sip_from_user} ${sip_from_host} ${sofia_profile_name} message notused)}"/>
+    	<action application="transfer" data="3000"/>
+          </condition>
+        </extension>
+
+        <extension name="snom-demo-1">
+          <condition field="destination_number" expression="^9000$">
+    	<!--<key> <light> <label> <user> <host> <profile> <action_name> <action>-->
+    	<action application="eval" data="${snom_bind_key(2 on DND ${sip_from_user} ${sip_from_host} ${sofia_profile_name} message api+uuid_transfer ${uuid} 9001)}"/>
+    	<action application="playback" data="$${hold_music}"/>
+          </condition>
+        </extension>
+
+        <extension name="eavesdrop">
+          <condition field="destination_number" expression="^88(\d{4})$|^\*0(.*)$">
+    	<action application="answer"/>
+    	<action application="eavesdrop" data="${hash(select/${domain_name}-spymap/$1$2)}"/>
+          </condition>
+        </extension>
+
+        <extension name="eavesdrop">
+          <condition field="destination_number" expression="^779$">
+    	<action application="answer"/>
+    	<action application="set" data="eavesdrop_indicate_failed=tone_stream://%(500, 0, 320)"/>
+    	<action application="set" data="eavesdrop_indicate_new=tone_stream://%(500, 0, 620)"/>
+    	<action application="set" data="eavesdrop_indicate_idle=tone_stream://%(250, 0, 920)"/>
+    	<action application="eavesdrop" data="all"/>
+          </condition>
+        </extension>
+
+        <extension name="call_return">
+          <condition field="destination_number" expression="^\*69$|^869$|^lcr$">
+    	<action application="transfer" data="${hash(select/${domain_name}-call_return/${caller_id_number})}"/>
+          </condition>
+        </extension>
+
+        <extension name="del-group">
+          <condition field="destination_number" expression="^80(\d{2})$">
+    	<action application="answer"/>
+    	<action application="group" data="delete:$1@${domain_name}:${sofia_contact(${sip_from_user}@${domain_name})}"/>
+    	<action application="gentones" data="%(1000, 0, 320)"/>
+          </condition>
+        </extension>
+
+        <extension name="add-group">
+          <condition field="destination_number" expression="^81(\d{2})$">
+    	<action application="answer"/>
+    	<action application="group" data="insert:$1@${domain_name}:${sofia_contact(${sip_from_user}@${domain_name})}"/>
+    	<action application="gentones" data="%(1000, 0, 640)"/>
+          </condition>
+        </extension>
+
+        <extension name="call-group-simo">
+          <condition field="destination_number" expression="^82(\d{2})$">
+    	<action application="bridge" data="{leg_timeout=15,ignore_early_media=true}${group(call:$1@${domain_name})}"/>
+          </condition>
+        </extension>
+
+        <extension name="call-group-order">
+          <condition field="destination_number" expression="^83(\d{2})$">
+    	<action application="bridge" data="{leg_timeout=15,ignore_early_media=true}${group(call:$1@${domain_name}:order)}"/>
+          </condition>
+        </extension>
+
+        <extension name="extension-intercom">
+          <condition field="destination_number" expression="^8(10[01][0-9])$">
+    	<action application="set" data="dialed_extension=$1"/>
+    	<action application="export" data="sip_auto_answer=true"/>
+    	<action application="bridge" data="user/${dialed_extension}@${domain_name}"/>
+          </condition>
+        </extension>
+
+        <!--
+    	 dial the extension (1000-1019) for 30 seconds and go to voicemail if the
+    	 call fails (continue_on_fail=true), otherwise hang up after a successful
+    	 bridge (hangup_after_bridge=true)
+        -->
+        <extension name="Local_Extension">
+          <condition field="destination_number" expression="^(10[01][0-9]|240[0-9][0-9]|250[0-9][0-9])$">
+    	<action application="export" data="dialed_extension=$1"/>
+    	<!-- bind_meta_app can have these args <key> [a|b|ab] [a|b|o|s] <app> -->
+    	<action application="bind_meta_app" data="1 b s execute_extension::dx XML features"/>
+    	<action application="bind_meta_app" data="2 b s record_session::$${recordings_dir}/${caller_id_number}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
+    	<action application="bind_meta_app" data="3 b s execute_extension::cf XML features"/>
+    	<action application="bind_meta_app" data="4 b s execute_extension::att_xfer XML features"/>
+    	<action application="set" data="ringback=${us-ring}"/>
+    	<action application="set" data="transfer_ringback=$${hold_music}"/>
+    	<action application="set" data="call_timeout=30"/>
+    	<!-- <action application="set" data="sip_exclude_contact=${network_addr}"/> -->
+    	<action application="set" data="hangup_after_bridge=true"/>
+    	<!--<action application="set" data="continue_on_fail=NORMAL_TEMPORARY_FAILURE,USER_BUSY,NO_ANSWER,TIMEOUT,NO_ROUTE_DESTINATION"/> -->
+    	<action application="set" data="continue_on_fail=true"/>
+    	<action application="hash" data="insert/${domain_name}-call_return/${dialed_extension}/${caller_id_number}"/>
+    	<action application="hash" data="insert/${domain_name}-last_dial_ext/${dialed_extension}/${uuid}"/>
+    	<action application="set" data="called_party_callgroup=${user_data(${dialed_extension}@${domain_name} var callgroup)}"/>
+    	<action application="hash" data="insert/${domain_name}-last_dial_ext/${called_party_callgroup}/${uuid}"/>
+    	<action application="hash" data="insert/${domain_name}-last_dial_ext/global/${uuid}"/>
+    	<!--<action application="export" data="nolocal:rtp_secure_media=${user_data(${dialed_extension}@${domain_name} var rtp_secure_media)}"/>-->
+    	<action application="hash" data="insert/${domain_name}-last_dial/${called_party_callgroup}/${uuid}"/>
+    	<action application="bridge" data="user/${dialed_extension}@${domain_name}"/>
+    	<action application="answer"/>
+    	<action application="sleep" data="1000"/>
+    	<action application="bridge" data="loopback/app=voicemail:default ${domain_name} ${dialed_extension}"/>
+          </condition>
+        </extension>
+
+        <extension name="Local_Extension_Skinny">
+          <condition field="destination_number" expression="^(11[01][0-9])$">
+    	<action application="set" data="dialed_extension=$1"/>
+    	<action application="export" data="dialed_extension=$1"/>
+    	<action application="set" data="call_timeout=30"/>
+    	<action application="set" data="hangup_after_bridge=true"/>
+    	<action application="set" data="continue_on_fail=true"/>
+            <action application="bridge" data="skinny/internal/${destination_number}"/>
+    	<action application="answer"/>
+    	<action application="sleep" data="1000"/>
+    	<action application="bridge" data="loopback/app=voicemail:default ${domain_name} ${dialed_extension}"/>
+          </condition>
+        </extension>
+
+        <extension name="group_dial_sales">
+          <condition field="destination_number" expression="^2000$">
+    	<action application="bridge" data="${group_call(sales@${domain_name})}"/>
+          </condition>
+        </extension>
+
+        <extension name="group_dial_support">
+          <condition field="destination_number" expression="^2001$">
+    	<action application="bridge" data="group/support@${domain_name}"/>
+          </condition>
+        </extension>
+
+        <extension name="group_dial_billing">
+          <condition field="destination_number" expression="^2002$">
+    	<action application="bridge" data="group/billing@${domain_name}"/>
+          </condition>
+        </extension>
+
+        <!-- voicemail operator extension -->
+        <extension name="operator">
+          <condition field="destination_number" expression="^(operator|0)$">
+    	<action application="set" data="transfer_ringback=$${hold_music}"/>
+    	<action application="transfer" data="1000 XML features"/>
+          </condition>
+        </extension>
+
+        <!-- voicemail main extension -->
+        <extension name="vmain">
+          <condition field="destination_number" expression="^vmain$|^4000$|^\*98$">
+    	<action application="answer"/>
+    	<action application="sleep" data="1000"/>
+    	<action application="voicemail" data="check default ${domain_name}"/>
+          </condition>
+        </extension>
+
+        <!--
+    	 This extension is used by mod_portaudio so you can pa call sip:someone@example.com
+    	 mod_portaudio will pass the entire string to the dialplan for routing.
+        -->
+        <extension name="sip_uri">
+          <condition field="destination_number" expression="^sip:(.*)$">
+    	<action application="bridge" data="sofia/${use_profile}/$1"/>
+          </condition>
+        </extension>
+
+        <!--
+    	start a dynamic conference with the settings of the "default" conference profile in conference.conf.xml
+        -->
+        <extension name="nb_conferences">
+          <condition field="destination_number" expression="^(30\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1-${domain_name}@default"/>
+          </condition>
+        </extension>
+
+        <extension name="wb_conferences">
+          <condition field="destination_number" expression="^(31\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1-${domain_name}@wideband"/>
+          </condition>
+        </extension>
+
+        <extension name="uwb_conferences">
+          <condition field="destination_number" expression="^(32\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1-${domain_name}@ultrawideband"/>
+          </condition>
+        </extension>
+        <!-- MONO 48kHz conferences -->
+        <extension name="cdquality_conferences">
+          <condition field="destination_number" expression="^(33\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1-${domain_name}@cdquality"/>
+          </condition>
+        </extension>
+
+        <!-- STEREO 48kHz conferences / Video MCU -->
+        <extension name="cdquality_stereo_conferences">
+          <condition field="destination_number" expression="^(35\d{2}).*?-screen$">
+    	<action application="answer"/>
+    	<action application="send_display" data="FreeSWITCH Conference|$1"/>
+    	<action application="set" data="conference_member_flags=join-vid-floor"/>
+    	<action application="conference" data="$1@video-mcu-stereo"/>
+          </condition>
+        </extension>
+
+        <extension name="conference-canvases" continue="true">
+          <condition field="destination_number" expression="(35\d{2})-canvas-(\d+)">
+    	<action application="push" data="conference_member_flags=second-screen"/>
+    	<action application="set" data="video_initial_watching_canvas=$2"/>
+    	<action application="transfer" data="$1"/>
+          </condition>
+        </extension>
+
+        <extension name="conf mod">
+          <condition field="destination_number" expression="^6070-moderator$">
+    	<action application="answer"/>
+    	<action application="set" data="conference_member_flags=moderator"/>
+    	<action application="conference" data="$1-${domain_name}@video-mcu-stereo"/>
+          </condition>
+        </extension>
+
+        <extension name="cdquality_conferences">
+          <condition field="destination_number" expression="^(35\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1@video-mcu-stereo"/>
+          </condition>
+        </extension>
+
+        <extension name="cdquality_conferences_720">
+          <condition field="destination_number" expression="^(36\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1@video-mcu-stereo-720"/>
+          </condition>
+        </extension>
+
+        <extension name="cdquality_conferences_480">
+          <condition field="destination_number" expression="^(37\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1@video-mcu-stereo-480"/>
+          </condition>
+        </extension>
+
+        <extension name="cdquality_conferences_320">
+          <condition field="destination_number" expression="^(38\d{2})$">
+    	<action application="answer"/>
+    	<action application="conference" data="$1@video-mcu-stereo-320"/>
+          </condition>
+        </extension>
+
+        <!-- dial the FreeSWITCH conference via SIP-->
+        <extension name="freeswitch_public_conf_via_sip">
+          <condition field="destination_number" expression="^9(888|8888|1616|3232)$">
+    	<action application="export" data="hold_music=silence"/>
+    	<!--
+    	     This will take the SAS from the b-leg and send it to the display on the a-leg phone.
+    	     Known working with Polycom and Snom maybe others.
+    	-->
+    	<!--
+    	<action application="set" data="exec_after_bridge_app=${sched_api(+4 zrtp expand uuid_display ${uuid} \${uuid_getvar(\${uuid_getvar(${uuid} signal_bond)} zrtp_sas1_string )}  \${uuid_getvar(\${uuid_getvar(${uuid} signal_bond)} zrtp_sas2_string )} )}"/>
+    	<action application="export" data="nolocal:zrtp_secure_media=true"/>
+    	-->
+    	<action application="bridge" data="sofia/${use_profile}/$1@conference.freeswitch.org"/>
+          </condition>
+        </extension>
+
+        <!--
+    	This extension will start a conference and invite a group.
+    	At anytime the participant can dial *2 to bridge directly to the boss.
+    	All other callers are then hung up on.
+        -->
+        <extension name="mad_boss_intercom">
+          <condition field="destination_number" expression="^0911$">
+    	<action application="set" data="conference_auto_outcall_caller_id_name=Mad Boss1"/>
+    	<action application="set" data="conference_auto_outcall_caller_id_number=0911"/>
+    	<action application="set" data="conference_auto_outcall_timeout=60"/>
+    	<action application="set" data="conference_utils_auto_outcall_flags=mute"/>
+    	<action application="set" data="conference_auto_outcall_prefix={sip_auto_answer=true,execute_on_answer='bind_meta_app 2 a s1 transfer::intercept:${uuid} inline'}"/>
+    	<action application="set" data="sip_exclude_contact=${network_addr}"/>
+    	<action application="conference_set_auto_outcall" data="${group_call(sales)}"/>
+    	<action application="conference" data="madboss_intercom1@default+flags{endconf|deaf}"/>
+          </condition>
+        </extension>
+
+        <!--
+    	This extension will start a conference and invite a few of people.
+    	At anytime the participant can dial *2 to bridge directly to the boss.
+    	All other callers are then hung up on.
+        -->
+        <extension name="mad_boss_intercom">
+          <condition field="destination_number" expression="^0912$">
+    	<action application="set" data="conference_auto_outcall_caller_id_name=Mad Boss2"/>
+    	<action application="set" data="conference_auto_outcall_caller_id_number=0912"/>
+    	<action application="set" data="conference_auto_outcall_timeout=60"/>
+    	<action application="set" data="conference_utils_auto_outcall_flags=mute"/>
+    	<action application="set" data="conference_auto_outcall_prefix={sip_auto_answer=true,execute_on_answer='bind_meta_app 2 a s1 transfer::intercept:${uuid} inline'}"/>
+    	<action application="set" data="sip_exclude_contact=${network_addr}"/>
+    	<action application="conference_set_auto_outcall" data="loopback/9664"/>
+    	<action application="conference" data="madboss_intercom2@default+flags{endconf|deaf}"/>
+          </condition>
+        </extension>
+
+        <!--This extension will start a conference and invite several people upon entering -->
+        <extension name="mad_boss">
+          <condition field="destination_number" expression="^0913$">
+    	<!--These params effect the outcalls made once you join-->
+    	<action application="set" data="conference_auto_outcall_caller_id_name=Mad Boss"/>
+    	<action application="set" data="conference_auto_outcall_caller_id_number=0911"/>
+    	<action application="set" data="conference_auto_outcall_timeout=60"/>
+    	<action application="set" data="conference_utils_auto_outcall_flags=none"/>
+    	<!--<action application="set" data="conference_auto_outcall_announce=say:You have been called into an emergency conference"/>-->
+    	<!--Add as many of these as you need, These are the people you are going to call-->
+    	<action application="conference_set_auto_outcall" data="loopback/9664"/>
+    	<action application="conference" data="madboss3@default"/>
+          </condition>
+        </extension>
+
+        <!-- a sample IVR  -->
+        <extension name="ivr_demo">
+          <condition field="destination_number" expression="^5000$">
+            <action application="answer"/>
+            <action application="sleep" data="2000"/>
+    	<action application="ivr" data="demo_ivr"/>
+          </condition>
+        </extension>
+
+        <!-- Create a conference on the fly and pull someone in at the same time. -->
+        <extension name="dynamic_conference">
+          <condition field="destination_number" expression="^5001$">
+    	<action application="conference" data="bridge:mydynaconf:sofia/${use_profile}/1234@conference.freeswitch.org"/>
+          </condition>
+        </extension>
+
+        <extension name="rtp_multicast_page">
+          <condition field="destination_number" expression="^pagegroup$|^7243$">
+    	<action application="answer"/>
+    	<action application="esf_page_group"/>
+          </condition>
+        </extension>
+
+        <!--
+    	 Parking extensions... transferring calls to 5900 will park them in a queue.
+        -->
+        <extension name="park">
+          <condition field="destination_number" expression="^5900$">
+    	<action application="set" data="fifo_music=$${hold_music}"/>
+    	<action application="fifo" data="5900@${domain_name} in"/>
+          </condition>
+        </extension>
+
+        <!--
+    	 Parking pickup extension.  Calling 5901 will pickup the call.
+        -->
+        <extension name="unpark">
+          <condition field="destination_number" expression="^5901$">
+    	<action application="answer"/>
+    	<action application="fifo" data="5900@${domain_name} out nowait"/>
+          </condition>
+        </extension>
+
+        <!--
+    	 Valet park retrieval, works with valet_park extension below.
+    	 Retrieve a valet parked call by dialing 6000 + park number + #
+        -->
+        <extension name="valet_park">
+          <condition field="destination_number" expression="^(6000)$">
+    	<action application="answer"/>
+    	<action application="valet_park" data="valet_parking_lot ask 1 11 10000 ivr/ivr-enter_ext_pound.wav"/>
+          </condition>
+        </extension>
+
+        <!--
+    	 Valet park 6001-6099.  Blind x-fer to 6001, 6002, etc. to valet park the call.
+    	 Dial 6001, 6002, etc. to retrieve a call that is already valet parked.
+    	 After call is retrieved, park extension is free for another call.
+        -->
+        <extension name="valet_park">
+          <condition field="destination_number" expression="^((?!6000)60\d{2})$">
+    	<action application="answer"/>
+    	<action application="valet_park" data="valet_parking_lot $1"/>
+          </condition>
+        </extension>
+
+
+        <!--
+    	This extension is used with Snom phones.
+
+    	Set a function key to park+lot (lot being a number or name.)
+    	Set type to Park+Orbit.  You can then park and pickup using
+    	the softkey on the phone.  Should work with other phones.
+        -->
+        <extension name="park">
+          <condition field="source" expression="mod_sofia"/>
+          <condition field="destination_number" expression="park\+(\d+)">
+    	<action application="fifo" data="$1@${domain_name} in undef $${hold_music}"/>
+          </condition>
+        </extension>
+        <!--
+    	The extension is parking pickup with a to param of the fifo we are calling
+    	Some phones send things like orbit= and you can extract that info.
+        -->
+        <extension name="unpark">
+          <condition field="source" expression="mod_sofia"/>
+          <condition field="destination_number" expression="^parking$"/>
+          <condition field="${sip_to_params}" expression="fifo\=(\d+)">
+    	<action application="answer"/>
+    	<action application="fifo" data="$1@${domain_name} out nowait"/>
+          </condition>
+        </extension>
+
+        <!--
+           This extension is used with Linksys phones.
+
+           Set a Phone tab option Call Park Serv to yes. You can park and
+           pickup using soft keys "park" and "unpark" found during
+           active call when moving navigation button. The other option
+           is to use phone's star codes (defaults to *38 and *39).
+        -->
+        <extension name="park">
+          <condition field="source" expression="mod_sofia"/>
+          <condition field="destination_number" expression="callpark"/>
+          <condition field="${sip_refer_to}">
+    	<expression><![CDATA[<sip:callpark@${domain_name};orbit=(\d+)>]]></expression>
+    	<action application="fifo" data="$1@${domain_name} in undef $${hold_music}"/>
+          </condition>
+        </extension>
+
+        <!--
+           This extension is used with Linksys phones.
+
+           The extension is parking pickup with a to param of the fifo
+           we are calling. Linksys sends orbit=<parkingslotnumber>
+           and we extract that info.
+        -->
+        <extension name="unpark">
+          <condition field="source" expression="mod_sofia"/>
+          <condition field="destination_number" expression="pickup"/>
+          <condition field="${sip_to_params}" expression="orbit\=(\d+)">
+    	<action application="answer"/>
+    	<action application="fifo" data="$1@${domain_name} out nowait"/>
+           </condition>
+        </extension>
+
+        <!--
+    	Here are some examples of how to override the ringback heard by the
+    	far end.  You have two variables that you can use to override this.
+
+    	ringback          - used when a call isn't answered. (early media)
+    	transfer_ringback - used when the call is already answered. (post answer)
+        -->
+
+        <!-- Demonstration of how to override the ringback in various situations -->
+        <extension name="wait">
+          <condition field="destination_number" expression="^wait$">
+    	<action application="pre_answer"/>
+    	<action application="sleep" data="20000"/>
+    	<action application="answer"/>
+    	<action application="sleep" data="1000"/>
+    	<action application="playback" data="voicemail/vm-goodbye.wav"/>
+    	<action application="hangup"/>
+          </condition>
+        </extension>
+
+        <extension name="fax_receive">
+          <condition field="destination_number" expression="^9178$">
+    	<action application="answer" />
+    	<action application="playback" data="silence_stream://2000"/>
+    	<action application="rxfax" data="$${temp_dir}/rxfax.tif"/>
+    	<action application="hangup"/>
+          </condition>
+        </extension>
+
+        <extension name="fax_transmit">
+          <condition field="destination_number" expression="^9179$">
+    	<action application="txfax" data="$${temp_dir}/txfax.tif"/>
+    	<action application="hangup"/>
+          </condition>
+        </extension>
+
+        <!-- Send a 180 and let the far end generate ringback. -->
+        <extension name="ringback_180">
+          <condition field="destination_number" expression="^9180$">
+    	<action application="ring_ready"/>
+    	<action application="sleep" data="20000"/>
+    	<action application="answer"/>
+    	<action application="sleep" data="1000"/>
+    	<action application="playback" data="voicemail/vm-goodbye.wav"/>
+    	<action application="hangup"/>
+          </condition>
+        </extension>
+
+        <!-- Send a 183 and send uk-ring as the ringtone. (early media) -->
+        <extension name="ringback_183_uk_ring">
+          <condition field="destination_number" expression="^9181$">
+    	<action application="set" data="ringback=$${uk-ring}"/>
+    	<action application="bridge" data="{ignore_early_media=true}loopback/wait"/>
+          </condition>
+        </extension>
+
+        <!-- Send a 183 and use music as the ringtone. (early media) -->
+        <extension name="ringback_183_music_ring">
+          <condition field="destination_number" expression="^9182$">
+    	<action application="set" data="ringback=$${hold_music}"/>
+    	<action application="bridge" data="{ignore_early_media=true}loopback/wait"/>
+          </condition>
+        </extension>
+
+        <!-- Answer the call and use music as the ringtone. (post answer) -->
+        <extension name="ringback_post_answer_uk_ring">
+          <condition field="destination_number" expression="^9183$">
+    	<action application="set" data="transfer_ringback=$${uk-ring}"/>
+    	<action application="answer"/>
+    	<action application="bridge" data="{ignore_early_media=true}loopback/wait"/>
+          </condition>
+        </extension>
+
+        <!-- Answer the call and use music as the ringtone. (post answer) -->
+        <extension name="ringback_post_answer_music">
+          <condition field="destination_number" expression="^9184$">
+    	<action application="set" data="transfer_ringback=$${hold_music}"/>
+    	<action application="answer"/>
+    	<action application="bridge" data="{ignore_early_media=true}loopback/wait"/>
+          </condition>
+        </extension>
+
+        <extension name="ClueCon">
+          <condition field="destination_number" expression="^9191$">
+            <action application="set" data="effective_caller_id_name=ClueCon IVR"/>
+            <action application="bridge" data="sofia/$${domain}/2000@bkw.org"/>
+          </condition>
+        </extension>
+
+        <extension name="show_info">
+          <condition field="destination_number" expression="^9192$">
+    	<action application="answer"/>
+    	<action application="info"/>
+    	<action application="sleep" data="250"/>
+    	<action application="hangup"/>
+          </condition>
+        </extension>
+
+        <extension name="video_record">
+          <condition field="destination_number" expression="^9193$">
+    	<action application="answer"/>
+    	<action application="record_fsv" data="$${temp_dir}/testrecord.fsv"/>
+          </condition>
+        </extension>
+
+        <extension name="video_playback">
+          <condition field="destination_number" expression="^9194$">
+    	<action application="answer"/>
+    	<action application="play_fsv" data="$${temp_dir}/testrecord.fsv"/>
+          </condition>
+        </extension>
+
+        <extension name="delay_echo">
+          <condition field="destination_number" expression="^9195$">
+    	<action application="answer"/>
+    	<action application="delay_echo" data="5000"/>
+          </condition>
+        </extension>
+
+        <extension name="echo">
+          <condition field="destination_number" expression="^9196$">
+    	<action application="answer"/>
+    	<action application="echo"/>
+          </condition>
+        </extension>
+
+        <extension name="milliwatt">
+          <condition field="destination_number" expression="^9197$">
+    	<action application="answer"/>
+    	<action application="playback" data="{loops=-1}tone_stream://%(251,0,1004)"/>
+          </condition>
+        </extension>
+
+        <extension name="tone_stream">
+          <condition field="destination_number" expression="^9198$">
+    	<action application="answer"/>
+    	<action application="playback" data="{loops=10}tone_stream://path=${conf_dir}/tetris.ttml"/>
+          </condition>
+        </extension>
+
+        <!-- install zrtp_agent.lua into scripts (ZRTP == 9787) -->
+        <extension name="zrtp_enrollement">
+          <condition field="destination_number" expression="^9787$">
+    	<action application="lua" data="zrtp_agent.lua"/>
+          </condition>
+        </extension>
+
+        <!--
+    	You will no longer hear the bong tone.  The wav file is playing stating the call is secure.
+    	The file will not play unless you have both TLS and SRTP active.
+        -->
+
+        <extension name="hold_music">
+          <condition field="destination_number" expression="^9664$"/>
+          <condition field="${rtp_has_crypto}" expression="^(AES_CM_128_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_80)$">
+    	<action application="answer"/>
+    	<action application="execute_extension" data="is_secure XML features"/>
+    	<action application="playback" data="$${hold_music}"/>
+    	<anti-action application="set" data="zrtp_secure_media=true"/>
+    	<anti-action application="answer"/>
+    	<anti-action application="playback" data="silence_stream://2000"/>
+    	<anti-action application="execute_extension" data="is_zrtp_secure XML features"/>
+    	<anti-action application="playback" data="$${hold_music}"/>
+          </condition>
+        </extension>
+
+        <extension name="laugh break">
+          <condition field="destination_number" expression="^9386$">
+            <action application="answer"/>
+            <action application="sleep" data="1500"/>
+            <action application="playback" data="phrase:funny_prompts"/>
+            <action application="hangup"/>
+          </condition>
+        </extension>
+
+        <!--
+    	You can place files in the default directory to get included.
+        -->
+        <X-PRE-PROCESS cmd="include" data="default/*.xml"/>
+
+        <!--
+        <extension name="refer">
+          <condition field="${sip_refer_to}">
+    	<expression><![CDATA[<sip:${destination_number}@${domain_name}>]]></expression>
+          </condition>
+          <condition field="${sip_refer_to}">
+    	<expression><![CDATA[<sip:(.*)@(.*)>]]></expression>
+    	<action application="set" data="refer_user=$1"/>
+    	<action application="set" data="refer_domain=$2"/>
+    	<action application="info"/>
+    	<action application="bridge" data="sofia/${use_profile}/${refer_user}@${refer_domain}"/>
+          </condition>
+        </extension>
+        -->
+        <!--
+    	This is an example of how to override the RURI on an outgoing invite to a registered contact.
+        -->
+        <!--
+        <extension name="ruri">
+          <condition field="destination_number" expression="^ruri$">
+    	<action application="bridge" data="sofia/${ruri_profile}/${ruri_user}${regex(${sofia_contact(${ruri_contact})}|^[^\@]+(.*)|%1)}"/>
+          </condition>
+        </extension>
+
+        <extension name="7004">
+          <condition field="destination_number" expression="^7004$">
+    	<action application="set" data="ruri_profile=default"/>
+    	<action application="set" data="ruri_user=2000"/>
+    	<action application="set" data="ruri_contact=1001@${domain_name}"/>
+    	<action application="execute_extension" data="ruri"/>
+          </condition>
+        </extension>
+        -->
+
+        <extension name="enum">
+          <condition field="${module_exists(mod_enum)}" expression="true"/>
+          <condition field="destination_number" expression="^(.*)$">
+    	<action application="transfer" data="$1 enum"/>
+          </condition>
+        </extension>
+
+        <extension name="acknowledge_call">
+          <condition field="destination_number" expression="^(.*)$">
+    	<action application="acknowledge_call"/>
+    	<action application="ring_ready"/>
+    	<action application="playback" data="$${hold_music}"/>
+          </condition>
+        </extension>
+
+      </context>
+    </include>
+
+  json_cdr.conf.xml: |-
+    <configuration name="json_cdr.conf" description="JSON CDR">
+        <settings>
+
+            <!-- Global parameters -->
+            <param name="log-b-leg" value="true"/>
+            <param name="prefix-a-leg" value="true"/>
+
+            <!-- Whether to URL encode the individual JSON values. Defaults to true, set to false for standard JSON. -->
+            <param name="encode-values" value="true"/>
+
+            <!-- File logging -->
+            <!-- Directory where to create the "json_cdr" directory used to store JSON CDRs. -->
+            <!-- Might be overriden by a channel variable "json_cdr_base". Leave empty for no file logging. -->
+            <!-- But after my tests, if you leave it blank, FreeSWITCH will put logs into subdirectories under <your-log-dir>/json_cdr/ -->
+            <!-- In our setup, it's /var/log/freeswitch/json_cdr/ -->
+            <!-- Note: you need to create this directory manually. -->
+            <param name="log-dir" value=""/>
+            <!-- Whether to rotate file CDRs. -->
+            <param name="rotate" value="true"/>
+
+        </settings>
+    </configuration>
+
+  event_socket.conf.xml: |-
+    <configuration name="event_socket.conf" description="Socket Client">
+      <settings>
+        <param name="nat-map" value="false"/>
+        <param name="listen-ip" value="127.0.0.1"/>
+        <param name="listen-port" value="8021"/>
+        <param name="password" value="ClueCon"/>
+        <!--<param name="apply-inbound-acl" value="loopback.auto"/>-->
+        <!--<param name="stop-on-bind-error" value="true"/>-->
+      </settings>
+    </configuration>
+
+  sofia.conf.xml: |-
+    <configuration name="sofia.conf" description="sofia Endpoint">
+
+      <global_settings>
+        <param name="log-level" value="0"/>
+        <!-- <param name="auto-restart" value="false"/> -->
+        <param name="debug-presence" value="0"/>
+        <!-- <param name="capture-server" value="udp:homer.domain.com:5060"/> -->
+        <param name="capture-server" value="udp:heplify-server.homer.svc.cluster.local:9060;hep=3;capture_id=100"/>
+        <!--
+        	the new format for HEPv2/v3 and capture ID
+
+    	protocol:host:port;hep=2;capture_id=200;
+
+        -->
+
+        <!-- <param name="capture-server" value="udp:homer.domain.com:5060;hep=3;capture_id=100"/> -->
+      </global_settings>
+
+      <!--
+          The rabbit hole goes deep.  This includes all the
+          profiles in the sip_profiles directory that is up
+          one level from this directory.
+      -->
+      <profiles>
+        <X-PRE-PROCESS cmd="include" data="../sip_profiles/*.xml"/>
+      </profiles>
+
+    </configuration>
+
+  switch.conf.xml: |-
+    <configuration name="switch.conf" description="Core Configuration">
+
+      <cli-keybindings>
+        <key name="1" value="help"/>
+        <key name="2" value="status"/>
+        <key name="3" value="show channels"/>
+        <key name="4" value="show calls"/>
+        <key name="5" value="sofia status"/>
+        <key name="6" value="reloadxml"/>
+        <key name="7" value="console loglevel 0"/>
+        <key name="8" value="console loglevel 7"/>
+        <key name="9" value="sofia status profile internal"/>
+        <key name="10" value="sofia profile internal siptrace on"/>
+        <key name="11" value="sofia profile internal siptrace off"/>
+        <key name="12" value="version"/>
+      </cli-keybindings>
+
+      <default-ptimes>
+        <!-- Set this to override the 20ms assumption of various codecs in the sdp with no ptime defined -->
+        <!-- <codec name="G729" ptime="40"/> -->
+      </default-ptimes>
+
+      <settings>
+        <!-- Colorize the Console -->
+        <param name="colorize-console" value="true"/>
+
+        <!--Include full timestamps in dialplan logs -->
+        <param name="dialplan-timestamps" value="false"/>
+
+        <!-- Run the timer at 20ms by default and drop down as needed unless you set 1m-timer=true which was previous default -->
+        <!-- <param name="1ms-timer" value="true"/> -->
+
+        <!--
+    	Set the Switch Name for HA environments.
+    	When setting the switch name, it will override the system hostname for all DB and CURL requests
+    	allowing cluster environments such as RHCS to have identical FreeSWITCH configurations but run
+    	as different hostnames.
+        -->
+        <!-- <param name="switchname" value="freeswitch"/> -->
+        <!-- <param name="cpu-idle-smoothing-depth" value="30"/> -->
+
+
+        <!-- Maximum number of simultaneous DB handles open -->
+        <param name="max-db-handles" value="50"/>
+        <!-- Maximum number of seconds to wait for a new DB handle before failing -->
+        <param name="db-handle-timeout" value="10"/>
+
+        <!-- Minimum idle CPU before refusing calls -->
+        <!-- <param name="min-idle-cpu" value="25"/> -->
+
+        <!-- Interval between heartbeat events -->
+        <!-- <param name="event-heartbeat-interval" value="20"/> -->
+
+        <!--
+    	Max number of sessions to allow at any given time.
+
+    	NOTICE: If you're driving 28 T1's in a single box you should set this to 644*2 or 1288
+    	this will ensure you're able to use the entire DS3 without a problem.  Otherwise you'll
+    	be 144 channels short of always filling that DS3 up which can translate into waste.
+        -->
+        <param name="max-sessions" value="1000"/>
+        <!--Most channels to create per second -->
+        <param name="sessions-per-second" value="30"/>
+        <!-- Default Global Log Level - value is one of debug,info,notice,warning,err,crit,alert -->
+        <param name="loglevel" value="debug"/>
+
+        <!-- Set the core DEBUG level (0-10) -->
+        <!-- <param name="debug-level" value="10"/> -->
+
+        <!-- SQL Buffer length within rage of 32k to 10m -->
+        <!-- <param name="sql-buffer-len" value="1m"/> -->
+        <!-- Maximum SQL Buffer length must be greater than sql-buffer-len -->
+        <!-- <param name="max-sql-buffer-len" value="2m"/> -->
+
+        <!--
+    	 The min-dtmf-duration specifies the minimum DTMF duration to use on
+    	 outgoing events. Events shorter than this will be increased in duration
+    	 to match min_dtmf_duration. You cannot configure a dtmf duration on a
+    	 profile that is less than this setting. You may increase this value,
+    	 but cannot set it lower than 400. This value cannot exceed
+    	 max-dtmf-duration. -->
+        <!-- <param name="min-dtmf-duration" value="400"/> -->
+
+        <!--
+    	 The max-dtmf-duration caps the playout of a DTMF event at the specified
+    	 duration. Events exceeding this duration will be truncated to this
+    	 duration. You cannot configure a duration on a profile that exceeds
+    	 this setting. This setting can be lowered, but cannot exceed 192000.
+    	 This setting cannot be set lower than min_dtmf_duration. -->
+        <!-- <param name="max-dtmf-duration" value="192000"/> -->
+
+        <!--
+    	 The default_dtmf_duration specifies the DTMF duration to use on
+    	 originated DTMF events or on events that are received without a
+    	 duration specified. This value can be increased or lowered. This
+    	 value is lower-bounded by min_dtmf_duration and upper-bounded by
+    	 max-dtmf-duration\. -->
+        <!-- <param name="default-dtmf-duration" value="2000"/> -->
+
+        <!--
+    	If you want to send out voicemail notifications via Windows you'll need to change the mailer-app
+    	variable to the setting below:
+
+    	<param name="mailer-app" value="msmtp"/>
+
+    	Do not change mailer-app-args.
+    	You will also need to download a sendmail clone for Windows (msmtp). This version works without issue:
+    	http://msmtp.sourceforge.net/index.html. Download and copy the .exe to %winddir%\system32.
+    	You'll need to create a small config file for smtp credentials (host name, authentication, tls, etc.) in
+    	%USERPROFILE%\Application Data\ called "msmtprc.txt". Below is a sample copy of this file:
+
+    	###################################
+    	# The SMTP server of the provider.
+    	account provider
+    	host smtp.myisp.com
+    	from john@myisp.com
+    	auth login
+    	user johndoe
+    	password mypassword
+
+    	# Set a default account
+    	account default : provider
+    	###################################
+
+        -->
+
+        <param name="mailer-app" value="sendmail"/>
+        <param name="mailer-app-args" value="-t"/>
+        <param name="dump-cores" value="yes"/>
+
+        <!-- Enable verbose channel events to include every detail about a channel on every event  -->
+        <!-- <param name="verbose-channel-events" value="no"/> -->
+
+        <!-- Enable clock nanosleep -->
+        <!-- <param name="enable-clock-nanosleep" value="true"/> -->
+
+        <!-- Enable monotonic timing -->
+        <!-- <param name="enable-monotonic-timing" value="true"/> -->
+
+        <!-- NEEDS DOCUMENTATION -->
+        <!-- <param name="enable-softtimer-timerfd" value="true"/> -->
+        <!-- <param name="enable-cond-yield" value="true"/> -->
+        <!-- <param name="enable-timer-matrix" value="true"/> -->
+        <!-- <param name="threaded-system-exec" value="true"/> -->
+        <!-- <param name="tipping-point" value="0"/> -->
+        <!-- <param name="timer-affinity" value="disabled"/> -->
+        <!-- NEEDS DOCUMENTATION -->
+
+        <!-- RTP port range -->
+        <param name="rtp-start-port" value="27384"/>
+        <param name="rtp-end-port" value="27484"/>
+
+        <!-- Test each port to make sure it is not in use by some other process before allocating it to RTP -->
+        <!-- <param name="rtp-port-usage-robustness" value="true"/> -->
+
+        <param name="rtp-enable-zrtp" value="false"/>
+
+        <!--
+    	 Store encryption keys for secure media in channel variables and call CDRs. Default: false.
+    	 WARNING: If true, anyone with CDR access can decrypt secure media!
+        -->
+        <!-- <param name="rtp-retain-crypto-keys" value="true"/> -->
+
+        <!--
+    	 Native PostgreSQL support was removed from the FreeSWITCH Core!
+    	 =================================
+    	 NOTICE: You MUST enable mod_pgsql
+    	 =================================
+    	 According to https://www.postgresql.org/docs/9.6/libpq-connect.html#LIBPQ-CONNSTRING
+    	 There are two accepted formats for connection strings supported by the libpq library:
+    	 * For plain keyword = value strings use pgsql://
+    	   pgsql://hostaddr=127.0.0.1 dbname=freeswitch user=freeswitch password='' options='-c client_min_messages=NOTICE'
+    	 * For RFC 3986 URIs use postgresql:// or postgres://
+    	   postgresql://
+    	   postgresql://localhost
+    	   postgresql://localhost:5433
+    	   postgresql://localhost/mydb
+    	   postgresql://user@localhost
+    	   postgresql://user:secret@localhost
+    	   postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp
+    	   postgresql:///mydb?host=localhost&port=5433
+        -->
+        <!-- <param name="core-db-dsn" value="pgsql://hostaddr=127.0.0.1 dbname=freeswitch user=freeswitch password='' options='-c client_min_messages=NOTICE'" /> -->
+        <!-- <param name="core-db-dsn" value="postgresql://freeswitch:@127.0.0.1/freeswitch?options=-c%20client_min_messages%3DNOTICE" /> -->
+        <!-- <param name="core-db-dsn" value="mariadb://Server=localhost;Database=freeswitch;Uid=freeswitch;Pwd=pass;" /> -->
+        <!-- <param name="core-db-dsn" value="dsn:username:password" /> -->
+        <!--
+    	 Allow to specify the sqlite db at a different location (In this example, move it to ramdrive for
+    	 better performance on most linux distro (note, you loose the data if you reboot))
+        -->
+        <!-- <param name="core-db-name" value="/dev/shm/core.db" /> -->
+
+        <!-- The system will create all the db schemas automatically, set this to false to avoid this behaviour -->
+        <!-- <param name="auto-create-schemas" value="true"/> -->
+        <!-- <param name="auto-clear-sql" value="true"/> -->
+        <!-- <param name="enable-early-hangup" value="true"/> -->
+
+        <!-- <param name="core-dbtype" value="MSSQL"/> -->
+
+        <!-- Allow multiple registrations to the same account in the central registration table -->
+        <!-- <param name="multiple-registrations" value="true"/> -->
+
+      </settings>
+
+    </configuration>
+
+  external.xml: |-
+    <profile name="external">
+      <!-- http://wiki.freeswitch.org/wiki/Sofia_Configuration_Files -->
+      <!-- This profile is only for outbound registrations to providers -->
+      <gateways>
+        <X-PRE-PROCESS cmd="include" data="external/*.xml"/>
+      </gateways>
+
+      <aliases>
+        <!--
+            <alias name="outbound"/>
+            <alias name="nat"/>
+        -->
+      </aliases>
+
+      <domains>
+        <domain name="all" alias="false" parse="true"/>
+      </domains>
+
+      <settings>
+        <param name="rfc-7989" value="yes"/>
+        <param name="debug" value="0"/>
+        <!-- If you want FreeSWITCH to shutdown if this profile fails to load, uncomment the next line. -->
+        <!-- <param name="shutdown-on-fail" value="true"/> -->
+        <param name="sip-trace" value="no"/>
+        <param name="sip-capture" value="yes"/>
+        <param name="rfc2833-pt" value="101"/>
+        <!-- RFC 5626 : Send reg-id and sip.instance -->
+        <!--<param name="enable-rfc-5626" value="true"/> -->
+        <param name="sip-port" value="$${external_sip_port}"/>
+        <param name="dialplan" value="XML"/>
+        <param name="context" value="public"/>
+        <param name="dtmf-duration" value="2000"/>
+        <param name="inbound-codec-prefs" value="$${global_codec_prefs}"/>
+        <param name="outbound-codec-prefs" value="$${outbound_codec_prefs}"/>
+        <param name="hold-music" value="$${hold_music}"/>
+        <param name="rtp-timer-name" value="soft"/>
+        <!--<param name="enable-100rel" value="true"/>-->
+        <!--<param name="disable-srv503" value="true"/>-->
+        <!-- This could be set to "passive" -->
+        <param name="local-network-acl" value="localnet.auto"/>
+        <param name="manage-presence" value="false"/>
+
+        <!-- used to share presence info across sofia profiles
+             manage-presence needs to be set to passive on this profile
+             if you want it to behave as if it were the internal profile
+             for presence.
+        -->
+        <!-- Name of the db to use for this profile -->
+        <!--<param name="dbname" value="share_presence"/>-->
+        <!--<param name="presence-hosts" value="$${domain}"/>-->
+        <!--<param name="force-register-domain" value="$${domain}"/>-->
+        <!--all inbound reg will stored in the db using this domain -->
+        <!--<param name="force-register-db-domain" value="$${domain}"/>-->
+        <!-- ************************************************* -->
+
+        <!--<param name="aggressive-nat-detection" value="true"/>-->
+        <param name="inbound-codec-negotiation" value="generous"/>
+        <param name="nonce-ttl" value="60"/>
+        <param name="auth-calls" value="false"/>
+        <param name="inbound-late-negotiation" value="true"/>
+        <param name="inbound-zrtp-passthru" value="true"/> <!-- (also enables late negotiation) -->
+        <!--
+            DO NOT USE HOSTNAMES, ONLY IP ADDRESSES IN THESE SETTINGS!
+        -->
+        <param name="rtp-ip" value="$${local_ip_v4}"/>
+        <param name="sip-ip" value="$${local_ip_v4}"/>
+        <param name="ext-rtp-ip" value="$${external_rtp_ip}"/>
+        <param name="ext-sip-ip" value="$${external_rtp_ip}"/>
+        <param name="rtp-timeout-sec" value="300"/>
+        <param name="rtp-hold-timeout-sec" value="1800"/>
+        <!--<param name="enable-3pcc" value="true"/>-->
+
+        <!-- TLS: disabled by default, set to "true" to enable -->
+        <param name="tls" value="$${external_ssl_enable}"/>
+        <!-- Set to true to not bind on the normal sip-port but only on the TLS port -->
+        <param name="tls-only" value="false"/>
+        <!-- additional bind parameters for TLS -->
+        <param name="tls-bind-params" value="transport=tls"/>
+        <!-- Port to listen on for TLS requests. (5081 will be used if unspecified) -->
+        <param name="tls-sip-port" value="$${external_tls_port}"/>
+        <!-- Location of the agent.pem and cafile.pem ssl certificates (needed for TLS server) -->
+        <!--<param name="tls-cert-dir" value=""/>-->
+        <!-- Optionally set the passphrase password used by openSSL to encrypt/decrypt TLS private key files -->
+        <param name="tls-passphrase" value=""/>
+        <!-- Verify the date on TLS certificates -->
+        <param name="tls-verify-date" value="true"/>
+        <!-- TLS verify policy, when registering/inviting gateways with other servers (outbound) or handling inbound registration/invite requests how should we verify their certificate -->
+        <!-- set to 'in' to only verify incoming connections, 'out' to only verify outgoing connections, 'all' to verify all connections, also 'subjects_in', 'subjects_out' and 'subjects_all' for subject validation. Multiple policies can be split with a '|' pipe -->
+        <param name="tls-verify-policy" value="none"/>
+        <!-- Certificate max verify depth to use for validating peer TLS certificates when the verify policy is not none -->
+        <param name="tls-verify-depth" value="2"/>
+        <!-- If the tls-verify-policy is set to subjects_all or subjects_in this sets which subjects are allowed, multiple subjects can be split with a '|' pipe -->
+        <param name="tls-verify-in-subjects" value=""/>
+        <!-- TLS version ("sslv23" (default), "tlsv1"). NOTE: Phones may not work with TLSv1 -->
+        <param name="tls-version" value="$${sip_tls_version}"/>
+      </settings>
+    </profile>
+
+  internal.xml: |-
+    <profile name="internal">
+      <!--
+          This is a sofia sip profile/user agent.  This will service exactly one ip and port.
+          In FreeSWITCH you can run multiple sip user agents on their own ip and port.
+
+          When you hear someone say "sofia profile" this is what they are talking about.
+      -->
+
+      <!-- http://wiki.freeswitch.org/wiki/Sofia_Configuration_Files -->
+      <!--aliases are other names that will work as a valid profile name for this profile-->
+      <aliases>
+        <!--
+            <alias name="default"/>
+        -->
+      </aliases>
+      <!-- Outbound Registrations -->
+      <gateways>
+      </gateways>
+
+      <domains>
+        <!-- indicator to parse the directory for domains with parse="true" to get gateways-->
+        <!--<domain name="$${domain}" parse="true"/>-->
+        <!-- indicator to parse the directory for domains with parse="true" to get gateways and alias every domain to this profile -->
+        <!--<domain name="all" alias="true" parse="true"/>-->
+        <domain name="all" alias="true" parse="false"/>
+      </domains>
+
+      <settings>
+        <param name="rfc-7989" value="yes"/>
+
+
+        <!-- inject delay between dtmf digits on send to help some slow interpreters (also per channel with rtp_digit_delay var -->
+        <!-- <param name="rtp-digit-delay" value="40"/>-->
+
+        <!--
+            When calls are in no media this will bring them back to media
+            when you press the hold button.
+        -->
+        <!--<param name="media-option" value="resume-media-on-hold"/> -->
+
+        <!--
+            This will allow a call after an attended transfer go back to
+            bypass media after an attended transfer.
+        -->
+        <!--<param name="media-option" value="bypass-media-after-att-xfer"/>-->
+
+        <!-- Can be set to "_undef_" to remove the User-Agent header -->
+        <!-- <param name="user-agent-string" value="FreeSWITCH Rocks!"/> -->
+
+        <param name="debug" value="0"/>
+        <!-- If you want FreeSWITCH to shutdown if this profile fails to load, uncomment the next line. -->
+        <!-- <param name="shutdown-on-fail" value="true"/> -->
+        <param name="sip-trace" value="no"/>
+        <param name="sip-capture" value="yes"/>
+
+        <!-- Use presence_map.conf.xml to convert extension regex to presence protos for routing -->
+        <!-- <param name="presence-proto-lookup" value="true"/> -->
+
+
+        <!-- Don't be picky about negotiated DTMF just always offer 2833 and accept both 2833 and INFO -->
+        <!--<param name="liberal-dtmf" value="true"/>-->
+
+
+        <!--
+            Sometimes, in extremely rare edge cases, the Sofia SIP stack may stop
+            responding. These options allow you to enable and control a watchdog
+            on the Sofia SIP stack so that if it stops responding for the
+            specified number of milliseconds, it will cause FreeSWITCH to crash
+            immediately. This is useful if you run in an HA environment and
+            need to ensure automated recovery from such a condition. Note that if
+            your server is idle a lot, the watchdog may fire due to not receiving
+            any SIP messages. Thus, if you expect your system to be idle, you
+            should leave the watchdog disabled. It can be toggled on and off
+            through the FreeSWITCH CLI either on an individual profile basis or
+            globally for all profiles. So, if you run in an HA environment with a
+            master and slave, you should use the CLI to make sure the watchdog is
+            only enabled on the master.
+            If such crash occurs, FreeSWITCH will dump core if allowed. The
+            stacktrace will include function watchdog_triggered_abort().
+        -->
+        <param name="watchdog-enabled" value="no"/>
+        <param name="watchdog-step-timeout" value="30000"/>
+        <param name="watchdog-event-timeout" value="30000"/>
+
+        <param name="log-auth-failures" value="false"/>
+        <param name="forward-unsolicited-mwi-notify" value="false"/>
+
+        <param name="context" value="public"/>
+        <param name="rfc2833-pt" value="101"/>
+        <!-- port to bind to for sip traffic -->
+        <param name="sip-port" value="$${internal_sip_port}"/>
+        <param name="dialplan" value="XML"/>
+        <param name="dtmf-duration" value="2000"/>
+        <param name="inbound-codec-prefs" value="$${global_codec_prefs}"/>
+        <param name="outbound-codec-prefs" value="$${global_codec_prefs}"/>
+        <param name="rtp-timer-name" value="soft"/>
+        <!-- ip address to use for rtp, DO NOT USE HOSTNAMES ONLY IP ADDRESSES -->
+        <param name="rtp-ip" value="$${local_ip_v4}"/>
+        <!-- ip address to bind to, DO NOT USE HOSTNAMES ONLY IP ADDRESSES -->
+        <param name="sip-ip" value="$${local_ip_v4}"/>
+        <param name="hold-music" value="$${hold_music}"/>
+        <param name="apply-nat-acl" value="nat.auto"/>
+
+
+        <!-- (default true) set to false if you do not wish to have called party info in 1XX responses -->
+        <!-- <param name="cid-in-1xx" value="false"/> -->
+
+        <!-- extended info parsing -->
+        <!-- <param name="extended-info-parsing" value="true"/> -->
+
+        <!--<param name="aggressive-nat-detection" value="true"/>-->
+        <!--
+            There are known issues (asserts and segfaults) when 100rel is enabled.
+            It is not recommended to enable 100rel at this time.
+        -->
+        <!--<param name="enable-100rel" value="true"/>-->
+
+        <!-- uncomment if you don't wish to try a next SRV destination on 503 response -->
+        <!-- RFC3263 Section 4.3 -->
+        <!--<param name="disable-srv503" value="true"/>-->
+
+        <!-- Enable Compact SIP headers. -->
+        <!--<param name="enable-compact-headers" value="true"/>-->
+        <!--
+            enable/disable session timers
+        -->
+        <!--<param name="enable-timer" value="false"/>-->
+        <!--<param name="minimum-session-expires" value="120"/>-->
+        <param name="apply-inbound-acl" value="domains"/>
+        <!--
+            This defines your local network, by default we detect your local network
+            and create this localnet.auto ACL for this.
+        -->
+        <param name="local-network-acl" value="localnet.auto"/>
+        <!--<param name="apply-register-acl" value="domains"/>-->
+        <!--<param name="dtmf-type" value="info"/>-->
+
+
+        <!-- 'true' means every time 'first-only' means on the first register -->
+        <!--<param name="send-message-query-on-register" value="true"/>-->
+
+        <!-- 'true' means every time 'first-only' means on the first register -->
+        <!--<param name="send-presence-on-register" value="first-only"/> -->
+
+
+        <!-- Caller-ID type (choose one, can be overridden by inbound call type and/or sip_cid_type channel variable -->
+        <!-- Remote-Party-ID header -->
+        <!--<param name="caller-id-type" value="rpid"/>-->
+
+        <!-- P-*-Identity family of headers -->
+        <!--<param name="caller-id-type" value="pid"/>-->
+
+        <!-- neither one -->
+        <!--<param name="caller-id-type" value="none"/>-->
+
+
+
+        <param name="record-path" value="$${recordings_dir}"/>
+        <param name="record-template" value="${caller_id_number}.${target_domain}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
+        <!--enable to use presence -->
+        <param name="manage-presence" value="true"/>
+        <!-- send a presence probe on each register to query devices to send presence instead of sending presence with less info -->
+        <!--<param name="presence-probe-on-register" value="true"/>-->
+        <!--<param name="manage-shared-appearance" value="true"/>-->
+        <!-- used to share presence info across sofia profiles -->
+        <!-- Name of the db to use for this profile -->
+        <!--<param name="dbname" value="share_presence"/>-->
+        <param name="presence-hosts" value="$${domain},$${local_ip_v4}"/>
+        <param name="presence-privacy" value="$${presence_privacy}"/>
+        <!-- ************************************************* -->
+
+        <!-- This setting is for AAL2 bitpacking on G726 -->
+        <!-- <param name="bitpacking" value="aal2"/> -->
+        <!--max number of open dialogs in proceeding -->
+        <!--<param name="max-proceeding" value="1000"/>-->
+        <!--session timers for all call to expire after the specified seconds -->
+        <!--<param name="session-timeout" value="1800"/>-->
+        <!-- Can be 'true' or 'contact' -->
+        <!--<param name="multiple-registrations" value="contact"/>-->
+        <!--set to 'greedy' if you want your codec list to take precedence -->
+        <param name="inbound-codec-negotiation" value="generous"/>
+        <!-- if you want to send any special bind params of your own -->
+        <!--<param name="bind-params" value="transport=udp"/>-->
+        <!--<param name="unregister-on-options-fail" value="true"/>-->
+        <!-- Send an OPTIONS packet to all registered endpoints -->
+        <!--<param name="all-reg-options-ping" value="true"/>-->
+        <!-- Send an OPTIONS packet to NATed registered endpoints. Can be 'true' or 'udp-only'. -->
+        <!--<param name="nat-options-ping" value="true"/>-->
+        <!--<param name="sip-options-respond-503-on-busy" value="true"/>-->
+        <!--<param name="sip-messages-respond-200-ok" value="true"/>-->
+        <!--<param name="sip-subscribe-respond-200-ok" value="true"/>-->
+
+        <!-- TLS: disabled by default, set to "true" to enable -->
+        <param name="tls" value="$${internal_ssl_enable}"/>
+        <!-- Set to true to not bind on the normal sip-port but only on the TLS port -->
+        <param name="tls-only" value="false"/>
+        <!-- additional bind parameters for TLS -->
+        <param name="tls-bind-params" value="transport=tls"/>
+        <!-- Port to listen on for TLS requests. (5061 will be used if unspecified) -->
+        <param name="tls-sip-port" value="$${internal_tls_port}"/>
+        <!-- Location of the agent.pem and cafile.pem ssl certificates (needed for TLS server) -->
+        <!--<param name="tls-cert-dir" value=""/>-->
+        <!-- Optionally set the passphrase password used by openSSL to encrypt/decrypt TLS private key files -->
+        <param name="tls-passphrase" value=""/>
+        <!-- Verify the date on TLS certificates -->
+        <param name="tls-verify-date" value="true"/>
+        <!-- TLS verify policy, when registering/inviting gateways with other servers (outbound) or handling inbound registration/invite requests how should we verify their certificate -->
+        <!-- set to 'in' to only verify incoming connections, 'out' to only verify outgoing connections, 'all' to verify all connections, also 'subjects_in', 'subjects_out' and 'subjects_all' for subject validation. Multiple policies can be split with a '|' pipe -->
+        <param name="tls-verify-policy" value="none"/>
+        <!-- Certificate max verify depth to use for validating peer TLS certificates when the verify policy is not none -->
+        <param name="tls-verify-depth" value="2"/>
+        <!-- If the tls-verify-policy is set to subjects_all or subjects_in this sets which subjects are allowed, multiple subjects can be split with a '|' pipe -->
+        <param name="tls-verify-in-subjects" value=""/>
+        <!-- TLS version default: tlsv1,tlsv1.1,tlsv1.2 -->
+        <param name="tls-version" value="$${sip_tls_version}"/>
+
+        <!-- TLS ciphers default: ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH  -->
+        <param name="tls-ciphers" value="$${sip_tls_ciphers}"/>
+
+        <!-- turn on auto-flush during bridge (skip timer sleep when the socket already has data)
+             (reduces delay on latent connections default true, must be disabled explicitly)-->
+        <!--<param name="rtp-autoflush-during-bridge" value="false"/>-->
+
+        <!--If you don't want to pass through timestamps from 1 RTP call to another (on a per call basis with rtp_rewrite_timestamps chanvar)-->
+        <!--<param name="rtp-rewrite-timestamps" value="true"/>-->
+        <!--<param name="pass-rfc2833" value="true"/>-->
+        <!--If you have ODBC support and a working dsn you can use it instead of SQLite-->
+        <!--<param name="odbc-dsn" value="dsn:user:pass"/>-->
+
+        <!-- Or, if you have PGSQL support, you can use that -->
+        <!--<param name="odbc-dsn" value="pgsql://hostaddr=127.0.0.1 dbname=freeswitch user=freeswitch password='' options='-c client_min_messages=NOTICE' application_name='freeswitch'" />-->
+
+        <!--Uncomment to set all inbound calls to no media mode-->
+        <!--<param name="inbound-bypass-media" value="true"/>-->
+
+        <!--Uncomment to set all inbound calls to proxy media mode-->
+        <!--<param name="inbound-proxy-media" value="true"/>-->
+
+        <!-- Let calls hit the dialplan before selecting codec for the a-leg -->
+        <param name="inbound-late-negotiation" value="true"/>
+
+        <!-- Allow ZRTP clients to negotiate end-to-end security associations (also enables late negotiation) -->
+        <param name="inbound-zrtp-passthru" value="true"/>
+
+        <!-- this lets anything register -->
+        <!--  comment the next line and uncomment one or both of the other 2 lines for call authentication -->
+        <!-- <param name="accept-blind-reg" value="true"/> -->
+
+        <!-- accept any authentication without actually checking (not a good feature for most people) -->
+        <!-- <param name="accept-blind-auth" value="true"/> -->
+
+        <!-- suppress CNG on this profile or per call with the 'suppress_cng' variable -->
+        <!-- <param name="suppress-cng" value="true"/> -->
+
+        <!--TTL for nonce in sip auth-->
+        <param name="nonce-ttl" value="60"/>
+        <!--Uncomment if you want to force the outbound leg of a bridge to only offer the codec
+            that the originator is using-->
+        <!--<param name="disable-transcoding" value="true"/>-->
+        <!-- Handle 302 Redirect in the dialplan -->
+        <!--<param name="manual-redirect" value="true"/> -->
+        <!-- Disable Transfer -->
+        <!--<param name="disable-transfer" value="true"/> -->
+        <!-- Disable Register -->
+        <!--<param name="disable-register" value="true"/> -->
+        <!-- Used for when phones respond to a challenged ACK with method INVITE in the hash -->
+        <!--<param name="NDLB-broken-auth-hash" value="true"/>-->
+        <!-- add a ;received="<ip>:<port>" to the contact when replying to register for nat handling -->
+        <!--<param name="NDLB-received-in-nat-reg-contact" value="true"/>-->
+        <param name="auth-calls" value="$${internal_auth_calls}"/>
+        <!-- Force the user and auth-user to match. -->
+        <param name="inbound-reg-force-matching-username" value="true"/>
+        <!-- on authed calls, authenticate *all* the packets not just invite -->
+        <param name="auth-all-packets" value="false"/>
+
+        <!-- external_sip_ip
+             Used as the public IP address for SDP.
+             Can be an one of:
+             ip address            - "12.34.56.78"
+             a stun server lookup  - "stun:stun.server.com"
+             a DNS name            - "host:host.server.com"
+             auto                  - Use guessed ip.
+             auto-nat              - Use ip learned from NAT-PMP or UPNP
+        -->
+        <param name="ext-rtp-ip" value="$${external_rtp_ip}"/>
+        <param name="ext-sip-ip" value="$${external_rtp_ip}"/>
+
+        <!-- rtp inactivity timeout -->
+        <param name="rtp-timeout-sec" value="300"/>
+        <param name="rtp-hold-timeout-sec" value="1800"/>
+        <!-- VAD choose one (out is a good choice); -->
+        <!-- <param name="vad" value="in"/> -->
+        <!-- <param name="vad" value="out"/> -->
+        <!-- <param name="vad" value="both"/> -->
+        <!--<param name="alias" value="sip:10.0.1.251:5555"/>-->
+        <!--
+            These are enabled to make the default config work better out of the box.
+            If you need more than ONE domain you'll need to not use these options.
+
+        -->
+        <!--all inbound reg will look in this domain for the users -->
+        <param name="force-register-domain" value="$${domain}"/>
+        <!--force the domain in subscriptions to this value -->
+        <param name="force-subscription-domain" value="$${domain}"/>
+        <!--all inbound reg will stored in the db using this domain -->
+        <param name="force-register-db-domain" value="$${domain}"/>
+
+
+        <!-- for sip over websocket support -->
+        <param name="ws-binding"  value=":5066"/>
+
+        <!-- for sip over secure websocket support -->
+        <!-- You need wss.pem in $${certs_dir} for wss or one will be created for you -->
+        <param name="wss-binding" value=":7443"/>
+
+        <!--<param name="delete-subs-on-register" value="false"/>-->
+
+        <!-- launch a new thread to process each new inbound register when using heavier backends -->
+        <!-- <param name="inbound-reg-in-new-thread" value="true"/> -->
+
+        <!-- enable rtcp on every channel also can be done per leg basis with rtcp_audio_interval_msec variable set to passthru to pass it across a call-->
+        <!--<param name="rtcp-audio-interval-msec" value="5000"/>-->
+        <!--<param name="rtcp-video-interval-msec" value="5000"/>-->
+
+        <!--force suscription expires to a lower value than requested-->
+        <!--<param name="force-subscription-expires" value="60"/>-->
+
+        <!-- add a random deviation to the expires value of the 202 Accepted -->
+        <!--<param name="sip-subscription-max-deviation" value="120"/>-->
+
+        <!-- disable register and transfer which may be undesirable in a public switch -->
+        <!--<param name="disable-transfer" value="true"/>-->
+        <!--<param name="disable-register" value="true"/>-->
+
+        <!--
+            enable-3pcc can be set to either 'true' or 'proxy', true accepts the call
+            right away, proxy waits until the call has been answered then sends accepts
+        -->
+        <!--<param name="enable-3pcc" value="true"/>-->
+
+        <!-- use at your own risk or if you know what this does.-->
+        <!--<param name="NDLB-force-rport" value="true"/>-->
+        <!--
+            Choose the realm challenge key. Default is auto_to if not set.
+
+            auto_from  - uses the from field as the value for the sip realm.
+            auto_to    - uses the to field as the value for the sip realm.
+            <anyvalue> - you can input any value to use for the sip realm.
+
+            If you want URL dialing to work you'll want to set this to auto_from.
+
+            If you use any other value besides auto_to or auto_from you'll
+            loose the ability to do multiple domains.
+
+            Note: comment out to restore the behavior before 2008-09-29
+        -->
+        <param name="challenge-realm" value="auto_from"/>
+        <!--<param name="disable-rtp-auto-adjust" value="true"/>-->
+        <!-- on inbound calls make the uuid of the session equal to the sip call id of that call -->
+        <!--<param name="inbound-use-callid-as-uuid" value="true"/>-->
+        <!-- on outbound calls set the callid to match the uuid of the session -->
+        <!--<param name="outbound-use-uuid-as-callid" value="true"/>-->
+        <!-- set to false disable this feature -->
+        <!--<param name="rtp-autofix-timing" value="false"/>-->
+
+        <!-- set this param to false if your gateway for some reason hates X- headers that it is supposed to ignore-->
+        <!--<param name="pass-callee-id" value="false"/>-->
+
+        <!-- clear clears them all or supply the name to add or the name
+             prefixed with ~ to remove valid values:
+
+               clear
+               CISCO_SKIP_MARK_BIT_2833
+               SONUS_SEND_INVALID_TIMESTAMP_2833
+
+        -->
+        <!--<param name="auto-rtp-bugs" data="clear"/>-->
+
+        <!-- the following can be used as workaround with bogus SRV/NAPTR records -->
+        <!--<param name="disable-srv" value="false" />-->
+        <!--<param name="disable-naptr" value="false" />-->
+
+        <!-- The following can be used to fine-tune timers within sofia's transport layer
+             Those settings are for advanced users and can safely be left as-is -->
+
+        <!-- Initial retransmission interval (in milliseconds).
+             Set the T1 retransmission interval used by the SIP transaction engine.
+             The T1 is the initial duration used by request retransmission timers A and E (UDP) as well as response retransmission timer G.   -->
+        <!-- <param name="timer-T1" value="500" /> -->
+
+        <!--  Transaction timeout (defaults to T1 * 64).
+             Set the T1x64 timeout value used by the SIP transaction engine.
+             The T1x64 is duration used for timers B, F, H, and J (UDP) by the SIP transaction engine.
+             The timeout value T1x64 can be adjusted separately from the initial retransmission interval T1. -->
+        <!-- <param name="timer-T1X64" value="32000" /> -->
+
+
+        <!-- Maximum retransmission interval (in milliseconds).
+             Set the maximum retransmission interval used by the SIP transaction engine.
+             The T2 is the maximum duration used for the timers E (UDP) and G by the SIP transaction engine.
+             Note that the timer A is not capped by T2. Retransmission interval of INVITE requests grows exponentially
+             until the timer B fires.  -->
+        <!-- <param name="timer-T2" value="4000" /> -->
+
+        <!--
+            Transaction lifetime (in milliseconds).
+            Set the lifetime for completed transactions used by the SIP transaction engine.
+            A completed transaction is kept around for the duration of T4 in order to catch late responses.
+            The T4 is the maximum duration for the messages to stay in the network and the duration of SIP timer K. -->
+        <!-- <param name="timer-T4" value="4000" /> -->
+
+        <!-- Turn on a jitterbuffer for every call -->
+        <!-- <param name="auto-jitterbuffer-msec" value="60"/> -->
+
+
+        <!-- By default mod_sofia will ignore the codecs in the sdp for hold/unhold operations
+             Set this to true if you want to actually parse the sdp and re-negotiate the codec during hold/unhold.
+             It's probably not what you want so stick with the default unless you really need to change this.
+        -->
+        <!--<param name="renegotiate-codec-on-hold" value="true"/>-->
+
+        <!-- By default mod_sofia will send "100 Trying" in response to a SIP INVITE. Set this to false if
+             you want to turn off this behavior and manually send the "100 Trying" via the acknowledge_call application.
+        -->
+        <!--<param name="auto-invite-100" value="false"/>-->
+      </settings>
+    </profile>
+
+  external-ipv6.xml: |-
+
+  internal-ipv6.xml: |-
+
+  vars.xml: |-
+    <include>
+      <!-- Preprocessor Variables
+           These are introduced when configuration strings must be consistent across modules.
+           NOTICE: YOU CAN NOT COMMENT OUT AN X-PRE-PROCESS line, Remove the line instead.
+
+           WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+
+           YOU SHOULD CHANGE THIS default_password value if you don't want to be subject to any
+           toll fraud in the future.  It's your responsibility to secure your own system.
+
+           This default config is used to demonstrate the feature set of FreeSWITCH.
+
+           WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+      -->
+      <X-PRE-PROCESS cmd="set" data="default_password=testpassword"/>
+      <!-- Did you change it yet? -->
+      <!--
+          The following variables are set dynamically - calculated if possible by freeswitch - and
+          are available to the config as $${variable}.  You can see their calculated value via fs_cli
+          by entering eval $${variable}
+
+          hostname
+          local_ip_v4
+          local_mask_v4
+          local_ip_v6
+          switch_serial
+          base_dir
+          recordings_dir
+          sound_prefix
+          sounds_dir
+          conf_dir
+          log_dir
+          run_dir
+          db_dir
+          mod_dir
+          htdocs_dir
+          script_dir
+          temp_dir
+          grammar_dir
+          certs_dir
+          storage_dir
+          cache_dir
+          core_uuid
+          zrtp_enabled
+          nat_public_addr
+          nat_private_addr
+          nat_type
+
+      -->
+
+
+      <X-PRE-PROCESS cmd="set" data="sound_prefix=$${sounds_dir}/en/us/callie"/>
+      <!--<Z-PRE-PROCESS cmd="set" data="sound_prefix=$${sounds_dir}/en/us/allison"/> -->
+
+      <!--
+          This setting is what sets the default domain FreeSWITCH will use if all else fails.
+
+          FreeSWICH will default to $${local_ip_v4} unless changed.  Changing this setting does
+          affect the sip authentication.  Please review conf/directory/default.xml for more
+          information on this topic.
+      -->
+      <X-PRE-PROCESS cmd="set" data="domain=$${local_ip_v4}"/>
+      <X-PRE-PROCESS cmd="set" data="domain_name=$${domain}"/>
+      <X-PRE-PROCESS cmd="set" data="hold_music=local_stream://moh"/>
+      <X-PRE-PROCESS cmd="set" data="use_profile=external"/>
+      <X-PRE-PROCESS cmd="set" data="rtp_sdes_suites=AEAD_AES_256_GCM_8|AEAD_AES_128_GCM_8|AES_CM_256_HMAC_SHA1_80|AES_CM_192_HMAC_SHA1_80|AES_CM_128_HMAC_SHA1_80|AES_CM_256_HMAC_SHA1_32|AES_CM_192_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_32|AES_CM_128_NULL_AUTH"/>
+      <!--
+          Enable ZRTP globally you can override this on a per channel basis
+
+          http://wiki.freeswitch.org/wiki/ZRTP (on how to enable zrtp)
+      -->
+      <X-PRE-PROCESS cmd="set" data="zrtp_secure_media=true"/>
+      <!--
+          NOTICE: When using SRTP it's critical that you do not offer or accept
+          variable bit rate codecs, doing so would leak information and possibly
+          compromise your SRTP stream. (FS-6404)
+
+          Supported SRTP Crypto Suites:
+
+          AEAD_AES_256_GCM_8
+          ____________________________________________________________________________
+          This algorithm is identical to AEAD_AES_256_GCM (see Section 5.2 of
+          [RFC5116]), except that the tag length, t, is 8, and an
+          authentication tag with a length of 8 octets (64 bits) is used.
+          An AEAD_AES_256_GCM_8 ciphertext is exactly 8 octets longer than its
+          corresponding plaintext.
+
+
+          AEAD_AES_128_GCM_8
+          ____________________________________________________________________________
+          This algorithm is identical to AEAD_AES_128_GCM (see Section 5.1 of
+          [RFC5116]), except that the tag length, t, is 8, and an
+          authentication tag with a length of 8 octets (64 bits) is used.
+          An AEAD_AES_128_GCM_8 ciphertext is exactly 8 octets longer than its
+          corresponding plaintext.
+
+
+          AES_CM_256_HMAC_SHA1_80 | AES_CM_192_HMAC_SHA1_80 | AES_CM_128_HMAC_SHA1_80
+          ____________________________________________________________________________
+          AES_CM_128_HMAC_SHA1_80 is the SRTP default AES Counter Mode cipher
+          and HMAC-SHA1 message authentication with an 80-bit authentication
+          tag. The master-key length is 128 bits and has a default lifetime of
+          a maximum of 2^48 SRTP packets or 2^31 SRTCP packets, whichever comes
+          first.
+
+
+          AES_CM_256_HMAC_SHA1_32 | AES_CM_192_HMAC_SHA1_32 | AES_CM_128_HMAC_SHA1_32
+          ____________________________________________________________________________
+          This crypto-suite is identical to AES_CM_128_HMAC_SHA1_80 except that
+          the authentication tag is 32 bits. The length of the base64-decoded key and
+          salt value for this crypto-suite MUST be 30 octets i.e., 240 bits; otherwise,
+          the crypto attribute is considered invalid.
+
+
+          AES_CM_128_NULL_AUTH
+          ____________________________________________________________________________
+          The SRTP default cipher (AES-128 Counter Mode), but to use no authentication
+          method.  This policy is NOT RECOMMENDED unless it is unavoidable; see
+          Section 7.5 of [RFC3711].
+
+
+          SRTP variables that modify behaviors based on direction/leg:
+
+          rtp_secure_media
+          ____________________________________________________________________________
+          possible values:
+              mandatory - Accept/Offer SAVP negotiation ONLY
+              optional  - Accept/Offer SAVP/AVP with SAVP preferred
+              forbidden - More useful for inbound to deny SAVP negotiation
+              false     - implies forbidden
+              true      - implies mandatory
+
+          default if not set is accept SAVP inbound if offered.
+
+
+          rtp_secure_media_inbound | rtp_secure_media_outbound
+          ____________________________________________________________________________
+          This is the same as rtp_secure_media, but would apply to either inbound
+          or outbound offers specifically.
+
+
+          How to specify crypto suites:
+          ____________________________________________________________________________
+          By default without specifying any crypto suites FreeSWITCH will offer
+          crypto suites from strongest to weakest accepting the strongest each
+          endpoint has in common.  If you wish to force specific crypto suites you
+          can do so by appending the suites in a comma separated list in the order
+          that you wish to offer them in.
+
+          Examples:
+
+              rtp_secure_media=mandatory:AES_CM_256_HMAC_SHA1_80,AES_CM_256_HMAC_SHA1_32
+              rtp_secure_media=true:AES_CM_256_HMAC_SHA1_80,AES_CM_256_HMAC_SHA1_32
+              rtp_secure_media=optional:AES_CM_256_HMAC_SHA1_80
+              rtp_secure_media=true:AES_CM_256_HMAC_SHA1_80
+
+          Additionally you can narrow this down on either inbound or outbound by
+          specifying as so:
+
+              rtp_secure_media_inbound=true:AEAD_AES_256_GCM_8
+              rtp_secure_media_inbound=mandatory:AEAD_AES_256_GCM_8
+              rtp_secure_media_outbound=true:AEAD_AES_128_GCM_8
+              rtp_secure_media_outbound=optional:AEAD_AES_128_GCM_8
+
+
+          rtp_secure_media_suites
+          ____________________________________________________________________________
+          Optionaly you can use rtp_secure_media_suites to dictate the suite list
+          and only use rtp_secure_media=[optional|mandatory|false|true] without having
+          to dictate the suite list with the rtp_secure_media* variables.
+      -->
+      <!--
+           Examples of codec options: (module must be compiled and loaded)
+
+           codecname[@8000h|16000h|32000h[@XXi]]
+
+           XX is the frame size must be multples allowed for the codec
+           FreeSWITCH can support 10-120ms on some codecs.
+           We do not support exceeding the MTU of the RTP packet.
+
+
+           iLBC@30i         - iLBC using mode=30 which will win in all cases.
+           DVI4@8000h@20i   - IMA ADPCM 8kHz using 20ms ptime. (multiples of 10)
+           DVI4@16000h@40i  - IMA ADPCM 16kHz using 40ms ptime. (multiples of 10)
+           speex@8000h@20i  - Speex 8kHz using 20ms ptime.
+           speex@16000h@20i - Speex 16kHz using 20ms ptime.
+           speex@32000h@20i - Speex 32kHz using 20ms ptime.
+           BV16             - BroadVoice 16kb/s narrowband, 8kHz
+           BV32             - BroadVoice 32kb/s wideband, 16kHz
+           G7221@16000h     - G722.1 16kHz (aka Siren 7)
+           G7221@32000h     - G722.1C 32kHz (aka Siren 14)
+           CELT@32000h      - CELT 32kHz, only 10ms supported
+           CELT@48000h      - CELT 48kHz, only 10ms supported
+           GSM@40i          - GSM 8kHz using 40ms ptime. (GSM is done in multiples of 20, Default is 20ms)
+           G722             - G722 16kHz using default 20ms ptime. (multiples of 10)
+           PCMU             - G711 8kHz ulaw using default 20ms ptime. (multiples of 10)
+           PCMA             - G711 8kHz alaw using default 20ms ptime. (multiples of 10)
+           G726-16          - G726 16kbit adpcm using default 20ms ptime. (multiples of 10)
+           G726-24          - G726 24kbit adpcm using default 20ms ptime. (multiples of 10)
+           G726-32          - G726 32kbit adpcm using default 20ms ptime. (multiples of 10)
+           G726-40          - G726 40kbit adpcm using default 20ms ptime. (multiples of 10)
+           AAL2-G726-16     - Same as G726-16 but using AAL2 packing. (multiples of 10)
+           AAL2-G726-24     - Same as G726-24 but using AAL2 packing. (multiples of 10)
+           AAL2-G726-32     - Same as G726-32 but using AAL2 packing. (multiples of 10)
+           AAL2-G726-40     - Same as G726-40 but using AAL2 packing. (multiples of 10)
+           LPC              - LPC10 using 90ms ptime (only supports 90ms at this time in FreeSWITCH)
+           L16              - L16 isn't recommended for VoIP but you can do it. L16 can exceed the MTU rather quickly.
+
+           These are the passthru audio codecs:
+
+           G729             - G729 in passthru mode. (mod_g729)
+           G723             - G723.1 in passthru mode. (mod_g723_1)
+           AMR              - AMR in passthru mode. (mod_amr)
+
+           These are the passthru video codecs: (mod_h26x)
+
+           H261             - H.261 Video
+           H263             - H.263 Video
+           H263-1998        - H.263-1998 Video
+           H263-2000        - H.263-2000 Video
+           H264             - H.264 Video
+
+           RTP Dynamic Payload Numbers currently used in FreeSWITCH and their purpose.
+
+           96  - AMR
+           97  - iLBC (30)
+           98  - iLBC (20)
+           99  - Speex 8kHz, 16kHz, 32kHz
+           100 -
+           101 - telephone-event
+           102 -
+           103 -
+           104 -
+           105 -
+           106 - BV16
+           107 - G722.1 (16kHz)
+           108 -
+           109 -
+           110 -
+           111 -
+           112 -
+           113 -
+           114 - CELT 32kHz, 48kHz
+           115 - G722.1C (32kHz)
+           116 -
+           117 - SILK 8kHz
+           118 - SILK 12kHz
+           119 - SILK 16kHz
+           120 - SILK 24kHz
+           121 - AAL2-G726-40 && G726-40
+           122 - AAL2-G726-32 && G726-32
+           123 - AAL2-G726-24 && G726-24
+           124 - AAL2-G726-16 && G726-16
+           125 -
+           126 -
+           127 - BV32
+
+      -->
+      <X-PRE-PROCESS cmd="set" data="global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8"/>
+      <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8"/>
+
+      <!--
+          xmpp_client_profile and xmpp_server_profile
+          xmpp_client_profile can be any string.
+          xmpp_server_profile is appended to "dingaling_" to form the database name
+          containing the "subscriptions" table.
+          used by: dingaling.conf.xml enum.conf.xml
+      -->
+
+      <X-PRE-PROCESS cmd="set" data="xmpp_client_profile=xmppc"/>
+      <X-PRE-PROCESS cmd="set" data="xmpp_server_profile=xmpps"/>
+      <!--
+           THIS IS ONLY USED FOR DINGALING
+
+           bind_server_ip
+
+           Can be an ip address, a dns name, or "auto".
+           This determines an ip address available on this host to bind.
+           If you are separating RTP and SIP traffic, you will want to have
+           use different addresses where this variable appears.
+           Used by: dingaling.conf.xml
+      -->
+      <X-PRE-PROCESS cmd="set" data="bind_server_ip=auto"/>
+
+      <!-- NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+           If you're going to load test FreeSWITCH please input real IP addresses
+           for external_rtp_ip and external_sip_ip
+      -->
+
+      <!-- external_rtp_ip
+           Can be an one of:
+               ip address: "12.34.56.78"
+               a stun server lookup: "stun:stun.server.com"
+               a DNS name: "host:host.server.com"
+           where fs.mydomain.com is a DNS A record-useful when fs is on
+           a dynamic IP address, and uses a dynamic DNS updater.
+           If unspecified, the bind_server_ip value is used.
+           Used by: sofia.conf.xml dingaling.conf.xml
+      -->
+      <X-PRE-PROCESS cmd="stun-set" data="external_rtp_ip=host:freeswitch-internal.FREESWITCH_NAMESPACE.svc.cluster.local"/>
+
+      <!-- external_sip_ip
+          Used as the public IP address for SDP.
+           Can be an one of:
+               ip address: "12.34.56.78"
+               a stun server lookup: "stun:stun.server.com"
+               a DNS name: "host:host.server.com"
+           where fs.mydomain.com is a DNS A record-useful when fs is on
+           a dynamic IP address, and uses a dynamic DNS updater.
+           If unspecified, the bind_server_ip value is used.
+           Used by: sofia.conf.xml dingaling.conf.xml
+      -->
+      <X-PRE-PROCESS cmd="stun-set" data="external_sip_ip=host:freeswitch-internal.FREESWITCH_NAMESPACE.svc.cluster.local"/>
+
+      <!-- unroll-loops
+           Used to turn on sip loopback unrolling.
+      -->
+      <X-PRE-PROCESS cmd="set" data="unroll_loops=true"/>
+
+      <!-- outbound_caller_id and outbound_caller_name
+           The caller ID telephone number we should use when calling out.
+           Used by: conference.conf.xml and user directory for default
+           outbound callerid name and number.
+      -->
+      <X-PRE-PROCESS cmd="set" data="outbound_caller_name=FreeSWITCH"/>
+      <X-PRE-PROCESS cmd="set" data="outbound_caller_id=0000000000"/>
+
+      <!-- various debug and defaults -->
+      <X-PRE-PROCESS cmd="set" data="call_debug=false"/>
+      <X-PRE-PROCESS cmd="set" data="console_loglevel=info"/>
+      <X-PRE-PROCESS cmd="set" data="default_areacode=918"/>
+      <X-PRE-PROCESS cmd="set" data="default_country=US"/>
+
+      <!-- if false or undefined, the destination number is included in presence NOTIFY dm:note.
+           if true, the destination number is not included -->
+      <X-PRE-PROCESS cmd="set" data="presence_privacy=false"/>
+
+      <X-PRE-PROCESS cmd="set" data="au-ring=%(400,200,383,417);%(400,2000,383,417)"/>
+      <X-PRE-PROCESS cmd="set" data="be-ring=%(1000,3000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="ca-ring=%(2000,4000,440,480)"/>
+      <X-PRE-PROCESS cmd="set" data="cn-ring=%(1000,4000,450)"/>
+      <X-PRE-PROCESS cmd="set" data="cy-ring=%(1500,3000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="cz-ring=%(1000,4000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="de-ring=%(1000,4000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="dk-ring=%(1000,4000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="dz-ring=%(1500,3500,425)"/>
+      <X-PRE-PROCESS cmd="set" data="eg-ring=%(2000,1000,475,375)"/>
+      <X-PRE-PROCESS cmd="set" data="es-ring=%(1500,3000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="fi-ring=%(1000,4000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="fr-ring=%(1500,3500,440)"/>
+      <X-PRE-PROCESS cmd="set" data="hk-ring=%(400,200,440,480);%(400,3000,440,480)"/>
+      <X-PRE-PROCESS cmd="set" data="hu-ring=%(1250,3750,425)"/>
+      <X-PRE-PROCESS cmd="set" data="il-ring=%(1000,3000,400)"/>
+      <X-PRE-PROCESS cmd="set" data="in-ring=%(400,200,425,375);%(400,2000,425,375)"/>
+      <X-PRE-PROCESS cmd="set" data="jp-ring=%(1000,2000,420,380)"/>
+      <X-PRE-PROCESS cmd="set" data="ko-ring=%(1000,2000,440,480)"/>
+      <X-PRE-PROCESS cmd="set" data="pk-ring=%(1000,2000,400)"/>
+      <X-PRE-PROCESS cmd="set" data="pl-ring=%(1000,4000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="ro-ring=%(1850,4150,475,425)"/>
+      <X-PRE-PROCESS cmd="set" data="rs-ring=%(1000,4000,425)"/>
+      <X-PRE-PROCESS cmd="set" data="ru-ring=%(800,3200,425)"/>
+      <X-PRE-PROCESS cmd="set" data="sa-ring=%(1200,4600,425)"/>
+      <X-PRE-PROCESS cmd="set" data="tr-ring=%(2000,4000,450)"/>
+      <X-PRE-PROCESS cmd="set" data="uk-ring=%(400,200,400,450);%(400,2000,400,450)"/>
+      <X-PRE-PROCESS cmd="set" data="us-ring=%(2000,4000,440,480)"/>
+      <X-PRE-PROCESS cmd="set" data="bong-ring=v=-7;%(100,0,941.0,1477.0);v=-7;>=2;+=.1;%(1400,0,350,440)"/>
+      <X-PRE-PROCESS cmd="set" data="beep=%(1000,0,640)"/>
+      <X-PRE-PROCESS cmd="set" data="sit=%(274,0,913.8);%(274,0,1370.6);%(380,0,1776.7)"/>
+
+      <!--
+           Digits Dialed filter: (FS-6940)
+
+           The digits stream may contain valid credit card numbers or social security numbers, These digit
+           filters will allow you to make a valant effort to stamp out sensitive information for
+           PCI/HIPPA compliance. (see xml_cdr dialed_digits)
+
+           df_us_ssn   = US Social Security Number pattern
+           df_us_luhn  = Visa, MasterCard, American Express, Diners Club, Discover and JCB
+      -->
+      <X-PRE-PROCESS cmd="set" data="df_us_ssn=(?!219099999|078051120)(?!666|000|9\d{2})\d{3}(?!00)\d{2}(?!0{4})\d{4}"/>
+      <X-PRE-PROCESS cmd="set" data="df_luhn=?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11}"/>
+      <!-- change XX to X below to enable -->
+      <XX-PRE-PROCESS cmd="set" data="digits_dialed_filter=(($${df_luhn})|($${df_us_ssn}))"/>
+
+      <!--
+          Setting up your default sip provider is easy.
+          Below are some values that should work in most cases.
+
+          These are for conf/directory/default/example.com.xml
+      -->
+      <X-PRE-PROCESS cmd="set" data="default_provider=example.com"/>
+      <X-PRE-PROCESS cmd="set" data="default_provider_username=joeuser"/>
+      <X-PRE-PROCESS cmd="set" data="default_provider_password=password"/>
+      <X-PRE-PROCESS cmd="set" data="default_provider_from_domain=example.com"/>
+      <!-- true or false -->
+      <X-PRE-PROCESS cmd="set" data="default_provider_register=false"/>
+      <X-PRE-PROCESS cmd="set" data="default_provider_contact=5000"/>
+
+      <!--
+         SIP and TLS settings. http://wiki.freeswitch.org/wiki/Tls
+
+         valid options: sslv2,sslv3,sslv23,tlsv1,tlsv1.1,tlsv1.2
+
+         default: tlsv1,tlsv1.1,tlsv1.2
+      -->
+      <X-PRE-PROCESS cmd="set" data="sip_tls_version=tlsv1,tlsv1.1,tlsv1.2"/>
+
+      <!--
+         TLS cipher suite: default ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH
+
+         The actual ciphers supported will change per platform.
+
+         openssl ciphers -v 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'
+
+         Will show you what is available in your verion of openssl.
+      -->
+      <X-PRE-PROCESS cmd="set" data="sip_tls_ciphers=ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"/>
+
+      <!-- Internal SIP Profile -->
+      <X-PRE-PROCESS cmd="set" data="internal_auth_calls=true"/>
+      <X-PRE-PROCESS cmd="set" data="internal_sip_port=15060"/>
+      <X-PRE-PROCESS cmd="set" data="internal_tls_port=15061"/>
+      <X-PRE-PROCESS cmd="set" data="internal_ssl_enable=false"/>
+
+      <!-- External SIP Profile -->
+      <X-PRE-PROCESS cmd="set" data="external_auth_calls=false"/>
+      <X-PRE-PROCESS cmd="set" data="external_sip_port=5080"/>
+      <X-PRE-PROCESS cmd="set" data="external_tls_port=5081"/>
+      <X-PRE-PROCESS cmd="set" data="external_ssl_enable=false"/>
+
+      <!-- Video Settings -->
+      <!-- Setting the max bandwdith -->
+      <X-PRE-PROCESS cmd="set" data="rtp_video_max_bandwidth_in=3mb"/>
+      <X-PRE-PROCESS cmd="set" data="rtp_video_max_bandwidth_out=3mb"/>
+
+      <!-- WebRTC Video -->
+      <!-- Suppress CNG for WebRTC Audio -->
+      <X-PRE-PROCESS cmd="set" data="suppress_cng=true"/>
+      <!-- Enable liberal DTMF for those that can't get it right -->
+      <X-PRE-PROCESS cmd="set" data="rtp_liberal_dtmf=true"/>
+      <!-- Helps with WebRTC Audio -->
+
+      <!-- Stock Video Avatars -->
+      <X-PRE-PROCESS cmd="set" data="video_mute_png=$${images_dir}/default-mute.png"/>
+      <X-PRE-PROCESS cmd="set" data="video_no_avatar_png=$${images_dir}/default-avatar.png"/>
+
+    </include>
+
+  modules.conf.xml: |-
+    <configuration name="modules.conf" description="Modules">
+      <modules>
+        <!-- Loggers (I'd load these first) -->
+        <load module="mod_console"/>
+        <!-- <load module="mod_graylog2"/> -->
+        <load module="mod_logfile"/>
+        <!-- <load module="mod_syslog"/> -->
+
+        <!--<load module="mod_yaml"/>-->
+
+        <!-- Multi-Faceted -->
+        <!-- mod_enum is a dialplan interface, an application interface and an api command interface -->
+        <load module="mod_enum"/>
+
+        <!-- XML Interfaces -->
+        <!-- <load module="mod_xml_rpc"/> -->
+        <!-- <load module="mod_xml_curl"/> -->
+        <!-- <load module="mod_xml_cdr"/> -->
+        <!-- <load module="mod_xml_radius"/> -->
+        <!-- <load module="mod_xml_scgi"/> -->
+
+        <!-- Event Handlers -->
+        <!-- <load module="mod_amqp"/> -->
+        <load module="mod_cdr_csv"/>
+        <!-- <load module="mod_cdr_sqlite"/> -->
+        <!-- <load module="mod_event_multicast"/> -->
+        <load module="mod_event_socket"/>
+        <!-- <load module="mod_event_zmq"/> -->
+        <!-- <load module="mod_zeroconf"/> -->
+        <!-- <load module="mod_erlang_event"/> -->
+        <!-- <load module="mod_smpp"/> -->
+        <!-- <load module="mod_snmp"/> -->
+
+        <!-- Directory Interfaces -->
+        <!-- <load module="mod_ldap"/> -->
+
+        <!-- Endpoints -->
+        <!-- <load module="mod_dingaling"/> -->
+        <!-- <load module="mod_portaudio"/> -->
+        <!-- <load module="mod_alsa"/> -->
+        <load module="mod_sofia"/>
+        <load module="mod_loopback"/>
+        <!-- <load module="mod_woomera"/> -->
+        <!-- <load module="mod_freetdm"/> -->
+        <!-- <load module="mod_unicall"/> -->
+        <!-- <load module="mod_skinny"/> -->
+        <!-- <load module="mod_khomp"/>   -->
+        <load module="mod_rtc"/>
+        <!-- <load module="mod_rtmp"/>   -->
+        <load module="mod_verto"/>
+
+        <!-- Applications -->
+        <load module="mod_signalwire"/>
+        <load module="mod_commands"/>
+        <load module="mod_conference"/>
+        <!-- <load module="mod_curl"/> -->
+        <load module="mod_db"/>
+        <load module="mod_dptools"/>
+        <load module="mod_expr"/>
+        <load module="mod_fifo"/>
+        <load module="mod_hash"/>
+        <!--<load module="mod_mongo"/> -->
+        <load module="mod_voicemail"/>
+        <!--<load module="mod_directory"/>-->
+        <!--<load module="mod_distributor"/>-->
+        <!--<load module="mod_lcr"/>-->
+        <!--<load module="mod_easyroute"/>-->
+        <load module="mod_esf"/>
+        <load module="mod_fsv"/>
+        <!--<load module="mod_cluechoo"/>-->
+        <load module="mod_valet_parking"/>
+        <!--<load module="mod_fsk"/>-->
+        <!--<load module="mod_spy"/>-->
+        <!--<load module="mod_sms"/>-->
+        <!--<load module="mod_sms_flowroute"/>-->
+        <!--<load module="mod_smpp"/>-->
+        <!--<load module="mod_random"/>-->
+        <load module="mod_httapi"/>
+        <!--<load module="mod_translate"/>-->
+
+        <!-- SNOM Module -->
+        <!--<load module="mod_snom"/>-->
+
+        <!-- This one only works on Linux for now -->
+        <!--<load module="mod_ladspa"/>-->
+
+        <!-- Dialplan Interfaces -->
+        <!-- <load module="mod_dialplan_directory"/> -->
+        <load module="mod_dialplan_xml"/>
+        <load module="mod_dialplan_asterisk"/>
+
+        <!-- Codec Interfaces -->
+        <load module="mod_spandsp"/>
+        <load module="mod_g723_1"/>
+        <load module="mod_g729"/>
+        <load module="mod_amr"/>
+        <!--<load module="mod_ilbc"/>-->
+        <!--<load module="mod_h26x"/>-->
+        <load module="mod_b64"/>
+        <!--<load module="mod_siren"/>-->
+        <!--<load module="mod_isac"/>-->
+        <load module="mod_opus"/>
+
+        <!-- File Format Interfaces -->
+        <load module="mod_av"/>
+        <load module="mod_sndfile"/>
+        <load module="mod_native_file"/>
+        <!--<load module="mod_opusfile"/>-->
+        <load module="mod_png"/>
+        <!-- <load module="mod_shell_stream"/> -->
+        <!--For icecast/mp3 streams/files-->
+        <!--<load module="mod_shout"/>-->
+        <!--For local streams (play all the files in a directory)-->
+        <load module="mod_local_stream"/>
+        <load module="mod_tone_stream"/>
+
+        <!-- Timers -->
+        <!-- <load module="mod_timerfd"/> -->
+        <!-- <load module="mod_posix_timer"/> -->
+
+        <!-- Languages -->
+        <!-- <load module="mod_v8"/> -->
+        <!-- <load module="mod_perl"/> -->
+        <!-- <load module="mod_python"/> -->
+        <!-- <load module="mod_java"/> -->
+        <load module="mod_lua"/>
+
+        <!-- ASR /TTS -->
+        <!-- <load module="mod_flite"/> -->
+        <!-- <load module="mod_pocketsphinx"/> -->
+        <!-- <load module="mod_cepstral"/> -->
+        <!-- <load module="mod_tts_commandline"/> -->
+        <!-- <load module="mod_rss"/> -->
+
+        <!-- Say -->
+        <load module="mod_say_en"/>
+        <!-- <load module="mod_say_ru"/> -->
+        <!-- <load module="mod_say_zh"/> -->
+        <!-- <load module="mod_say_sv"/> -->
+
+        <!-- Third party modules -->
+        <!--<load module="mod_nibblebill"/>-->
+        <!--<load module="mod_callcenter"/>-->
+
+        <!-- custom -->
+        <load module="mod_json_cdr"/>
+
+      </modules>
+    </configuration>

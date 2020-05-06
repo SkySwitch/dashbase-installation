@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: freeswitch
+    component: call
+  name: freeswitch-failed-call
+spec:
+  selector:
+    matchLabels:
+      app: freeswitch
+      component: call
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: freeswitch
+        component: call
+    spec:
+      containers:
+        # no receiver
+        - name: caller
+          image: dashbase/sip-cmd-phone
+          args: [
+            "-u", "1007", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--call", "1008"
+          ]
+        - name: receiver
+          image: dashbase/sip-cmd-phone
+          args: [
+            "-u", "1007", "-p", "testpassword", "-d", "freeswitch-internal:15060", "--auto-answer"
+          ]
+
