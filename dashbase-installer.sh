@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALLER_VERSION="1.4.0"
+INSTALLER_VERSION="1.4.2"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -17,6 +17,7 @@ STORAGE_KEY="undefined"
 PRESTO_FLAG="false"
 TABLENAME="logs"
 CDR_FLAG="false "
+DEMO_FLAG="false"
 
 echo "Installer script version is $INSTALLER_VERSION"
 
@@ -46,6 +47,7 @@ display_help() {
   echo "     --ucaas        enable ucaas feature  e.g. --ucaas"
   echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
   echo "     --help         display command options and usage example"
+  echo "     --demo         setup freeswitch,filebeat pods and feed log data into the target table"
   echo ""
   echo "   The following options only be used on V2 dashbase"
   echo "     --v2               setup dashbase V2"
@@ -168,6 +170,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --presto)
     PRESTO_FLAG="true"
+    ;;
+  --demo)
+    DEMO_FLAG="true"
     ;;
   *)
     log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
@@ -706,6 +711,20 @@ expose_endpoints() {
   fi
 }
 
+demo_setup() {
+  if [ "$DEMO_FLAG" == "true" ]; then
+    ES_HOSTS="https://table-$TABLENAME:7888"
+    NAMESPACE="dashbase"
+    log_info "Setting up demo freeswitch and configure filebeat to send logs to target table $TABLENAME"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/resources.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/example-applications/freeswitch/resources.tar"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/resources.tar -C /data/"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FILEBEAT_ES_HOSTS|$ES_HOSTS|" /data/resources/filebeat.yml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FILEBEAT_ES_HOSTS|$ES_HOSTS|" /data/resources/filebeat-loader.yml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FREESWITCH_NAMESPACE|$NAMESPACE|" /data/resources/config.yml
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/resources -n dashbase"
+  fi
+}
+
 # main processes executed below this line
 # pre-installation checks
 
@@ -796,5 +815,7 @@ else
   done
 
 fi
+
+demo_setup
 
 } 2>&1 | tee -a /tmp/dashbase_install_"$(date +%d-%m-%Y_%H-%M-%S)".log
