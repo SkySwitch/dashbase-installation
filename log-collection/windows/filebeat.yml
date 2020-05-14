@@ -1,5 +1,4 @@
 #=========================== Filebeat inputs =============================
-filebeat.registry_flush: 30s
 filebeat.inputs:
 
 - type: log

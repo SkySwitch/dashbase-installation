@@ -6,7 +6,8 @@ filebeat.inputs:
 
   # Glob based paths.
   paths:
-    - 'C:\Program Files (x86)\Syslogd\Logs\SyslogCatchAll*.txt'
+    #- 'C:\Logfiles\CLSLog-*'
+    - '/Users/narsky/c/unifysquare/clslog-1.log'
 
   close_inactive: 90s
   harvester_limit: 1000
@@ -17,23 +18,37 @@ filebeat.inputs:
     _message_parser:
       type: multi
       parsers_list:
-        - name: kiwi
+
+        - name: sipone
           config:
             type: grok
-            pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{DATA}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\]%{SPACE}%{NUMBER:pid} %{DATA:id1} %{URIHOST:uri_host} %{LOGLEVEL:level:meta} \(%{DATA:source_file:meta}:%{INT:line:int}\) - %{GREEDYDATA:message}'
-        - name: sip
-          config:
-            type: multi
-            applyAll: 'true'
-            parsers:
-              sip_grok:
-                type: grok
-                pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{DATA}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\]%{SPACE}%{NUMBER:pid} %{DATA:id1} %{GREEDYDATA:message}'
-              sip_sip:
+            pattern: |-
+              %{DATA:level:meta}\(%{DATA:flag:meta}\) \[%{DATA:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{DATA:component:meta},%{DATA:source}\) (\[%{DATA:correlation-id}\])?
+              [>]+%{DATA:message-header}
+              %{GREEDYDATA:message}
+            subParsers:
+              message:
                 type: sip
-                sortedFields: call-id,user-agent
+                sortedFields: "call-id,user-agent"
 
-  multiline.pattern: ^\d{4}-\d{2}-\d{2}
+        - name: siptwo
+          config:
+            type: grok
+            pattern: |-
+              %{DATA:level:meta}\(%{DATA:flag:meta}\) \[%{DATA:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{DATA:component:meta},%{DATA:source}\) (\[%{DATA:correlation-id}\])?%{DATA:message-header}
+              Start-Line: %{GREEDYDATA:message}
+            subParsers:
+              message:
+                type: sip
+                sortedFields: "call-id,user-agent"
+
+        - name: universal
+          config:
+            type: grok
+            pattern: |-
+              %{DATA:level:meta}\(%{DATA:flag:meta}\) \[%{DATA:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{DATA:component:meta},%{DATA:source}\) (\[%{DATA:correlation-id}\])?%{GREEDYDATA:message}
+
+  multiline.pattern: ^TL_
   multiline.negate: true
   multiline.match: after
   
