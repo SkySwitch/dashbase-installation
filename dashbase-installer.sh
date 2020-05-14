@@ -1,6 +1,7 @@
 #!/bin/bash
 
-INSTALLER_VERSION="1.4.2"
+DASHVERSION="1.5.0-rc4"
+INSTALLER_VERSION="1.5.0-rc4"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -8,7 +9,6 @@ UCAAS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.4.0"
 AUTHUSERNAME="undefined"
 AUTHPASSWORD="undefined"
 BUCKETNAME="undefined"
@@ -18,6 +18,7 @@ PRESTO_FLAG="false"
 TABLENAME="logs"
 CDR_FLAG="false "
 DEMO_FLAG="false"
+WEBRTC_FLAG="false"
 
 echo "Installer script version is $INSTALLER_VERSION"
 
@@ -47,6 +48,7 @@ display_help() {
   echo "     --ucaas        enable ucaas feature  e.g. --ucaas"
   echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
   echo "     --help         display command options and usage example"
+  echo "     --webrtc       enable remote read on prometheus to api url for webrtc data e.g. --webrtc"
   echo "     --demo         setup freeswitch,filebeat pods and feed log data into the target table"
   echo ""
   echo "   The following options only be used on V2 dashbase"
@@ -173,6 +175,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --demo)
     DEMO_FLAG="true"
+    ;;
+  --webrtc)
+    WEBRTC_FLAG="true"
     ;;
   *)
     log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
@@ -577,6 +582,11 @@ update_dashbase_valuefile() {
      log_info "update dashbase-values.yaml file for CDR data in insights page"
      kubectl exec -it admindash-0 -n dashbase -- sed -i 's/INSIGHTS_IS_CDR\:\ \"false\"/INSIGHTS_IS_CDR\:\ \"true\"/' /data/dashbase-values.yaml
      kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/exporter_metric.yaml >> /data/dashbase-values.yaml"
+  fi
+  # update webrtc remote read url for prometheus
+  if [ "$WEBRTC_FLAG" == "true" ]; then
+    log_info "update prometheus configuration to enable remote read url point to https://api:9876/prometheus/read"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i '/prometheus\_env\_variable/ r /data/prometheus_webrtc' /data/dashbase-values.yaml
   fi
   # update bucket name and storage access
   if [ "$V2_FLAG" == "true" ]; then

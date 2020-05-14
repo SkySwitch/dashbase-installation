@@ -19,19 +19,19 @@ default:
     containerConfig:
       resources:
         requests:
-          cpu: 1
-          memory: 2G
+          cpu: 1.2
+          memory: 2.4G
         limits:
-          cpu: 1
-          memory: 2G
+          cpu: 1.2
+          memory: 2.4G
     environment:
-      JAVA_OPTS: "-Xmx20g -Xms20g"
+      JAVA_OPTS: "-Xmx2g -Xms2g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "7"
       RETENTION_SIZE_GB: "850"
       READER_CACHE_MEM_PERCENT: "60"
-      NUM_INDEXING_THREADS: "2"
+      NUM_INDEXING_THREADS: "1"
 
 ingress:
   enabled: true
@@ -100,6 +100,9 @@ services:
   prometheus:
     enabled: true
     image: "dashbase/prometheus:nightly"
+    imagePullPolicy: Always
+   # prometheus_env_variable
+
   grafana:
     enabled: true
   alertmanager:

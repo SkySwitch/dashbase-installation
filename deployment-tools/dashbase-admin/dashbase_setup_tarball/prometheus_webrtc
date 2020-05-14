@@ -1,0 +1,3 @@
+    environment:
+      ENABLE_REMOTE_READ_WEBRTC: "true"
+      REMOTE_READ_URL_WEBRTC: https://api:9876/prometheus/read
