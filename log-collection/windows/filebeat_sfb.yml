@@ -6,8 +6,7 @@ filebeat.inputs:
 
   # Glob based paths.
   paths:
-    #- 'C:\Logfiles\CLSLog-*'
-    - '/Users/narsky/c/unifysquare/clslog-1.log'
+    - 'C:\Logfiles\CLSLog-*'
 
   close_inactive: 90s
   harvester_limit: 1000
