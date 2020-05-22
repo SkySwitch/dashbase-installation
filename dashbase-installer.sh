@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="1.5.0-rc4"
-INSTALLER_VERSION="1.5.0-rc4"
+DASHVERSION="1.5.2"
+INSTALLER_VERSION="1.5.2"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
