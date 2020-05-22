@@ -26,6 +26,7 @@ default:
           memory: 2.4G
     environment:
       JAVA_OPTS: "-Xmx2g -Xms2g"
+      IGNORE_PARSE_FAILURE: true
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "7"

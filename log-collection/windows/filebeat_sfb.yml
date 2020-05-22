@@ -15,37 +15,12 @@ filebeat.inputs:
   clean_removed: true
   fields:
     _message_parser:
-      type: multi
-      parsers_list:
-
-        - name: sipone
-          config:
-            type: grok
-            pattern: |-
-              %{DATA:level:meta}\(%{DATA:flag:meta}\) \[%{DATA:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{DATA:component:meta},%{DATA:source}\) (\[%{DATA:correlation-id}\])?
-              [>]+%{DATA:message-header}
-              %{GREEDYDATA:message}
-            subParsers:
-              message:
-                type: sip
-                sortedFields: "call-id,user-agent"
-
-        - name: siptwo
-          config:
-            type: grok
-            pattern: |-
-              %{DATA:level:meta}\(%{DATA:flag:meta}\) \[%{DATA:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{DATA:component:meta},%{DATA:source}\) (\[%{DATA:correlation-id}\])?%{DATA:message-header}
-              Start-Line: %{GREEDYDATA:message}
-            subParsers:
-              message:
-                type: sip
-                sortedFields: "call-id,user-agent"
-
-        - name: universal
-          config:
-            type: grok
-            pattern: |-
-              %{DATA:level:meta}\(%{DATA:flag:meta}\) \[%{DATA:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{DATA:component:meta},%{DATA:source}\) (\[%{DATA:correlation-id}\])?%{GREEDYDATA:message}
+      type: grok
+      pattern: '%{NOTSPACE:level:meta}\(%{NOTSPACE:flag:meta}\) \[%{NOTSPACE:machine:meta}\]%{BASE16NUM:process}\.%{BASE16NUM:thread}::%{NOTSPACE:timestamp:datetime:MM/dd/yyyy-HH:mm:ss.SSS}\.%{BASE16NUM:sequence-num} \(%{NOTSPACE:component:meta},%{NOTSPACE:source}\) (\[%{NOTSPACE:correlation-id}\])?%{SPACE}(?:[<>]+%{DATA:message-header}%{SPACE}|:Start-Line: )?%{GREEDYDATA:message}'
+      subParsers:
+        message:
+          type: sip
+          sortedFields: "call-id,user-agent"
 
   multiline.pattern: ^TL_
   multiline.negate: true

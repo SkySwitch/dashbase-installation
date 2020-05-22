@@ -15,23 +15,11 @@ filebeat.inputs:
   clean_removed: true
   fields:
     _message_parser:
-      type: multi
-      parsers_list:
-        - name: kiwi
-          config:
-            type: grok
-            pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{DATA}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\]%{SPACE}%{NUMBER:pid} %{DATA:id1} %{URIHOST:uri_host} %{LOGLEVEL:level:meta} \(%{DATA:source_file:meta}:%{INT:line:int}\) - %{GREEDYDATA:message}'
-        - name: sip
-          config:
-            type: multi
-            applyAll: 'true'
-            parsers:
-              sip_grok:
-                type: grok
-                pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{DATA}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\]%{SPACE}%{NUMBER:pid} %{DATA:id1} %{GREEDYDATA:message}'
-              sip_sip:
-                type: sip
-                sortedFields: call-id,user-agent
+      pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{NOTSPACE}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\]%{SPACE}%{NUMBER:pid} %{DATA:id1} (?:%{URIHOST:uri_host} %{LOGLEVEL:level:meta} \(%{NOTSPACE:source_file:meta}:%{INT:line:int}\) - )?%{GREEDYDATA:message}'
+      subParsers:
+        message:
+          type: sip
+          sortedFields: "call-id,user-agent"
 
   multiline.pattern: ^\d{4}-\d{2}-\d{2}
   multiline.negate: true
