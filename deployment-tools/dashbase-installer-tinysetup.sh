@@ -9,7 +9,6 @@ UCAAS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
-DASHVERSION="1.4.0"
 AUTHUSERNAME="undefined"
 AUTHPASSWORD="undefined"
 BUCKETNAME="undefined"
@@ -20,6 +19,7 @@ TABLENAME="logs"
 CDR_FLAG="false "
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
+VNUM=$(echo $DASHVERSION |cut -d "." -f1)
 
 echo "Installer script version is $INSTALLER_VERSION tiny setup for install testing only"
 
@@ -379,22 +379,21 @@ check_basic_auth() {
 
 check_v2() {
   # check v2 input
-  if [ "$V2_FLAG" ==  "true" ] && [ "$BUCKETNAME" == "undefined" ]; then
-    log_fatal "V2 is selected but not provide any cloud object storage bucket name"
-  elif [ "$V2_FLAG" ==  "true" ] &&  [ "$BUCKETNAME" != "undefined" ]; then
-    log_info "V2 is selected and bucket name is $BUCKETNAME"
-  elif [ "$V2_FLAG" ==  "true" ] && [ "$PLATFORM" == "gce" ]; then
-    log_info "V2 is selected and cloud platform is gce"
-    if [ "$STORAGE_ACCOUNT" == "undefined" ] || [ "$STORAGE_KEY" == "undefined" ]; then
-      log_fatal "V2 setup on GCE requires inputs for --storage_account and --storage_key"
+  if [[ "$V2_FLAG" ==  "true" ]] || [[ ${VNUM} -ge 2 ]]; then
+    log_info "V2 is selected checking V2 requirement"
+    if [ "$BUCKETNAME" == "undefined" ]; then
+       log_fatal "V2 is selected but not provide any cloud object storage bucket name"
+    elif [ "$BUCKETNAME" != "undefined" ]; then
+       log_info "V2 is selected and bucket name is $BUCKETNAME"
     fi
-  elif [ "$V2_FLAG" ==  "true" ] && [ "$PLATFORM" == "azure" ]; then
-    log_info "V2 is selected and cloud platform is azure"
-    if [ "$STORAGE_ACCOUNT" == "undefined" ] || [ "$STORAGE_KEY" == "undefined" ]; then
-      log_fatal "V2 setup on Azure requires inputs for --storage_account and --storage_key"
+    if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ]; then
+       log_info "V2 is selected and cloud platform is $PLATFORM"
+       if [ "$STORAGE_ACCOUNT" == "undefined" ] || [ "$STORAGE_KEY" == "undefined" ]; then
+          log_fatal "V2 setup on $PLATFORM requires inputs for --storage_account and --storage_key"
+       fi
     fi
-  elif [ "$V2_FLAG" ==  "false" ]; then
-    log_info "V2 is not selected in this installation"
+  elif [[ "$V2_FLAG" ==  "false" ]] && [[ ${VNUM} -eq 1 ]]; then
+      log_info "V2 is not selected in this installation"
   fi
 }
 
@@ -781,6 +780,9 @@ fi
 # expose services
 expose_endpoints
 
+# demo setup
+demo_setup
+
 # display endpoints
 echo "Exposed endpoints are below"
 
@@ -826,7 +828,5 @@ else
   done
 
 fi
-
-demo_setup
 
 } 2>&1 | tee -a /tmp/dashbase_install_"$(date +%d-%m-%Y_%H-%M-%S)".log

@@ -42,6 +42,34 @@ remove_storageclass() {
     fi
 }
 
+remove_demo_setup() {
+  # delete demo freeswitch pods
+  if [ "$(kubectl get deployment -n dashbase |grep -c freeswitch)" -gt "0" ]; then
+     log_info "demo freeswitch deployment sets exists"
+     for FREESW in $(kubectl get deployment -n dashbase |grep freeswitch |awk '{print $1}' |tr "\n" " "); do
+         log_info "delete deployment set $FREESW"
+         kubectl delete deployment "$FREESW" -n dashbase
+      done
+  else
+     log_info "no freeswitch deployment set is found"
+  fi
+  # delete demo filebeat / freeswitch stateful set
+  if [ "$(kubectl get sts -n dashbase |grep -c filebeat-loader)" -gt "0" ]; then
+     log_info "demo filebeat stateful set  filebeat-loader exists"
+     kubectl delete sts filebeat-loader -n dashbase
+     log_info "delete demo stateful set filebeat-loader"
+  else
+     log_info "no demo filebeat stateful set is found"
+  fi
+  if [ "$(kubectl get sts -n dashbase |grep -c freeswitch)" -gt "0" ]; then
+     log_info "demo freeswitch stateful set freeswitch exists"
+     kubectl delete sts freeswitch -n dashbase
+     log_info "delete demo stateful  set freeswitch"
+  else
+     log_info "no demo freeswitch  stateful set is found"
+  fi
+}
+
 remove_tiller() {
     #  delete helm tiller
     if [ "$(kubectl get po -n kube-system |grep -c tiller-deploy)" -gt "0" ]; then
@@ -222,6 +250,8 @@ remove_sa_dashadmin() {
 }
 
 remove_combo() {
+    # delete demo setup
+    remove_demo_setup
     # delete pvc
     delete_dashbase_pvc
     # delete secrets
