@@ -19,7 +19,6 @@ TABLENAME="logs"
 CDR_FLAG="false "
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
-VNUM=$(echo $DASHVERSION |cut -d "." -f1)
 
 echo "Installer script version is $INSTALLER_VERSION"
 
@@ -333,6 +332,7 @@ check_version() {
       log_fatal "Entered dashbase version $VERSION is invalid"
     fi
   fi
+  VNUM=$(echo $VERSION |cut -d "." -f1)
 }
 
 check_ostype() {
@@ -514,7 +514,8 @@ download_dashbase() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicy.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicy.tar -C /data/"
   # get the custom values yaml file
-  if [[ "$V2_FLAG" ==  "true" ]] || [[ ${VNUM} -ge 2 ]]; then
+  echo "VNUM is $VNUM"
+  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
     log_info "Download dashbase-values-v2.yaml file for v2 setup"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values-v2.yaml"
   else
@@ -589,7 +590,7 @@ update_dashbase_valuefile() {
     kubectl exec -it admindash-0 -n dashbase -- sed -i '/prometheus\_env\_variable/ r /data/prometheus_webrtc' /data/dashbase-values.yaml
   fi
   # update bucket name and storage access
-  if [ "$V2_FLAG" == "true" ]; then
+  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
     log_info "update object storage bucket name"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i 's|MYBUCKET|$BUCKETNAME|' /data/dashbase-values.yaml"
 
