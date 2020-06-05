@@ -1,0 +1,19 @@
+- type: log
+  paths:
+    - /root/work/responder.log
+  fields:
+    _message_parser:
+      type: grok
+      pattern: |-
+        %{DATA:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSZ}
+        hostname: %{DATA:hostname:text}
+        call-id: %{DATA:call-id:meta}
+        %{GREEDYDATA:message}
+  multiline.pattern: '^20'
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true

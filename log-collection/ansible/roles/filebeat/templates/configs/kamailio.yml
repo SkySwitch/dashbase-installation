@@ -24,7 +24,7 @@
 
 - type: log
   paths:
-    - /var/log/sipdump/*.data
+    - /root/work/kamailio.log
   fields:
     _message_parser:
       type: multi

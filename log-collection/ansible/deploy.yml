@@ -19,7 +19,7 @@
 
   vars:
     filebeat_version: "oss-7.6.1"
-    prometheus_pushgateway_enable: True
+    prometheus_pushgateway_enable: False
     configs_list: "{{ configs.split(',') }}"
     table: "logs"
     pushgateway_url: "{{ dashbase_url.split('//')[0] }}//pushgateway.{{ dashbase_url.split('.')[1:] | join('.') | regex_replace(':(\\d+)$') }}"
