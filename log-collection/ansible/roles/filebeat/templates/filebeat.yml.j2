@@ -59,7 +59,7 @@ setup.template:
 
 output.elasticsearch:
   bulk_max_size: 3000
-  worker: 30
+  worker: 5
   compression_level: 5
   hosts: "{{ dashbase_url }}"
   index: "{{ table }}"
