@@ -1,0 +1,113 @@
+dashbase_version: nightly
+
+https: true
+
+default_storageclass_provider:
+  platform: "aws"
+
+v2:
+  bucket: MYBUCKET
+
+default:
+  storage:
+    class: "dashbase-meta"
+    size: 10Gi
+
+  table:
+    priorityClassName: dashbase-high-priority
+    storage:
+      class: "dashbase-data"
+      size: "10Gi"
+    environment:
+      JAVA_OPTS: "-Xmx2g -Xms2g"
+      BLOOM_FILTER_SIZE: "400"
+      MAX_BUFFER_DELAY_IN_SEC: "1000"
+      RETENTION_NUM_DAYS: "7"
+      RETENTION_SIZE_GB: "8"
+      READER_CACHE_MEM_PERCENT: "60"
+      NUM_INDEXING_THREADS: "2"
+
+presto:
+  enabled: false
+  presto:
+    prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
+    dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
+
+ingress:
+  enabled: true
+  certmanager: false
+  host: test.dashbase.io
+
+#tables:
+#  LOGS:
+#      replicas: 1
+
+tablesv2:
+  LOGS:
+    table_manager:
+      replicas: 1
+    indexer:
+      enabled: true
+
+services:
+  etcd:
+    enabled: true
+  api:
+    enabled: true
+    environment:
+      ENABLE_K8S_DISCOVERY: "true"
+  web:
+    expose: true
+    enabled: true
+    secrets:
+      presto-cert:
+        dir: /run/prestojks/
+        file: presto-cert.pem
+      presto-key:
+        dir: /run/prestojks/
+        file: presto-key.pem
+      presto-keystore:
+        dir: /run/prestojks/
+        file: presto-keystore
+      presto-keystore-password:
+        dir: /run/prestojks/
+        file: presto-keystore-password
+    environment:
+      ENABLE_SEARCH_SCHEDULER: "true"
+      ENABLE_CHRONOLOGICAL_SORT: "true"
+      ENABLE_SCHEDULED_METRICS: "true"
+      DISPLAY_COLOREDFIELDS: "from.sip-uri.user,to.sip-uri.user,call-id,level"
+      ENABLE_UCAAS: "false"
+      ENABLE_CALL: "false"
+      ENABLE_INSIGHTS: "false"
+      CALL_TABLES: "LOGS"
+      INSIGHTS_IS_CDR: "false"
+      UCAAS_PROMETHEUS_URL: "http://prometheus:9090"
+#     UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
+
+  prometheus:
+    enabled: true
+    image: "dashbase/prometheus:nightly"
+    imagePullPolicy: Always
+   # prometheus_env_variable
+
+  grafana:
+    enabled: true
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: true
+  searcher:
+    enabled: true
+    replicas: 1
+  exporter:
+    enabled: false
+    config:
+      metrics:
+        ucaas_unique_leg_count:
+          description: "ucaas unique call legs"
+          table: "LOGS"
+          accumulate: false
+          filter: "type:sip"
+          aggregation: "topn(hostname, 100, topn(user-agent, 100, cardinality(call-id)))"
+

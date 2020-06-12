@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="1.5.2"
-INSTALLER_VERSION="1.5.2"
+DASHVERSION="1.5.3"
+INSTALLER_VERSION="1.5.3"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -11,12 +11,14 @@ USERNAME="undefined"
 LICENSE="undefined"
 AUTHUSERNAME="undefined"
 AUTHPASSWORD="undefined"
+ADMINUSERNAME="dashbaseadm"
+ADMINPASSWORD="dashbase123"
 BUCKETNAME="undefined"
 STORAGE_ACCOUNT="undefined"
 STORAGE_KEY="undefined"
 PRESTO_FLAG="false"
 TABLENAME="logs"
-CDR_FLAG="false "
+CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 
@@ -40,6 +42,12 @@ display_help() {
   echo "                    e.g. --authusername=admin"
   echo "     --authpassword basic auth password, use together with authusername option"
   echo "                    e.g. --authpassword=dashbase"
+  echo "     --adminusername specify admin username to access to admin page web portal"
+  echo "                     default admin user is dashbaseadm"
+  echo "                     e.g. --adminusername=myadmin"
+  echo "     --adminpassword specify admin password to access to admin page web portal"
+  echo "                     default admin passowrd is dashbase123"
+  echo "                     e.g. --adminpassword=myadminpass"
   echo "     --valuefile    specify a custom values yaml file"
   echo "                    e.g. --valuefile=/tmp/mydashbase_values.yaml"
   echo "     --presto       enable presto component e.g. --presto"
@@ -150,6 +158,14 @@ while [[ $# -gt 0 ]]; do
     fail_if_empty "$PARAM" "$VALUE"
     AUTHPASSWORD=$VALUE
     ;;
+  --adminusername)
+    fail_if_empty "$PARAM" "$VALUE"
+    ADMINUSERNAME=$VALUE
+    ;;
+  --adminpassword)
+    fail_if_empty "$PARAM" "$VALUE"
+    ADMINPASSWORD=$VALUE
+    ;;
   --storage_account)
     fail_if_empty "$PARAM" "$VALUE"
     STORAGE_ACCOUNT=$VALUE
@@ -210,8 +226,10 @@ check_platform_input() {
     log_info "entered plaform type is $PLATFORM"
   elif [ "$PLATFORM" == "gce" ]; then
     log_info "entered plaform type is $PLATFORM"
+  elif [ "$PLATFORM" == "docker" ]; then
+    log_info "entered plaform type is $PLATFORM"
   else
-    log_fatal "Incorrect platform type, and platform type should be either aws, gce, or azure"
+    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure or docker"
   fi
 }
 
@@ -308,11 +326,11 @@ check_node_memory() {
 
 check_node() {
   if ! check_node_cpu "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(8 core at least)."
+    echo "Node($1) doesn't have enough cpu resources(6 core at least)."
     return 0
   fi
   if ! check_node_memory "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(64Gi at least)."
+    echo "Node($1) doesn't have enough memory resources(60 Gi at least)."
     return 0
   fi
 
@@ -428,7 +446,7 @@ preflight_check() {
   if [ $AVAIILABLE_NODES -ge 2 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(3 nodes with each have 8 core and 64 Gi at least)."
+    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 core and 64 Gi at least)."
   fi
 }
 
@@ -453,8 +471,8 @@ adminpod_setup() {
     log_fatal "Previous admin pod admindash exists"
   else
     # Download and install installer helper statefulset yaml file
-    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-sts_helm3.yaml -o admindash-sts_helm3.yaml
-    kubectl apply -f admindash-sts_helm3.yaml -n dashbase
+    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-server-sts_helm3.yaml -o admindash-server-sts_helm3.yaml
+    kubectl apply -f admindash-server-sts_helm3.yaml -n dashbase
     log_info "setting up admin pod, please wait for three minutes"
     kubectl wait --for=condition=Ready pods/admindash-0 --timeout=180s -n dashbase
     # Check to ensure admin pod is available else exit 1
@@ -492,7 +510,6 @@ create_storageclass() {
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-aws.yaml -n dashbase"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-aws.yaml -n dashbase"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-aws.yaml -n dashbase"
-
   elif [ "$PLATFORM" == "gce" ]; then
     log_info "create storageclass for GCE disk"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-gce.yaml -n dashbase"
@@ -502,6 +519,11 @@ create_storageclass() {
     log_info "create storageclass for Azure disk"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-azure.yaml -n dashbase"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-azure.yaml -n dashbase"
+  elif [ "$PLATFORM" == "docker" ]; then
+    log_info "create storageclass for docker"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-docker.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-docker.yaml -n dashbase"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-docker.yaml -n dashbase"
   fi
   kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get storageclass |grep dashbase"
   STORECLASSCHK=$(kubectl get storageclass | grep -c dashbase)
@@ -680,12 +702,20 @@ create_basic_auth_secret() {
   kubectl get secret dashbase-auth -n dashbase
 }
 
+create_admin_auth_secret() {
+  log_info "create basic auth secret in admin pod"
+  kubectl exec -it admindash-0 -n dashbase -- mkdir -p /data/admindash-auth
+  kubectl exec -it admindash-0 -n dashbase -- htpasswd -b -c /data/admindash-auth/auth "$ADMINUSERNAME" "$ADMINPASSWORD"
+  kubectl exec -it admindash-0 -n dashbase -- kubectl create secret generic admindash-auth --from-file=/data/admindash-auth/auth -n dashbase
+  kubectl get secret dashbase-adminauth -n dashbase
+}
+
 install_dashbase() {
   DASHVALUEFILE=$(echo $VALUEFILE | rev | cut -d"/" -f1 | rev)
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
   log_info "Dashbase version $VERSION  and chart version $VERSION is going to install on the target K8s cluster"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug --no-hooks > /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
@@ -716,8 +746,13 @@ expose_endpoints() {
       # apply the ingress-web.yaml into K8s cluster
       kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/ingress-web.yaml -n dashbase"
     fi
+    log_info "Creating ingress for admindash server with basic auth"
+    create_admin_auth_secret
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "sed -i 's|test.dashbase.io|$SUBDOMAIN|' /data/admindash-server-ingress.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/admindash-server-ingress.yaml -n dashbase"
   else
     log_info "setup LoadBalancer with https endpoints to expose services"
+    #EXPOSE_ADMIN_SERVER_FLAG="--expose-admin-server"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/create-lb.sh --https $EXPOSEMON"
   fi
 }
@@ -760,8 +795,8 @@ if [ "$(kubectl get storageclass -n dashbase | grep -c dashbase)" -gt "0" ]; the
     log_fatal "previous dashbase persistent volumes are detected in this cluster"
   fi
 else
-  echo "creating dashbase storageclass"
-  create_storageclass
+  echo "helm chart will create dashbase storageclass"
+  # create_storageclass
 fi
 
 check_helm
@@ -794,6 +829,7 @@ if [[ "$INGRESS_FLAG" == "true"  ]]; then
    echo "Access to dashbase web UI with https://web.$SUBDOMAIN"
    echo "Access to dashbase table endpoint with https://table-logs.$SUBDOMAIN"
    echo "Access to dashbase grafana endpoint with https://grafana.$SUBDOMAIN"
+   echo "Access to dashbase admin page endpoint with https://admindash.$SUBDOMAIN"
    echo ""
 else
 
@@ -815,7 +851,7 @@ else
     echo "LoadBalancer($SERVICE_NAME): IP is not ready."
   fi
   done
-  
+
   for SERVICE_INFO in $(kubectl get service -o=jsonpath='{range .items[*]}{.metadata.name},{.spec.type},{.status.loadBalancer.ingress[0].ip},{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}' -n dashbase |grep -E 'prometheus|pushgateway'); do
   read -r SERVICE_NAME SERVICE_TYPE SERVICE_LB_IP SERVICE_LB_HOSTNAME <<<"$(echo "$SERVICE_INFO" | tr ',' ' ')"
   if [ "$SERVICE_TYPE" != "LoadBalancer" ]; then

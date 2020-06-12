@@ -1,0 +1,7 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: dashbase-indexer-storage
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+provisioner: docker.io/hostpath
