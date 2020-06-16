@@ -289,7 +289,7 @@ check_k8s_permission() {
   fi
 }
 
-check_node_cpu() {
+check_node_cpu_v1() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
     if [[ ${BASH_REMATCH[1]} -ge 3000 ]]; then
@@ -305,17 +305,33 @@ check_node_cpu() {
   return 1
 }
 
-check_node_memory() {
+check_node_cpu_v2() {
+  ## check nodes resources
+  if [[ "$2" =~ ^([0-9]+)m$ ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 14000 ]]; then
+      return 0
+    fi
+  elif [[ "$2" =~ ^([0-9]+)$ ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 14 ]]; then
+      return 0
+    fi
+  else
+    echo "Can't determine the cpu($2) of node($1)."
+  fi
+  return 1
+}
+
+check_node_memory_v1() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 14000000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 14000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 14 ]]; then
       return 0
     fi
   else
@@ -324,12 +340,45 @@ check_node_memory() {
   return 1
 }
 
-check_node() {
-  if ! check_node_cpu "$1" "$2"; then
+check_node_memory_v2() {
+  if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 26000000 ]]; then
+      return 0
+    fi
+  elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 26000 ]]; then
+      return 0
+    fi
+  elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 26 ]]; then
+      return 0
+    fi
+  else
+    echo "Can't determine the memory($2) of node($1)."
+  fi
+  return 1
+}
+
+check_node_v1() {
+  if ! check_node_cpu_v1 "$1" "$2"; then
     echo "Node($1) doesn't have enough cpu resources(3 cores at least)."
     return 0
   fi
-  if ! check_node_memory "$1" "$3"; then
+  if ! check_node_memory_v1 "$1" "$3"; then
+    echo "Node($1) doesn't have enough memory resources(30 Gi at least)."
+    return 0
+  fi
+
+  ((AVAIILABLE_NODES++))
+  return 0
+}
+
+check_node_v2() {
+  if ! check_node_cpu_v2 "$1" "$2"; then
+    echo "Node($1) doesn't have enough cpu resources(3 cores at least)."
+    return 0
+  fi
+  if ! check_node_memory_v2 "$1" "$3"; then
     echo "Node($1) doesn't have enough memory resources(30 Gi at least)."
     return 0
   fi
@@ -403,6 +452,7 @@ check_v2() {
        log_fatal "V2 is selected but not provide any cloud object storage bucket name"
     elif [ "$BUCKETNAME" != "undefined" ]; then
        log_info "V2 is selected and bucket name is $BUCKETNAME"
+       V2_NODE="true"
     fi
     if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ]; then
        log_info "V2 is selected and cloud platform is $PLATFORM"
@@ -412,6 +462,7 @@ check_v2() {
     fi
   elif [[ "$V2_FLAG" ==  "false" ]] && [[ ${VNUM} -eq 1 ]]; then
       log_info "V2 is not selected in this installation"
+      V2_NODE="false"
   fi
 }
 
@@ -434,19 +485,35 @@ preflight_check() {
 
   echo ""
   echo "Checking kubernetes nodes capacity..."
-  AVAIILABLE_NODES=0
-  # get comma separated nodes info
-  # gke-chao-debug-default-pool-a5df0776-588v,3920m,12699052Ki
-  for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
-    # replace comma with spaces.
-    read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
-    check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
-  done
-  echo ""
-  if [ $AVAIILABLE_NODES -ge 2 ]; then
-    log_info "This cluster is ready for dashbase installation on resources"
+
+  if [ "$V2_NODE" == "true" ]; then
+    AVAIILABLE_NODES=0
+    # get comma separated nodes info
+    for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
+      # replace comma with spaces.
+      read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
+      check_node_v2 "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
+    done
+    echo ""
+    if [ $AVAIILABLE_NODES -ge 1 ]; then
+      log_info "This cluster is ready for dashbase installation on resources"
+    else
+      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
+    fi
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
+    AVAIILABLE_NODES=0
+    # get comma separated nodes info
+    for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
+      # replace comma with spaces.
+      read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
+      check_node_v1 "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
+    done
+    echo ""
+    if [ $AVAIILABLE_NODES -ge 2 ]; then
+      log_info "This cluster is ready for dashbase installation on resources"
+    else
+      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
+    fi
   fi
 }
 
