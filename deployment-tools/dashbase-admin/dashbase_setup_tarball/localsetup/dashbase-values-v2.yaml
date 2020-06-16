@@ -87,7 +87,7 @@ services:
 
   prometheus:
     enabled: true
-    image: "dashbase/prometheus:nightly"
+   # image: "dashbase/prometheus:nightly"
     imagePullPolicy: Always
    # prometheus_env_variable
 

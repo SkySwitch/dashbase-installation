@@ -75,11 +75,11 @@ tablesv2:
       containerConfig:
         resources:
           requests:
-            cpu: 5
-            memory: 32G
+            cpu: 7
+            memory: 15G
           limits:
-            cpu: 5
-            memory: 32G
+            cpu: 7
+            memory: 15G
 
 services:
   etcd:
@@ -127,7 +127,7 @@ services:
 
   prometheus:
     enabled: true
-    image: "dashbase/prometheus:nightly"
+  # image: "dashbase/prometheus:nightly"
     imagePullPolicy: Always
   # prometheus_env_variable
 
@@ -143,11 +143,11 @@ services:
     containerConfig:
       resources:
         requests:
-          cpu: 1
-          memory: 5G
+          cpu: 4
+          memory: 7G
         limits:
-          cpu: 1
-          memory: 5G
+          cpu: 4
+          memory: 7G
   exporter:
     enabled: false
     config:

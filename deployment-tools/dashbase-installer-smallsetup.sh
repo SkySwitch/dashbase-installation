@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="1.5.3"
-INSTALLER_VERSION="1.5.3"
+DASHVERSION="1.5.4"
+INSTALLER_VERSION="1.5.4"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -323,15 +323,15 @@ check_node_cpu_v2() {
 
 check_node_memory_v1() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 30000000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 30000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 30 ]]; then
       return 0
     fi
   else
@@ -375,7 +375,7 @@ check_node_v1() {
 
 check_node_v2() {
   if ! check_node_cpu_v2 "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(3 cores at least)."
+    echo "Node($1) doesn't have enough cpu resources(16 cores at least)."
     return 0
   fi
   if ! check_node_memory_v2 "$1" "$3"; then
@@ -498,7 +498,7 @@ preflight_check() {
     if [ $AVAIILABLE_NODES -ge 1 ]; then
       log_info "This cluster is ready for dashbase installation on resources"
     else
-      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
+      log_fatal "This cluster doesn't have enough resources for dashbase installation(1 node with minium 16 cores and 32 Gi memory)."
     fi
   else
     AVAIILABLE_NODES=0
@@ -512,7 +512,7 @@ preflight_check() {
     if [ $AVAIILABLE_NODES -ge 2 ]; then
       log_info "This cluster is ready for dashbase installation on resources"
     else
-      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
+      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 cores and 32 Gi memory at least)."
     fi
   fi
 }
@@ -774,7 +774,7 @@ create_admin_auth_secret() {
   kubectl exec -it admindash-0 -n dashbase -- mkdir -p /data/admindash-auth
   kubectl exec -it admindash-0 -n dashbase -- htpasswd -b -c /data/admindash-auth/auth "$ADMINUSERNAME" "$ADMINPASSWORD"
   kubectl exec -it admindash-0 -n dashbase -- kubectl create secret generic admindash-auth --from-file=/data/admindash-auth/auth -n dashbase
-  kubectl get secret dashbase-adminauth -n dashbase
+  kubectl get secret admindash-auth -n dashbase
 }
 
 install_dashbase() {
@@ -894,7 +894,7 @@ if [[ "$INGRESS_FLAG" == "true"  ]]; then
    echo "Update your DNS server with the following ingress controller IP to map with this name *.$SUBDOMAIN"
    kubectl get svc -n dashbase |grep nginx-ingress-controller |awk '{print $1 "    " $4}'
    echo "Access to dashbase web UI with https://web.$SUBDOMAIN"
-   echo "Access to dashbase table endpoint with https://table-logs.$SUBDOMAIN"
+   echo "Access to dashbase table endpoint with https://table-$TABLENAME.$SUBDOMAIN"
    echo "Access to dashbase grafana endpoint with https://grafana.$SUBDOMAIN"
    echo "Access to dashbase admin page endpoint with https://admindash.$SUBDOMAIN"
    echo ""

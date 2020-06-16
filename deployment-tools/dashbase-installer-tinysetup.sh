@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="1.5.3"
-INSTALLER_VERSION="1.5.3"
+DASHVERSION="1.5.4"
+INSTALLER_VERSION="1.5.4"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -707,7 +707,7 @@ create_admin_auth_secret() {
   kubectl exec -it admindash-0 -n dashbase -- mkdir -p /data/admindash-auth
   kubectl exec -it admindash-0 -n dashbase -- htpasswd -b -c /data/admindash-auth/auth "$ADMINUSERNAME" "$ADMINPASSWORD"
   kubectl exec -it admindash-0 -n dashbase -- kubectl create secret generic admindash-auth --from-file=/data/admindash-auth/auth -n dashbase
-  kubectl get secret dashbase-adminauth -n dashbase
+  kubectl get secret admindash-auth -n dashbase
 }
 
 install_dashbase() {
@@ -827,7 +827,7 @@ if [[ "$INGRESS_FLAG" == "true"  ]]; then
    echo "Update your DNS server with the following ingress controller IP to map with this name *.$SUBDOMAIN"
    kubectl get svc -n dashbase |grep nginx-ingress-controller |awk '{print $1 "    " $4}'
    echo "Access to dashbase web UI with https://web.$SUBDOMAIN"
-   echo "Access to dashbase table endpoint with https://table-logs.$SUBDOMAIN"
+   echo "Access to dashbase table endpoint with https://table-$TABLENAME.$SUBDOMAIN"
    echo "Access to dashbase grafana endpoint with https://grafana.$SUBDOMAIN"
    echo "Access to dashbase admin page endpoint with https://admindash.$SUBDOMAIN"
    echo ""
