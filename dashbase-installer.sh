@@ -360,11 +360,11 @@ check_node_memory_v2() {
 }
 
 check_node_v1() {
-  if ! check_node_cpu "$1" "$2"; then
+  if ! check_node_cpu_v1 "$1" "$2"; then
     echo "Node($1) doesn't have enough cpu resources(6 core at least)."
     return 0
   fi
-  if ! check_node_memory "$1" "$3"; then
+  if ! check_node_memory_v1 "$1" "$3"; then
     echo "Node($1) doesn't have enough memory resources(60 Gi at least)."
     return 0
   fi
