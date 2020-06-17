@@ -5,9 +5,6 @@ https: true
 default_storageclass_provider:
   platform: "aws"
 
-v2:
-  bucket: MYBUCKET
-
 default:
   storage:
     class: "dashbase-meta"
@@ -17,77 +14,36 @@ default:
     priorityClassName: dashbase-high-priority
     storage:
       class: "dashbase-data"
-      size: "1000Gi"
-
-    containerConfig:
-      resources:
-        requests:
-          cpu: 3.5
-          memory: 26G
-        limits:
-          cpu: 3.5
-          memory: 26G
+      size: "10Gi"
     environment:
-      JAVA_OPTS: "-Xmx20g -Xms20g"
-      IGNORE_PARSE_FAILURE: true
+      JAVA_OPTS: "-Xmx2g -Xms2g"
       BLOOM_FILTER_SIZE: "400"
       MAX_BUFFER_DELAY_IN_SEC: "1000"
       RETENTION_NUM_DAYS: "7"
-      RETENTION_SIZE_GB: "850"
+      RETENTION_SIZE_GB: "8"
       READER_CACHE_MEM_PERCENT: "60"
-      NUM_INDEXING_THREADS: "2"
-
-presto:
-  enabled: false
-  presto:
-    prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
-    dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
-    coordinatorResources:
-      requests:
-        cpu: 1
-        memory: 4G
-      limits:
-        cpu: 1
-        momory: 4G
+      NUM_INDEXING_THREADS: "1"
 
 ingress:
   enabled: true
   certmanager: false
   host: test.dashbase.io
 
-#tables:
-#  LOGS:
-#      replicas: 1
-
-tablesv2:
+tables:
   LOGS:
-    table_manager:
       replicas: 1
-      containerConfig:
-        resources:
-          requests:
-            cpu: 1
-            memory: 3G
-          limits:
-            cpu: 1
-            memory: 3G
-    indexer:
-      containerConfig:
-        resources:
-          requests:
-            cpu: 4
-            memory: 15G
-          limits:
-            cpu: 4
-            memory: 15G
+
+presto:
+  enabled: false
+  presto:
+    prestoKeystorePassword: PRESTO_KEYSTORE_PASSWORD
+    dashbaseKeystorePassword: DASHBASE_KEYSTORE_PASSWORD
 
 services:
   etcd:
     enabled: true
   api:
     enabled: true
-    environment:
-      ENABLE_K8S_DISCOVERY: "true"
   web:
     expose: true
     enabled: true
@@ -104,14 +60,6 @@ services:
       presto-keystore-password:
         dir: /run/prestojks/
         file: presto-keystore-password
-    containerConfig:
-      resources:
-        limits:
-          cpu: 1
-          memory: 1.5G
-        requests:
-          cpu: 500m
-          memory: 1G
     environment:
       ENABLE_SEARCH_SCHEDULER: "true"
       ENABLE_CHRONOLOGICAL_SORT: "true"
@@ -127,9 +75,9 @@ services:
 
   prometheus:
     enabled: true
-  # image: "dashbase/prometheus:nightly"
+   # image: "dashbase/prometheus:nightly"
     imagePullPolicy: Always
-  # prometheus_env_variable
+   # prometheus_env_variable
 
   grafana:
     enabled: true
@@ -137,17 +85,6 @@ services:
     enabled: false
   pushgateway:
     enabled: true
-  searcher:
-    enabled: true
-    replicas: 1
-    containerConfig:
-      resources:
-        requests:
-          cpu: 4
-          memory: 7G
-        limits:
-          cpu: 4
-          memory: 7G
   exporter:
     enabled: false
     config:

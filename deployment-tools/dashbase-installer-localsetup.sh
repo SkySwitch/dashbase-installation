@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="1.5.4"
-INSTALLER_VERSION="1.5.4"
+DASHVERSION="1.5.3"
+INSTALLER_VERSION="1.5.3"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -22,7 +22,7 @@ CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 
-echo "Installer script version is $INSTALLER_VERSION poc setup"
+echo "Installer script version is $INSTALLER_VERSION local setup for install testing only"
 
 display_help() {
   echo "Usage: $0 [options...]"
@@ -69,13 +69,13 @@ display_help() {
   echo "                        e.g. --storage_key=MYSTORAGEACCOUNTACCESSKEY"
   echo ""
   echo "   Command example in V1"
-  echo "   ./dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=test.dashbase.io"
+  echo "   ./dashbase-installer-localsetup.sh --platform=docker --ingress --subdomain=test.dashbase.io"
   echo ""
   echo "   Command example in V2"
-  echo "   ./dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress \ "
-  echo "                                      --subdomain=test.dashase.io --bucketname=my-s3-bucket \ "
-  echo "                                      --storage_account=MYSTORAGEACCOUNTSTRING \ "
-  echo "                                      --storage_key=MYSTORAGEACCOUNTACCESSKEY \ "
+  echo "   ./dashbase-installer-localsetup.sh --platform=docker --v2 --ingress \ "
+  echo "                                     --subdomain=test.dashase.io --bucketname=my-s3-bucket \ "
+  echo "                                     --storage_account=MYSTORAGEACCOUNTSTRING \ "
+  echo "                                     --storage_key=MYSTORAGEACCOUNTACCESSKEY \ "
   echo ""
   exit 0
 }
@@ -289,14 +289,14 @@ check_k8s_permission() {
   fi
 }
 
-check_node_cpu_v1() {
+check_node_cpu() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 3000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 7500 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 3 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 7 ]]; then
       return 0
     fi
   else
@@ -305,33 +305,17 @@ check_node_cpu_v1() {
   return 1
 }
 
-check_node_cpu_v2() {
-  ## check nodes resources
-  if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14000 ]]; then
-      return 0
-    fi
-  elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14 ]]; then
-      return 0
-    fi
-  else
-    echo "Can't determine the cpu($2) of node($1)."
-  fi
-  return 1
-}
-
-check_node_memory_v1() {
+check_node_memory() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 10000000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 10000 ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 30 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge 10 ]]; then
       return 0
     fi
   else
@@ -340,46 +324,13 @@ check_node_memory_v1() {
   return 1
 }
 
-check_node_memory_v2() {
-  if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 26000000 ]]; then
-      return 0
-    fi
-  elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 26000 ]]; then
-      return 0
-    fi
-  elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 26 ]]; then
-      return 0
-    fi
-  else
-    echo "Can't determine the memory($2) of node($1)."
-  fi
-  return 1
-}
-
-check_node_v1() {
-  if ! check_node_cpu_v1 "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(3 cores at least)."
+check_node() {
+  if ! check_node_cpu "$1" "$2"; then
+    echo "Node($1) doesn't have enough cpu resources(7 core at least)."
     return 0
   fi
-  if ! check_node_memory_v1 "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(30 Gi at least)."
-    return 0
-  fi
-
-  ((AVAIILABLE_NODES++))
-  return 0
-}
-
-check_node_v2() {
-  if ! check_node_cpu_v2 "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(16 cores at least)."
-    return 0
-  fi
-  if ! check_node_memory_v2 "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(30 Gi at least)."
+  if ! check_node_memory "$1" "$3"; then
+    echo "Node($1) doesn't have enough memory resources(10Gi at least)."
     return 0
   fi
 
@@ -452,7 +403,6 @@ check_v2() {
        log_fatal "V2 is selected but not provide any cloud object storage bucket name"
     elif [ "$BUCKETNAME" != "undefined" ]; then
        log_info "V2 is selected and bucket name is $BUCKETNAME"
-       V2_NODE="true"
     fi
     if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ]; then
        log_info "V2 is selected and cloud platform is $PLATFORM"
@@ -462,7 +412,6 @@ check_v2() {
     fi
   elif [[ "$V2_FLAG" ==  "false" ]] && [[ ${VNUM} -eq 1 ]]; then
       log_info "V2 is not selected in this installation"
-      V2_NODE="false"
   fi
 }
 
@@ -485,35 +434,21 @@ preflight_check() {
 
   echo ""
   echo "Checking kubernetes nodes capacity..."
-
-  if [ "$V2_NODE" == "true" ]; then
-    AVAIILABLE_NODES=0
-    # get comma separated nodes info
-    for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
-      # replace comma with spaces.
-      read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
-      check_node_v2 "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
-    done
-    echo ""
-    if [ $AVAIILABLE_NODES -ge 1 ]; then
-      log_info "This cluster is ready for dashbase installation on resources"
-    else
-      log_fatal "This cluster doesn't have enough resources for dashbase installation(1 node with minium 16 cores and 32 Gi memory)."
-    fi
+  AVAIILABLE_NODES=0
+#  REQUIRED_AVAILABLE_NODES=0
+  # get comma separated nodes info
+  # gke-chao-debug-default-pool-a5df0776-588v,3920m,12699052Ki
+  for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
+    # replace comma with spaces.
+    read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
+    log_warning "Skip Node check due to local setup"
+    check_node "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
+  done
+  echo ""
+  if [ $AVAIILABLE_NODES -ge 1 ]; then
+    log_info "This cluster is ready for dashbase installation on resources"
   else
-    AVAIILABLE_NODES=0
-    # get comma separated nodes info
-    for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
-      # replace comma with spaces.
-      read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
-      check_node_v1 "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
-    done
-    echo ""
-    if [ $AVAIILABLE_NODES -ge 2 ]; then
-      log_info "This cluster is ready for dashbase installation on resources"
-    else
-      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 cores and 32 Gi memory at least)."
-    fi
+    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
   fi
 }
 
@@ -604,12 +539,12 @@ download_dashbase() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicy.tar -C /data/"
   # get the custom values yaml file
   echo "VNUM is $VNUM"
-  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
+  if [[ "$V2_FLAG" ==  "true" ]] || [[ ${VNUM} -ge 2 ]]; then
     log_info "Download dashbase-values-v2.yaml file for v2 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase-values-v2.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/localsetup/dashbase-values-v2.yaml"
   else
     log_info "Download dashbase-values.yaml file for v1 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/smallsetup/dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/testsetup/dashbase-values.yaml"
   fi
 
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
@@ -782,7 +717,7 @@ install_dashbase() {
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
   log_info "Dashbase version $VERSION  and chart version $VERSION is going to install on the target K8s cluster"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug > /dev/null"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug --no-hooks > /dev/null"
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
@@ -819,7 +754,6 @@ expose_endpoints() {
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/admindash-server-ingress.yaml -n dashbase"
   else
     log_info "setup LoadBalancer with https endpoints to expose services"
-    #EXPOSE_ADMIN_SERVER_FLAG="--expose-admin-server"
     kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/create-lb.sh --https $EXPOSEMON"
   fi
 }
@@ -862,8 +796,8 @@ if [ "$(kubectl get storageclass -n dashbase | grep -c dashbase)" -gt "0" ]; the
     log_fatal "previous dashbase persistent volumes are detected in this cluster"
   fi
 else
-  echo "helm chart will create dashbase storageclass"
-  # create_storageclass
+  echo "creating dashbase storageclass"
+  create_storageclass
 fi
 
 check_helm
