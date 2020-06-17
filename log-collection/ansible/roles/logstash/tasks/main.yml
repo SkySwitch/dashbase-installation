@@ -85,16 +85,43 @@
     name: logstash
     state: started
 
-- name: Create mysql_statement file
+- name: Check if Netspaiens specified
+  command: "true"
+  register: isNetsapiens
+  with_items: "{{ configs_list }}"
+  when: item is regex("netsapiens.*")
+
+- name: Check if Netspaiens CDR specified
+  command: "true"
+  register: isNetsapiensCDR
+  with_items: "{{ configs_list }}"
+  when: item is regex("nscdr.*")
+
+- name: Create Netsapiens mysql_statement file
   shell: |-
     echo "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM event_$(date +\%Y\%m\%d) WHERE event_type='responder' AND event_index > :sql_last_value">/etc/logstash/conf.d/netsapiens_mysql_statement
-  #when: "'netsapiens' in configs_list"
+  when: isNetsapiens.changed
 
-- name: Create cron job to update mysql statement based on current date
+- name: Create Netsapiens cron job to update mysql statement based on current date
   cron:
     name: "logstash restart with new mysql_statement"
     minute: "0"
     hour: "0"
     job: |-
-      systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run*; echo "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM event_$(date +\%Y\%m\%d) WHERE event_type='responder' AND event_index > :sql_last_value">/etc/logstash/conf.d/netsapiens_mysql_statement; systemctl start logstash
-  #when: "'netsapiens' in configs_list"
+      systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run_netsapiens*; echo "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM event_$(date +\%Y\%m\%d) WHERE event_type='responder' AND event_index > :sql_last_value">/etc/logstash/conf.d/netsapiens_mysql_statement; systemctl start logstash
+  when: isNetsapiens.changed
+
+- name: Create Netsapiens CDR mysql_statement file
+  shell: |-
+    echo "SELECT * FROM $(date +\%Y\%m)_r WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/nscdr_mysql_statement
+  when: isNetsapiensCDR.changed
+
+- name: Create Netsapiens CDR cron job to update mysql statement based on current date
+  cron:
+    name: "logstash restart with new Netsapiens CDR mysql_statement"
+    minute: "0"
+    hour: "0"
+    day: "1"
+    job: |-
+      systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run_nscdr*; echo "SELECT * FROM $(date +\%Y\%m)_r WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/nscdr_mysql_statement; systemctl start logstash
+  when: isNetsapiensCDR.changed

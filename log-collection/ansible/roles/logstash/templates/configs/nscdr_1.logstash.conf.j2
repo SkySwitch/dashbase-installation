@@ -1,0 +1,35 @@
+input {
+	jdbc {
+		jdbc_driver_library => "/usr/share/java/mysql-connector-java-8.0.19.jar"
+		jdbc_driver_class => "com.mysql.jdbc.Driver"
+
+		jdbc_connection_string => "{{ nscdr_1.connection_string }}"
+		jdbc_user => "{{ nscdr_1.user}}"
+		jdbc_password => "{{ nscdr_1.password }}"
+
+        last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_nscdr_1"
+        statement_filepath => "/etc/logstash/conf.d/nscdr_mysql_statement"
+        schedule => "*/10 * * * *"
+        use_column_value => true
+        tracking_column => "time_start"
+	}
+}
+
+filter {
+  mutate {
+    rename => {
+      "orig_callid" => "call-id"
+    }
+  }
+  date {
+    match => ["time_start", "UNIX"]
+  }
+}
+
+output {
+    elasticsearch {
+        hosts => "{{ dashbase_url }}"
+        index => "{{ table }}"
+        ssl_certificate_verification => false
+    }
+}
