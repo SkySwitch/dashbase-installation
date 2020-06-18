@@ -23,6 +23,10 @@ filter {
     rename => {
       "event_text" => "message"
     }
+    add_field => {
+      "capture.src.ip" => "{{ netsapiens_1.nsserver_ip }}"
+      "capture.src.port" => "{{ netsapiens_1.nsserver_port }}"
+    }
   }
   date {
     match => ["event_ts", "UNIX_MS"]

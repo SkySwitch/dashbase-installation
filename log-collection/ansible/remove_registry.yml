@@ -1,0 +1,22 @@
+---
+- name: Transfer and execute a script.
+  hosts: filebeat_hosts
+  become: yes
+  become_method: sudo
+  tasks:
+
+     - name: Stop Filebeat Service
+       service: 
+        name: filebeat
+        state: stopped
+
+     - name: Remove registry file
+       file:
+        path: /var/lib/filebeat/registry/filebeat/*.json
+        state: absent
+
+     - name: Start Filebeat Service
+       service: 
+        name: filebeat
+        state: started
+

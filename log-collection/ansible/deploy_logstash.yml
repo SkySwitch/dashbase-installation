@@ -22,12 +22,15 @@
     netsapiens_1:
       connection_string: "jdbc:mysql://localhost:3306/database"
       user: "logstash"
-      password: "logstash"
+      nsserver_ip: "127.0.0.1"
+      nsserver_port: "5060"
 
     netsapiens_2:
       connection_string: "jdbc:mysql://localhost:3306/database"
       user: "logstash"
       password: "logstash"
+      nsserver_ip: "127.0.0.1"
+      nsserver_port: "5060"
 
     nscdr_1:
       connection_string: "jdbc:mysql://localhost:3306/database"
