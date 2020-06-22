@@ -20,6 +20,9 @@ filter {
     rename => {
       "orig_callid" => "call-id"
     }
+    add_field => {
+      "type" => "cdr"
+    }
   }
   date {
     match => ["time_start", "UNIX"]
