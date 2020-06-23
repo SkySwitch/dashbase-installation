@@ -64,6 +64,8 @@ display_help() {
   echo "                              e.g. --authusername=admin"
   echo "     --authpassword           basic auth password, use together with authusername option"
   echo "                              e.g. --authpassword=dashbase"
+  echo "     --ucaas                  enable ucaas feature on dashbase installation  e.g. --ucaas"
+  echo "     --cdr                    enable cdr log data for insight page on dashbase installation  e.g. --cdr"
   echo "     --version                dashbase version e.g. --version=1.3.2"
   echo "     --v2                     setup dashbase V2, e.g.  --v2"
   echo ""
@@ -698,7 +700,7 @@ setup_dashbase() {
     echo "download dashbase software"
     /usr/bin/git clone https://github.com/dashbase/dashbase-installation.git
     echo "setup and configure dashbase, this process will take 20-30 minutes"
-    if [ "$V2_FLAG" == "true" ]; then
+    if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
       log_info "Dashbase V2 is selected"
       create_s3
       update_s3_policy_json
