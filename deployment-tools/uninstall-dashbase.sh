@@ -83,7 +83,7 @@ remove_tiller() {
 
 remove_clusterrolebindings() {
     # delete clusterrolebindings
-    for CRBIND in admin-user-binding tiller ; do
+    for CRBIND in admin-user-binding tiller nginx-ingress nginx-ingress-table dashbase-kube-state-metrics prometheus; do
        if [ "$(kubectl get clusterrolebindings |grep -c $CRBIND)" -gt "0" ]; then
           log_info "cluster role binding $CRBIND exists"
           log_info "delete cluster role  binding $CRBIND"
@@ -92,6 +92,34 @@ remove_clusterrolebindings() {
           log_info "cluster role binding $CRBIND is not found"
        fi
     done
+}
+
+remove_cluster_role() {
+    # delete ingress role
+    if [ "$(kubectl get ClusterRole |grep -c nginx-ingress |grep -iv table)" -gt "0" ]; then
+       log_info "cluster role nginx-ingress exists"
+       kubectl delete ClusterRole nginx-ingress
+    else
+       log_info "cluster role nginx-ingress not found"
+    fi
+    if [ "$(kubectl get ClusterRole |grep -c nginx-ingress-table)" -gt "0" ]; then
+       log_info "cluster role nginx-ingress-table exists"
+       kubectl delete ClusterRole nginx-ingress-table
+    else
+       log_info "cluster role nginx-ingress-table not found"
+    fi
+    if [ "$(kubectl get ClusterRole |grep -c dashbase-kube-state-metrics)" -gt "0" ]; then
+       log_info "cluster role dashbase-kube-state-metrics exists"
+       kubectl delete ClusterRole dashbase-kube-state-metrics
+    else
+       log_info "cluster role dashbase-kube-state-metrics not found"
+    fi
+    if [ "$(kubectl get ClusterRole |grep -c prometheus)" -gt "0" ]; then
+       log_info "cluster role prometheus exists"
+       kubectl delete ClusterRole prometheus
+    else
+       log_info "cluster role prometheus not found"
+    fi
 }
 
 remove_sa_tiller() {
@@ -106,10 +134,15 @@ remove_sa_tiller() {
 
 remove_ingress_via_admindash() {
   # check if nginx is deployed , if yes delete it; and timeout after 8 minutes
-  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -iv nginx-ingress-table |grep -c nginx-ingress)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
     log_info "nginx-ingress controller is dedected"
     log_info "removing ngnix-ingress controller"
     kubectl exec -it admindash-0 -n dashbase -- helm delete --purge nginx-ingress
+  done
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c nginx-ingress-table)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "nginx-ingress-table controller is dedected"
+    log_info "removing ngnix-ingress-table controller"
+    kubectl exec -it admindash-0 -n dashbase -- helm delete --purge nginx-ingress-table
   done
 }
 
@@ -125,10 +158,15 @@ remove_dashbase_via_admindash() {
 
 remove_ingress_via_admindash_helm3() {
   # check if nginx is deployed , if yes delete it; and timeout after 8 minutes
-  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -c nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -iv nginx-ingress-table |grep -c nginx-ingress)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
     log_info "nginx-ingress controller is dedected"
     log_info "removing ngnix-ingress controller"
     kubectl exec -it admindash-0 -n dashbase -- helm delete nginx-ingress -n dashbase
+  done
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -c nginx-ingress-table)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "nginx-ingress-table controller is dedected"
+    log_info "removing ngnix-ingress-table controller"
+    kubectl exec -it admindash-0 -n dashbase -- helm delete nginx-ingress-table -n dashbase
   done
 }
 
@@ -267,6 +305,7 @@ remove_combo() {
     # delete sa tiller account
     remove_sa_tiller
     # delete namespace
+    remove_cluster_role
     kubectl delete namespace dashbase
 }
 
@@ -338,6 +377,7 @@ else
   remove_storageclass
   remove_tiller
   remove_clusterrolebindings
+  remove_cluster_role
   remove_sa_tiller
 fi
 

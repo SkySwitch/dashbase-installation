@@ -10,6 +10,7 @@ fi
 RANDOM=$(openssl rand -hex 3 > randomstring)
 RSTRING=$(cat randomstring)
 
+DASHVERSION="1.5.4"
 AWS_EKS_SCRIPT_VERSION="1.4.0"
 AWS_ACCESS_KEY="undefined"
 AWS_SECRET_ACCESS_KEY="undefined"
@@ -63,6 +64,7 @@ display_help() {
   echo "                              e.g. --authusername=admin"
   echo "     --authpassword           basic auth password, use together with authusername option"
   echo "                              e.g. --authpassword=dashbase"
+  echo "     --version                dashbase version e.g. --version=1.3.2"
   echo "     --v2                     setup dashbase V2, e.g.  --v2"
   echo ""
   echo "   Command example in V1"
@@ -175,6 +177,10 @@ while [[ $# -gt 0 ]]; do
   --v2)
     V2_FLAG="true"
     ;;
+  --version)
+    fail_if_empty "$PARAM" "$VALUE"
+    VERSION=$VALUE
+    ;;
   *)
     log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
     ;;
@@ -213,6 +219,21 @@ check_commands() {
   done
 }
 
+check_version() {
+  if [ -z "$VERSION" ]; then
+    VERSION=$DASHVERSION
+    log_info "No input dashbase version, use default version $DASHVERSION"
+  else
+    log_info "Dashbase version entered is $VERSION"
+    if [ "$(curl --silent -k https://registry.hub.docker.com/v2/repositories/dashbase/api/tags/$VERSION |tr -s ',' '\n' |grep -c digest)" -eq 1 ]; then
+      log_info "Entered dashbase version $VERSION is valid"
+    else
+      log_fatal "Entered dashbase version $VERSION is invalid"
+    fi
+  fi
+  VNUM=$(echo $VERSION |cut -d "." -f1)
+}
+
 check_ostype() {
   if [[ $OSTYPE == *"darwin"* ]]; then
     WKOSTYPE="mac"
@@ -240,11 +261,18 @@ check_input() {
     log_info "Entered aws access key id = $AWS_ACCESS_KEY"
     log_info "Entered aws secret access key = $AWS_SECRET_ACCESS_KEY"
     log_info "Default AWS region = $REGION"
-    if [ "$CLUSTERSIZE" == "large" ]; then
-       INSTYPE="r5.2xlarge"
-       # uncomment the following line to make default large cluster size be 3 nodes
-       #if [ "$NODENUM" -eq "2" ]; then  log_info "Change default node number from 2 to 3"; NODENUM=3; fi
-    fi
+    # check dashbase version
+     if [[ "$V2_FLAG" ==  "true" ]] || [[ ${VNUM} -ge 2 ]]; then
+       log_info "dashbase V2 is selected"
+       INSTYPE="c5.4xlarge"
+       if [ "$CLUSTERSIZE" == "small" ]; then NODENUM=1 ; fi
+     elif [[ "$V2_FLAG" ==  "false" ]] && [[ ${VNUM} -eq 1 ]]; then
+       log_info "dashbase V1 is selected"
+       if [ "$CLUSTERSIZE" == "large" ]; then INSTYPE="r5.2xlarge" ; fi
+       if [[ "$NODENUM" -lt 2 ]]; then
+         log_fatal "Entered node number must be equal or greater than two"
+       fi
+     fi
     log_info "Instance type used on EKS cluster = $INSTYPE"
     log_info "Number of worker nodes in EKS cluster = $NODENUM"
     log_info "The EKS cluster name = $CLUSTERNAME"
