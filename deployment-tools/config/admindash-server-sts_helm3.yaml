@@ -40,8 +40,7 @@ spec:
       serviceAccountName: dashadmin
       containers:
         - name: admindash
-          # TODO
-          image: dashbase/dashbase-admin:chaotest
+          image: dashbase/dashbase-admin-server:nightly
           imagePullPolicy: Always
           command: ["flask", "run", '--host=0.0.0.0']
           env:
