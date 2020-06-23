@@ -11,7 +11,7 @@ RANDOM=$(openssl rand -hex 3 > randomstring)
 RSTRING=$(cat randomstring)
 
 DASHVERSION="1.5.4"
-AWS_EKS_SCRIPT_VERSION="1.4.0"
+AWS_EKS_SCRIPT_VERSION="1.5.4"
 AWS_ACCESS_KEY="undefined"
 AWS_SECRET_ACCESS_KEY="undefined"
 REGION="us-east-2"
@@ -493,48 +493,48 @@ V1_dashbase() {
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --cdr --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --version=$VERSION
           fi
       elif [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "true" ]; then
          log_info "Dashbase small setup with ingress controller endpoint and basic auth is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --cdr --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --version=$VERSION
          fi
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --cdr --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --version=$VERSION
         fi
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
@@ -543,48 +543,48 @@ V1_dashbase() {
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --cdr --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --version=$VERSION
          fi
       elif [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "true" ]; then
          log_info "Dashbase large setup with ingress controller endpoint and basic auth is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --cdr --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD
+           dashbase-installation/dashbase-installer.sh --platform=aws --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --version=$VERSION
          fi
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --cdr --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/dashbase-installer.sh --platform=aws
+           dashbase-installation/dashbase-installer.sh --platform=aws --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws
+           dashbase-installation/dashbase-installer.sh --platform=aws --version=$VERSION
          fi
       fi
     fi
@@ -597,48 +597,48 @@ V2_dashbase() {
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --cdr --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --version=$VERSION
          fi
       elif [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "true" ]; then
          log_info "Dashbase small setup with ingress controller endpoint and basic auth is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --cdr --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --version=$VERSION
         fi
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME --cdr --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME --ucaas
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME
+           dashbase-installation/deployment-tools/dashbase-installer-smallsetup.sh --platform=aws --v2 --bucketname=$BUCKETNAME --version=$VERSION
          fi
       fi
     elif [ "$CLUSTERSIZE" == "large" ]; then
@@ -647,48 +647,48 @@ V2_dashbase() {
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --cdr --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --bucketname=$BUCKETNAME --version=$VERSION
          fi
       elif [ "$SETUP_TYPE" == "ingress" ] && [ "$BASIC_AUTH" == "true" ]; then
          log_info "Dashbase large setup with ingress controller endpoint and basic auth is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --cdr --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --ingress --subdomain=$SUBDOMAIN --basic_auth --authusername=$AUTHUSERNAME --authpassword=$AUTHPASSWORD --bucketname=$BUCKETNAME --version=$VERSION
          fi
       else
          log_info "Dashbase small setup with load balancer endpoint is selected"
          # checking ucass and cdr flag is selected or not
          if [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "true" ]; then
            log_info "UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME --cdr --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME --cdr --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "true" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "UCASS option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME --ucaas
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME --ucaas --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "true" ]; then
            log_warning "only CDR option is selected and missing UCAAS option, will install default without UCAAS"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME --version=$VERSION
          elif [ "$UCAAS_FLAG" == "false" ] && [ "$CDR_FLAG" == "false" ]; then
            log_info "no UCAAS and CDR option is selected"
-           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME
+           dashbase-installation/dashbase-installer.sh --platform=aws --v2 --bucketname=$BUCKETNAME --version=$VERSION
          fi
       fi
     fi
@@ -742,5 +742,6 @@ check_max_vpc_limit
 setup_eks_cluster
 check_eks_cluster
 setup_dashbase
+# shellcheck disable=SC2119
 display_bucketname
 #} 2>&1 | tee -a /tmp/aws_eks_setup_"$(date +%d-%m-%Y_%H-%M-%S)".log
