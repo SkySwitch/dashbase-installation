@@ -732,6 +732,7 @@ display_bucketname() {
 run_by_root
 check_ostype
 check_commands
+check_version
 check_input
 show_setup
 check_basic_auth
