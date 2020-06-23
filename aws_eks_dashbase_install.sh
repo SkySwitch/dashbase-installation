@@ -78,7 +78,7 @@ display_help() {
   echo "                                 --authpassword=dashbase"
   echo ""
   echo "   Command example in V2"
-  echo "   ./aws_eks_dashbase_install.sh --v2 --aws_access_key=YOURAWSACCESSKEY \ "
+  echo "   ./aws_eks_dashbase_install.sh --version=2.2.1 --aws_access_key=YOURAWSACCESSKEY \ "
   echo "                                 --aws_secret_access_key=YOURACESSSECRETACCESSKEY \ "
   echo "                                 --region=us-west-2 --subdomain=test.dashase.io  \ "
   echo "                                 --install_dashbase --basic_auth\ "
