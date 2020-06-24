@@ -26,7 +26,7 @@ rm -rf ~/data/https-dashbase.yaml
 DASH_FLAG="false"
 PRESTO_FLAG="false"
 NAMESPACE="undefined"
-CMDS="curl tar unzip git"
+CMDS="curl tar unzip git keytool"
 
 # log functions and input flag setup
 function log_info() {
