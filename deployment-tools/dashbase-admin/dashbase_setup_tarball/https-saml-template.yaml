@@ -1,0 +1,28 @@
+kind: Secret
+metadata:
+  name: saml-keystore
+apiVersion: v1
+data:
+  keystore: KEYSTORE
+---
+kind: Secret
+metadata:
+  name: saml-keystore-password
+apiVersion: v1
+data:
+  keystore_password: KEYPASS
+---
+kind: Secret
+metadata:
+  name: saml-cert
+apiVersion: v1
+data:
+  cert.pem: CERTPEM
+---
+kind: Secret
+metadata:
+  name: saml-key
+apiVersion: v1
+data:
+  key.pem: KEYPEM
+---

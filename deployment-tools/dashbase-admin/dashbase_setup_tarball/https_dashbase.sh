@@ -1,8 +1,8 @@
+#!/bin/bash
 # This script will nstall secure dashbase in k8s  and also will setup redash.
 # run the script example
 # ./https_dashbase.sh <namespace>
 
-#!/bin/bash
 # enter namespace value, not entering namespace value will auto exit
 if [ -z "$1" ]
 then

@@ -1,8 +1,8 @@
+#!/bin/bash
 # This script will nstall secure presto in k8s  and also will setup redash.
 # run the script example
 # ./https_presto.sh <namespace>
 
-#!/bin/bash
 # enter namespace value, not entering namespace value will auto exit
 if [ -z "$1" ]
 then

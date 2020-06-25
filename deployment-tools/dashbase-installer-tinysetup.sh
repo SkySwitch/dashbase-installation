@@ -550,6 +550,11 @@ download_dashbase() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "ln -s /data/dashbase-values.yaml  /dashbase/dashbase-values.yaml"
 }
 
+create_internal_token() {
+  log_info "create dashbase internal token used for api, web and auth components"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "openssl rand -hex 16 > /data/token-string"
+}
+
 update_dashbase_valuefile() {
   # update dashbase-values.yaml for platform choice and subdomain
   if [ -n "$SUBDOMAIN" ]; then
@@ -591,6 +596,11 @@ update_dashbase_valuefile() {
   log_info "update dashbase-values.yaml file with table name = $TABLENAME"
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/dashbase-values.yaml
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/exporter_metric.yaml
+
+  # update internal token string
+  TOKENSTRING=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/token-string")
+  log_info "update dashbase-values.yaml file with INTERNAL TOKEN string = internal-token-"
+  kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INTTOKEN|$TOKENSTRING|" /data/dashbase-values.yaml
 
   # update ucaas feature
   if [ "$UCAAS_FLAG" == "true" ]; then
@@ -693,6 +703,20 @@ create_sslcert() {
   else
     log_fatal "Error to create presto SSL cert, key, keystore, and keystore password"
   fi
+
+  # create presto SSL cert
+  log_info "setup presto internal SSL cert, key, keystore, keystore password"
+  #kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/https_saml.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/https_saml.sh"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/https-saml.yaml -n dashbase"
+  kubectl get secrets -n dashbase | grep -E 'saml-cert|saml-key'
+  CHKPSECRETS=$(kubectl get secrets -n dashbase | grep -c 'saml')
+  if [ "$CHKPSECRETS" -eq "4" ]; then
+    log_info "saml SSL cert, key, keystore and keystore password are created"
+  else
+    log_fatal "Error to create saml SSL cert, key, keystore, and keystore password"
+  fi
+
 }
 
 create_basic_auth_secret() {
@@ -801,6 +825,7 @@ fi
 
 check_helm
 create_sslcert
+create_internal_token
 
 # setup dashbase value yaml file and install dashbase
 if [ "$VALUEFILE" == "dashbase-values.yaml" ]; then

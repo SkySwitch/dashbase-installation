@@ -80,6 +80,8 @@ services:
   api:
     enabled: true
     environment:
+      INTERNAL_TOKEN: "internal-token-INTTOKEN"
+      AUTH_URL: "https://auth.test.dashbase.io"
       ENABLE_K8S_DISCOVERY: "true"
   web:
     expose: true
@@ -117,6 +119,28 @@ services:
       INSIGHTS_IS_CDR: "false"
       UCAAS_PROMETHEUS_URL: "http://prometheus:9090"
 #     UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
+      INTERNAL_TOKEN: "internal-token-INTTOKEN"
+      AUTH_URL: "https://auth.test.dashbase.io"
+
+  auth:
+    enabled: false
+    secrets:
+      metadata-okta:
+        dir: /run/secrets/
+        file: metadata-okta.xml
+      saml-keystore:
+        dir: /run/secrets/
+        file: samlKeystore.jks
+    environment:
+      INTERNAL_TOKEN: "internal-token-INTTOKEN"
+      DASHBASE_WEB_URL: https://web.test.mydomain.com
+      ENABLE_SAML_AUTH: "true"
+      SAML_KEYSTORE_PATH: /run/secrets/samlKeystore.jks
+      SAML_KEYSTORE_PASSWORD: SAMLKEYPASS
+      SAML_PRIVATE_KEY_PASSWORD: SAMLKEYPASS
+      SAML_METADATA_PATH: /run/secrets/metadata-okta.xml
+      SAML_SERVICE_PROVIDER_ENTITY_ID: https://auth.test.dashbase.io/callback?client_name=SAML2Client
+      SAML_SERVICE_PROVIDER_METADATA_PATH: sp-metadata.xml
 
   prometheus:
     enabled: true
