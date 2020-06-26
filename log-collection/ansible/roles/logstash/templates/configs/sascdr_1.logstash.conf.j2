@@ -3,13 +3,13 @@ input {
 		jdbc_driver_library => "/usr/share/java/mysql-connector-java-8.0.19.jar"
 		jdbc_driver_class => "com.mysql.jdbc.Driver"
 
-		jdbc_connection_string => "{{ nscdr_1.connection_string }}"
-		jdbc_user => "{{ nscdr_1.user}}"
-		jdbc_password => "{{ nscdr_1.password }}"
+		jdbc_connection_string => "{{ sascdr_1.connection_string }}"
+		jdbc_user => "{{ sascdr_1.user}}"
+		jdbc_password => "{{ sascdr_1.password }}"
                 jdbc_fetch_size => 100000
 
-        last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_nscdr_1"
-        statement_filepath => "/etc/logstash/conf.d/nscdr_mysql_statement"
+        last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_sascdr_1"
+        statement_filepath => "/etc/logstash/conf.d/sascdr_mysql_statement"
         schedule => "*/1 * * * *"
         use_column_value => true
         tracking_column => "time_start"

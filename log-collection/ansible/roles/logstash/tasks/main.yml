@@ -85,17 +85,23 @@
     name: logstash
     state: started
 
-- name: Check if Netspaiens specified
+- name: Check if Netsapiens specified
   command: "true"
   register: isNetsapiens
   with_items: "{{ configs_list }}"
   when: item is regex("netsapiens.*")
 
-- name: Check if Netspaiens CDR specified
+- name: Check if Netsapiens CDR specified
   command: "true"
   register: isNetsapiensCDR
   with_items: "{{ configs_list }}"
   when: item is regex("nscdr.*")
+
+- name: Check if Sas CDR specified
+  command: "true"
+  register: isSasCDR
+  with_items: "{{ configs_list }}"
+  when: item is regex("sascdr.*")
 
 - name: Create Netsapiens mysql_statement file
   shell: |-
@@ -125,3 +131,9 @@
     job: |-
       systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run_nscdr*; echo "SELECT * FROM $(date +\%Y\%m)_r WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/nscdr_mysql_statement; systemctl start logstash
   when: isNetsapiensCDR.changed
+
+- name: Create Sas CDR mysql_statement file
+  shell: |-
+    echo "SELECT * FROM cdr WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/sascdr_mysql_statement
+  when: isSasCDR.changed
+

@@ -6,10 +6,11 @@ input {
 		jdbc_connection_string => "{{ nscdr_2.connection_string }}"
 		jdbc_user => "{{ nscdr_2.user}}"
 		jdbc_password => "{{ nscdr_2.password }}"
+                jdbc_fetch_size => 100000
 
         last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_nscdr_2"
         statement_filepath => "/etc/logstash/conf.d/nscdr_mysql_statement"
-        schedule => "*/10 * * * *"
+        schedule => "*/1 * * * *"
         use_column_value => true
         tracking_column => "time_start"
 	}
