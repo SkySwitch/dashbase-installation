@@ -15,7 +15,7 @@
       private: no
 
   vars:
-    logstash_version: "oss-7.6.1"
+    logstash_version: "oss-7.7.1"
     configs_list: "{{ configs.split(',') }}"
     table: "logs"
 
