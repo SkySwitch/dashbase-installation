@@ -57,7 +57,7 @@ ingress:
 
 filebeat:
   enabled: true
-  elasticsearch_url: https://table-logs-cq:7888
+  elasticsearch_url: https://table-system:7888
 
 tables:
   system:
