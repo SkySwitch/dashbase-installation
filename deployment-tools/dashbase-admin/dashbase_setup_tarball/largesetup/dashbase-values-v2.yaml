@@ -60,7 +60,7 @@ filebeat:
   elasticsearch_url: https://table-logs-cq:7888
 
 tables:
-  logs-cq:
+  system:
     replicas: 1
     storage:
       class: "dashbase-data"
