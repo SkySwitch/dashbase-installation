@@ -2150,3 +2150,43 @@
             - name: rtcp_octet_count
               type: integer
 
+- key: capture
+  title: "Dashbase captured data"
+  description: >
+    Dashbase captured fields
+  fields:
+    - name: capture
+      type: group
+      description: >
+        Fields from captured packets.
+      fields:
+        - name: tsec
+          type: integer
+
+        - name: tmsec
+          type: integer
+
+        - name: epoch
+          type: double
+
+        - name: src
+          type: group
+          description: >
+            Src fields from captured packets.
+          fields:
+            - name: ip
+              type: keyword
+
+            - name: port
+              type: integer
+
+        - name: dst
+          type: group
+          description: >
+            Dst fields from captured packets.
+          fields:
+            - name: ip
+              type: keyword
+
+            - name: port
+              type: integer

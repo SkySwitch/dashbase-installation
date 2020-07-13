@@ -17,6 +17,8 @@
         field: "time_start"
         layouts:
           - '2006-01-02 15:04:05'
+          - 'UNIX'
         test:
           - '2020-06-02 16:39:01'
+          - '1594295947'
         ignore_missing: true
