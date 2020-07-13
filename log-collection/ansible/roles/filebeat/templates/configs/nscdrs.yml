@@ -10,7 +10,7 @@
   symlinks: true
   clean_removed: true
   fields:
-    type: nscdr
+    type: cdr
 
   processors:
     - timestamp:
