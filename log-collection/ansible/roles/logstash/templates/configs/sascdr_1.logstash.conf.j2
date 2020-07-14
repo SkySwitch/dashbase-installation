@@ -27,7 +27,7 @@ filter {
     }
   }
   date {
-    match => ["time_start", "UNIX"]
+    match => ["time_start", "ISO8601", "yyyy-MM-dd HH:mm:ss"]
   }
 }
 
