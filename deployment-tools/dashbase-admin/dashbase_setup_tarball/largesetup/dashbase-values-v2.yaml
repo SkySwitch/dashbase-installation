@@ -55,33 +55,15 @@ ingress:
   certmanager: false
   host: test.dashbase.io
 
-filebeat:
+etcd_cluster:
   enabled: true
+  replicas: 5
+
+filebeat:
+  enabled: false
   elasticsearch_url: https://table-system:7888
 
-tables:
-  system:
-    replicas: 1
-    storage:
-      class: "dashbase-data"
-      size: "500Gi"
-    containerConfig:
-      resources:
-        limits:
-          cpu: 3
-          memory: 6G
-        requests:
-          cpu: 3
-          memory: 6G
-    environment:
-      INDEX_OFFSET: "true"
-      BLOOM_FILTER_SIZE: "100"
-      MAX_BUFFER_DELAY_IN_SEC: "90"
-      MAX_BUFFER_SIZE_MB: "1000"
-      NUM_INDEXING_THREADS: "2"
-      RETENTION_NUM_DAYS: "5"
-      RETENTION_SIZE_GB: "425" # 500 * 0.85 = 1275
-      JAVA_OPTS: " -Xmx6g -Xms6g -XX:NativeMemoryTracking=summary"
+# V1_tables
 
 tablesv2:
   LOGS:
@@ -107,7 +89,7 @@ tablesv2:
 
 services:
   etcd:
-    enabled: true
+    enabled: false
   api:
     enabled: true
     environment:
