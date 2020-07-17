@@ -1,0 +1,15 @@
+- type: log
+  paths:
+    - /var/log/*.txt
+  fields:
+    _message_parser:
+      type: grok
+      pattern: '\"%{NOTSPACE:system:meta}\",\"%{INT:log_level:int}\",\"%{DATA:timestamp:datetime:yyyy-MMM-dd HH:mm:ss}\",\"%{DATA:event_end}\",\"%{INT:log_facility:int}\",\"%{DATA:message}\",\"%{NOTSPACE:ip_port}\"'
+
+  multiline.pattern: ^\"
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+
