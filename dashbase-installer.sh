@@ -693,11 +693,11 @@ update_dashbase_valuefile() {
   # update dashbase system logs
   if [ "$SYSTEM_LOG" == "true" ]; then
     log_info "update dashbase-values.yaml file to enable dashbase system log collection"
-    kubectl exec -it admindash-0 dashbase -- sed -i '/filebeat\:/!b;n;c\ \ enabled\: true' /data/dashbase-values.yaml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i '/filebeat\:/!b;n;c\ \ enabled\: true' /data/dashbase-values.yaml
     if [ "$VNUM" -ge 2 ]; then
-       kubectl exec -it admindash-0 dashbase -- sed -i '/V1_tables/ r /data/dashbase_system_log_table_v2.yaml' /data/dashbase-values.yaml
+       kubectl exec -it admindash-0 -n dashbase -- sed -i '/V1_tables/ r /data/dashbase_system_log_table_v2.yaml' /data/dashbase-values.yaml
     else
-       kubectl exec -it admindash-0 dashbase -- sed -i '/Dashbase_Logs/ r /data/dashbase_system_log_table_v1.yaml' /data/dashbase-values.yaml
+       kubectl exec -it admindash-0 -n dashbase -- sed -i '/Dashbase_Logs/ r /data/dashbase_system_log_table_v1.yaml' /data/dashbase-values.yaml
     fi
   fi
 
