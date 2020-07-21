@@ -37,8 +37,8 @@
             tag: %{WORD:capture.tag:text}
             pid: %{NUMBER:capture.pid:int}
             process: %{NUMBER:capture.process:int}
-            time: %{NUMBER:capture.tsec:double}
-            date: %{DATA:timestamp:datetime:EEE MMM ppd HH:mm:ss yyyy}
+            time: %{NUMBER:timestamp:datetime:epoch}
+            date: %{DATA:date:text}
             proto: %{DATA:capture.proto:text}
             srcip: %{IPORHOST:capture.src.ip:text}
             srcport: %{INT:capture.src.port:text}
