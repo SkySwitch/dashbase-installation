@@ -21,6 +21,7 @@ TABLENAME="logs"
 CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
+SYSTEM_LOG="false"
 
 echo "Installer script version is $INSTALLER_VERSION"
 
@@ -57,6 +58,8 @@ display_help() {
   echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
   echo "     --help         display command options and usage example"
   echo "     --webrtc       enable remote read on prometheus to api url for webrtc data e.g. --webrtc"
+  echo "     --systemlog    enable dashbase system log table, e.g. --systemlog  this will create a table called system."
+  echo "                    and contains all dashbase pods logs in this system table"
   echo "     --demo         setup freeswitch,filebeat pods and feed log data into the target table"
   echo ""
   echo "   The following options only be used on V2 dashbase"
@@ -191,6 +194,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --demo)
     DEMO_FLAG="true"
+    ;;
+  --systemlog)
+    SYSTEM_LOG="true"
     ;;
   --webrtc)
     WEBRTC_FLAG="true"
@@ -418,6 +424,14 @@ check_ostype() {
   fi
 }
 
+check_systemlog() {
+  if [ "$SYSTEM_LOG" == "false" ]; then
+    log_info "Dashbase system logs is not collected and displayed in the dashbase web portal"
+  else
+    log_info "Dashbase system logs is enabled, a table named system will use to display dashbase pods logs"
+  fi
+}
+
 check_basic_auth() {
   # check basic auth input
   if [ "$BASIC_AUTH" != "true" ]; then
@@ -597,6 +611,23 @@ create_storageclass() {
   if [ "$STORECLASSCHK" -eq "3" ]; then echo "Dashbase storageclasses are available"; else log_fatal "Dashbase storageclasses not found"; fi
 }
 
+install_etcd_operator() {
+  # setup etcd-operator
+  log_info "Setup etcd operator via helm"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase-etcd stable/etcd-operator --namespace dashbase"
+  sleep 15
+  ETCD_COUNT=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get po -n dashbase |grep -c etcd-operator")
+  # check etcd-operator pod counts
+  if [ "$ETCD_COUNT" -eq "3" ]; then
+    log_info "Dashbase etcd operator is created successfully"
+  elif [ "$ETCD_COUNT" -eq "0" ]; then
+    log_fatal "Dashbase etcd operator failed to create"
+  else
+    log_warning "Dashbase etcd operator is still creating"
+  fi
+}
+
 download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from Github"
@@ -658,6 +689,17 @@ update_dashbase_valuefile() {
   log_info "update dashbase-values.yaml file with table name = $TABLENAME"
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/dashbase-values.yaml
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/exporter_metric.yaml
+
+  # update dashbase system logs
+  if [ "$SYSTEM_LOG" == "true" ]; then
+    log_info "update dashbase-values.yaml file to enable dashbase system log collection"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i '/filebeat\:/!b;n;c\ \ enabled\: true' /data/dashbase-values.yaml
+    if [ "$VNUM" -ge 2 ]; then
+       kubectl exec -it admindash-0 -n dashbase -- sed -i '/V1_tables/ r /data/dashbase_system_log_table_v2.yaml' /data/dashbase-values.yaml
+    else
+       kubectl exec -it admindash-0 -n dashbase -- sed -i '/Dashbase_Logs/ r /data/dashbase_system_log_table_v1.yaml' /data/dashbase-values.yaml
+    fi
+  fi
 
   # update ucaas feature
   if [ "$UCAAS_FLAG" == "true" ]; then
@@ -848,6 +890,7 @@ check_basic_auth
 check_version
 check_license
 check_v2
+check_systemlog
 preflight_check
 
 # install admin pod
@@ -868,6 +911,7 @@ fi
 
 check_helm
 create_sslcert
+install_etcd_operator
 
 # setup dashbase value yaml file and install dashbase
 if [ "$VALUEFILE" == "dashbase-values.yaml" ]; then

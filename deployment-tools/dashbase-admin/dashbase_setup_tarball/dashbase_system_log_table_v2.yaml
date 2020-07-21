@@ -1,0 +1,23 @@
+tables:
+  system:
+    replicas: 1
+    storage:
+      class: "dashbase-data"
+      size: "500Gi"
+    containerConfig:
+      resources:
+        limits:
+          cpu: 3
+          memory: 6G
+        requests:
+          cpu: 3
+          memory: 6G
+    environment:
+      INDEX_OFFSET: "true"
+      BLOOM_FILTER_SIZE: "100"
+      MAX_BUFFER_DELAY_IN_SEC: "90"
+      MAX_BUFFER_SIZE_MB: "1000"
+      NUM_INDEXING_THREADS: "2"
+      RETENTION_NUM_DAYS: "5"
+      RETENTION_SIZE_GB: "425" # 500 * 0.85 = 1275
+      JAVA_OPTS: " -Xmx6g -Xms6g -XX:NativeMemoryTracking=summary"

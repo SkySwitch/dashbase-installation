@@ -52,15 +52,27 @@ ingress:
   certmanager: false
   host: test.dashbase.io
 
+etcd_cluster:
+  enabled: true
+  replicas: 5
+
+filebeat:
+  enabled: false
+  elasticsearch_url: https://table-system:7888
+
 tables:
   LOGS:
       replicas: 2
+# Dashbase_Logs
+
 
 services:
   etcd:
-    enabled: true
+    enabled: false
   api:
     enabled: true
+    environment:
+      ENABLE_K8S_DISCOVERY: "true"
   web:
     expose: true
     enabled: true

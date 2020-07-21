@@ -10,8 +10,8 @@ fi
 RANDOM=$(openssl rand -hex 3 > randomstring)
 RSTRING=$(cat randomstring)
 
-DASHVERSION="1.5.4"
-AWS_EKS_SCRIPT_VERSION="1.5.4"
+DASHVERSION="2.2.7"
+AWS_EKS_SCRIPT_VERSION="2.2.7"
 AWS_ACCESS_KEY="undefined"
 AWS_SECRET_ACCESS_KEY="undefined"
 REGION="us-east-2"
@@ -718,9 +718,9 @@ setup_dashbase() {
 }
 
 display_bucketname() {
-  POARN=$(echo "aws iam list-policies --query 'Policies[?PolicyName==\`$BUCKETNAME\`].Arn' --output text |awk '{ print $1}'" | bash)
-  IAMINSROLE=$(aws iam get-instance-profile --instance-profile-name "$INSPROFILENAME" |grep RoleName |sed -e 's/\"//g' |sed -e 's/\,//g' |awk '{ print $2}')
-  if [ "$V2_FLAG" == "true" ]; then
+  if [[ $INSTALL_DASHBASE == "true" ]] && [[ ${VNUM} -ge 2 ]]; then
+    POARN=$(echo "aws iam list-policies --query 'Policies[?PolicyName==\`$BUCKETNAME\`].Arn' --output text |awk '{ print $1}'" | bash)
+    IAMINSROLE=$(aws iam get-instance-profile --instance-profile-name "$INSPROFILENAME" |grep RoleName |sed -e 's/\"//g' |sed -e 's/\,//g' |awk '{ print $2}')
     echo "The S3 bucket name used in dashbase V2 setup is $BUCKETNAME"
     echo "The S3 bucket policy is $POARN"
     echo "The IAM role attached with the s3 bucket policy is $IAMINSROLE"

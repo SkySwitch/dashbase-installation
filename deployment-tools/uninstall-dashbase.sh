@@ -146,9 +146,19 @@ remove_ingress_via_admindash() {
   done
 }
 
+remove_etcd_via_admindash() {
+  # check if etcd-operator is deployed, if yes delete it; and timeout after 8 minutes
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep -c dashbase-etcd)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "etcd-operator is detected via adminpod using helm2"
+    # remove etcd-operator
+    log_info "removing etcd-operator via helm2 in admindash pod"
+    kubectl exec -it admindash-0 -n dashbase -- helm delete --purge dashbase-etcd
+  done
+}
+
 remove_dashbase_via_admindash() {
   # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
-  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls |grep dashbase |grep -c -Eiv 'nginx|etcd')" -eq "1" ] && [ $SECONDS -lt 480 ]; do
     log_info "dashbase components deployed via helm"
     # remove dashbase
     log_info "removing dashbase components via helm in admindash pod"
@@ -170,9 +180,19 @@ remove_ingress_via_admindash_helm3() {
   done
 }
 
+remove_etcd_via_admindash_helm3() {
+  # check if etcd-operator is deployed, if yes delete it; and timeout after 8 minutes
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep -c dashbase-etcd)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "etcd-operator is detected via adminpod using helm3"
+    # remove etcd-operator
+    log_info "removing etcd-operator via helm3 in admindash pod"
+    kubectl exec -it admindash-0 -n dashbase -- helm delete dashbase-etcd -n dashbase
+  done
+}
+
 remove_dashbase_via_admindash_helm3() {
   # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
-  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+  while [ "$(kubectl exec -it admindash-0 -n dashbase -- helm ls -n dashbase |grep dashbase |grep -c -Eiv 'nginx|etcd')" -eq "1" ] && [ $SECONDS -lt 480 ]; do
     log_info "dashbase components deployed via helm"
     # remove dashbase
     log_info "removing dashbase components via helm in admindash pod"
@@ -190,9 +210,19 @@ remove_ingress_via_helm() {
   done
 }
 
+remove_etcd_via_helm() {
+  # check if etcd-operator is deployed, if yes delete it; and timeout after 8 minutes
+  while [ "$(helm ls |grep dashbase |grep -c dashbase-etcd)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "etcd-operator is detected - helm2"
+    # remove etcd-operator
+    log_info "removing etcd-operator via helm2"
+    helm delete --purge dashbase-etcd
+  done
+}
+
 remove_dashbase_via_helm() {
   # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
-  while [ "$(helm ls |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+  while [ "$(helm ls |grep dashbase |grep -c -Eiv 'nginx|etcd')" -eq "1" ] && [ $SECONDS -lt 480 ]; do
     log_info "dashbase components deployed via helm"
     # remove dashbase
     log_info "removing dashbase components via helm in admindash pod"
@@ -209,9 +239,19 @@ remove_ingress_via_helm_3() {
   done
 }
 
+remove_etcd_via_helm_3() {
+  # check if etcd-operator is deployed, if yes delete it; and timeout after 8 minutes
+  while [ "$(helm ls -n dashbase |grep dashbase |grep -c dashbase-etcd)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+    log_info "etcd-operator is detected - helm3"
+    # remove etcd-operator
+    log_info "removing etcd-operator via helm3"
+    helm delete dashbase-etcd -n dashbase
+  done
+}
+
 remove_dashbase_via_helm_3() {
   # check if dashbase is deployed, if yes delete it; and timeout after 8 minutes
-  while [ "$(helm ls -n dashbase |grep dashbase |grep -c -iv nginx)" -eq "1" ] && [ $SECONDS -lt 480 ]; do
+  while [ "$(helm ls -n dashbase |grep dashbase |grep -c -Eiv 'nginx|etcd')" -eq "1" ] && [ $SECONDS -lt 480 ]; do
     log_info "dashbase components deployed via helm"
     # remove dashbase
     log_info "removing dashbase components via helm in admindash pod"
@@ -225,6 +265,7 @@ remove_release_via_helm() {
     if [ "$(helm ls -n dashbase |grep -E -- 'dashbase|ingress')" ]; then
       log_info "Either dashbase or ingress release exists on dashbase namespace"
       remove_ingress_via_helm_3
+      remove_etcd_via_helm_3
       remove_dashbase_via_helm_3
     fi
   elif [ "$( helm version --client |grep -c "v2." )" -eq "1" ]; then
@@ -232,6 +273,7 @@ remove_release_via_helm() {
     if [ "$(helm ls |grep -E -- 'dashbase|ingress')" ]; then
       log_info "Either dashbase or ingress release exists on dashbase namespace"
       remove_ingress_via_helm
+      remove_etcd_via_helm
       remove_dashbase_via_helm
     fi
   else
@@ -327,9 +369,11 @@ if [ "$(kubectl get namespace |grep -c dashbase)" -eq "1" ]; then
         # check admin pod has helm 2 or 3
         if [ "$(kubectl exec -it admindash-0 -n dashbase -- helm version --client |grep -c "v3.")" -eq "1" ]; then
           remove_ingress_via_admindash_helm3
+          remove_etcd_via_admindash_helm3
           remove_dashbase_via_admindash_helm3
         else
           remove_ingress_via_admindash
+          remove_etcd_via_admindash
           remove_dashbase_via_admindash
         fi
 
