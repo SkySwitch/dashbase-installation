@@ -37,6 +37,9 @@ output {
     elasticsearch {
         hosts => "{{ dashbase_url }}"
         index => "{{ table }}"
+        template => "/etc/logstash/templates.json"
+        template_name => "{{ table }}"
+        template_overwrite => true
         ssl_certificate_verification => false
     }
 }
