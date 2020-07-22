@@ -1,0 +1,56 @@
+{
+  "index_patterns": [
+    "{{ table }}"
+  ],
+  "settings": {},
+  "mappings": {
+    "_default_": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "@version": {
+          "type": "keyword"
+        },
+        "call-id": {
+          "type": "keyword"
+        },
+        "term_callid": {
+          "type": "keyword"
+        },
+        "by_callid": {
+          "type": "keyword"
+        },
+        "time_start": {
+          "type": "text"
+        },
+        "time_release": {
+          "type": "text"
+        },
+        "sas_time_start": {
+          "type": "text"
+        },
+        "duration": {
+          "type": "double"
+        },
+        "orig_from_user": {
+          "type": "text"
+        },
+        "orig_to_user": {
+          "type": "text"
+        },
+        "orig_ip": {
+          "type": "text"
+        },
+        "term_ip": {
+          "type": "text"
+        },
+        "release_text": {
+          "type": "text"
+        }
+      },
+      "dynamic_templates": [],
+      "numeric_detection": false
+    }
+  }
+}

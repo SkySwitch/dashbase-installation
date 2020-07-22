@@ -17,7 +17,7 @@
   vars:
     logstash_version: "oss-7.6.1"
     configs_list: "{{ configs.split(',') }}"
-    table: "logs"
+    table: "logstash-logs"
 
     netsapiens_1:
       connection_string: "jdbc:mysql://localhost:3306/database"

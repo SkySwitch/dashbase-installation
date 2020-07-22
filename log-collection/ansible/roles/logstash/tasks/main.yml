@@ -62,6 +62,15 @@
   with_items:
     "{{ configs_list }}"
 
+## Copy templates json
+- name: Copy the templates.json
+  template:
+    src: templates.json
+    dest: /etc/logstash/templates.json
+    owner: logstash
+    group: logstash
+    mode: 0600
+
 ## Copy the Logstash pipeline config file
 - name: Copy pipelines.yml file
   template:
