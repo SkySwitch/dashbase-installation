@@ -1,0 +1,21 @@
+- type: log
+  paths:
+    - /var/log/*.log
+  fields:
+    _message_parser:
+      type: grok
+      pattern: '%{TIMESTAMP_ISO8601}%{SPACE}%{NOTSPACE}%{SPACE}%{IPORHOST:ip:meta}%{SPACE}\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss,SSS}\]%{SPACE}%{NUMBER:pid} %{DATA:id1} (?:%{URIHOST:hostname} %{LOGLEVEL:level:meta} \(%{NOTSPACE:source_file:meta}:%{INT:line:int}\) - (%{NOTSPACE:message_start} sending from \[%{NOTSPACE:capture.src.ip}\]:%{NOTSPACE:capture.src.port} to \[%{NOTSPACE:capture.dst.ip}\]:%{NOTSPACE:capture.dst.port}|%{NOTSPACE:message_start} Received message on \[%{NOTSPACE:capture.dst.ip}\]:%{NOTSPACE:capture.dst.port} from \[%{NOTSPACE:capture.src.ip}\]:%{NOTSPACE:capture.src.port})?)?%{GREEDYDATA:message}'
+      subParsers:
+        message:
+          type: sip
+          sortedFields: "call-id,user-agent"
+
+  multiline.pattern: ^\d{4}-\d{2}-\d{2}
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+
