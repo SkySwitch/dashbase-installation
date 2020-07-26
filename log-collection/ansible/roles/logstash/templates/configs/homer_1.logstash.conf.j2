@@ -1,0 +1,61 @@
+input {
+	jdbc {
+		jdbc_driver_library => "/usr/share/java/mysql-connector-java-8.0.19.jar"
+		jdbc_driver_class => "com.mysql.jdbc.Driver"
+
+		jdbc_connection_string => "{{ homer_1.connection_string }}"
+		jdbc_user => "{{ homer_1.user}}"
+		jdbc_password => "{{ homer_1.password }}"
+
+                last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_homer_1"
+                statement_filepath => "/etc/logstash/conf.d/homer_mysql_statement"
+                schedule => "*/10 * * * *"
+                use_column_value => true
+                tracking_column => "id"
+	}
+}
+
+filter {
+  mutate {
+    rename => {
+      "callid" => "call-id"
+    }
+    rename => {
+      "node" => "hostname"
+    }
+    rename => {
+      "msg" => "message"
+    }
+    rename => {
+      "source_ip" => "capture.src.ip"
+    }
+    rename => {
+      "source_port" => "capture.src.port"
+    }
+    rename => {
+      "destination_ip" => "capture.dst.ip"
+    }
+    rename => {
+      "destination_port" => "capture.dst.port"
+    }
+    add_field => {
+      "[_message_parser][type]" => "sip"
+      "[_message_parser][sortedFields]" => "call-id,user-agent"
+    }
+    convert => {
+      "micro_ts" => "string"
+    }
+    gsub => ["micro_ts", "\d{3}$", ""]
+  }
+  date {
+    match => ["micro_ts", "UNIX_MS"]
+  }
+}
+
+output {
+    elasticsearch {
+        hosts => "{{ dashbase_url }}"
+        index => "{{ table }}"
+        ssl_certificate_verification => false
+    }
+}

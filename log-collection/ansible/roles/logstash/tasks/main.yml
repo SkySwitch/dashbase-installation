@@ -103,6 +103,12 @@
   with_items: "{{ configs_list }}"
   when: item is regex("sascdr.*")
 
+- name: Check if Homer specified
+  command: "true"
+  register: isHomer
+  with_items: "{{ configs_list }}"
+  when: item is regex("homer.*")
+
 - name: Create Netsapiens mysql_statement file
   shell: |-
     echo "SELECT event_index, hostname, event_type, orig_callid, event_text, event_ts, event_time FROM event_$(date +\%Y\%m\%d) WHERE event_type='responder' AND event_index > :sql_last_value">/etc/logstash/conf.d/netsapiens_mysql_statement
@@ -137,3 +143,15 @@
     echo "SELECT * FROM cdr WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/sascdr_mysql_statement
   when: isSasCDR.changed
 
+- name: Create Homer mysql_statement file
+  shell: |-
+    echo "SELECT id, micro_ts, source_ip, source_port, destination_ip, destination_port, msg FROM sip_capture_call_$(date +\%Y\%m\%d) WHERE id > :sql_last_value">/etc/logstash/conf.d/homer_mysql_statement
+  when: isHomer.changed
+
+- name: Create Homer cron job to update mysql statement based on current date
+  cron:
+    name: "logstash restart with new mysql_statement"
+    minute: "0"
+    hour: "0"
+    job: |-
+      systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run_homer*; echo "SELECT id, micro_ts, source_ip, source_port, destination_ip, destination_port, msg FROM sip_capture_call_$(date +\%Y\%m\%d) WHERE id > :sql_last_value">/etc/logstash/conf.d/homer_mysql_statement; systemctl start logstash

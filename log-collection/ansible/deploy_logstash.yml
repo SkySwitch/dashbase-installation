@@ -48,3 +48,7 @@
       user: "logstash"
       password: "logstash"
 
+    homer_1:
+      connection_string: "jdbc:mysql://localhost:3306/database"
+      user: "logstash"
+      password: "logstash"
