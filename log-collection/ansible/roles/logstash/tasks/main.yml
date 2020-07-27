@@ -145,7 +145,8 @@
 
 - name: Create Homer mysql_statement file
   shell: |-
-    echo "SELECT id, micro_ts, source_ip, source_port, destination_ip, destination_port, msg FROM sip_capture_call_$(date +\%Y\%m\%d) WHERE id > :sql_last_value">/etc/logstash/conf.d/homer_mysql_statement
+    echo "SELECT id, micro_ts, source_ip, source_port, destination_ip, destination_port, node, msg FROM sip_capture_call_$(date +\%Y\%m\%d) WHERE id > :sql_last_value">/etc/logstash/conf.d/homer_mysql_statement
+
   when: isHomer.changed
 
 - name: Create Homer cron job to update mysql statement based on current date
@@ -154,4 +155,5 @@
     minute: "0"
     hour: "0"
     job: |-
-      systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run_homer*; echo "SELECT id, micro_ts, source_ip, source_port, destination_ip, destination_port, msg FROM sip_capture_call_$(date +\%Y\%m\%d) WHERE id > :sql_last_value">/etc/logstash/conf.d/homer_mysql_statement; systemctl start logstash
+      systemctl stop logstash; rm /etc/logstash/conf.d/.logstash_jdbc_last_run_homer*; echo "SELECT id, micro_ts, source_ip, source_port, destination_ip, destination_port, node, msg FROM sip_capture_call_$(date +\%Y\%m\%d) WHERE id > :sql_last_value">/etc/logstash/conf.d/homer_mysql_statement; systemctl start logstash
+
