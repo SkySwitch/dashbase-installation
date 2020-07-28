@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="2.2.7"
-INSTALLER_VERSION="2.2.7"
+DASHVERSION="2.2.11"
+INSTALLER_VERSION="2.2.11"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -22,6 +22,8 @@ CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 SYSTEM_LOG="false"
+INDEXERCPU=7
+INDEXERMEMORY=15
 
 echo "Installer script version is $INSTALLER_VERSION"
 
@@ -49,6 +51,10 @@ display_help() {
   echo "     --adminpassword specify admin password to access to admin page web portal"
   echo "                     default admin passowrd is dashbase123"
   echo "                     e.g. --adminpassword=myadminpass"
+  echo "     --indexer_cpu   specify each indexer cpu requirement, default cpu per indexer is 7"
+  echo "                     e.g. --indexer_cpu=4"
+  echo "     --indexer_memory specify the indexer memory requirement, default memory per indexer is 15"
+  echo "                     e.g. --indexer_memory=8"
   echo "     --valuefile    specify a custom values yaml file"
   echo "                    e.g. --valuefile=/tmp/mydashbase_values.yaml"
   echo "     --presto       enable presto component e.g. --presto"
@@ -168,6 +174,14 @@ while [[ $# -gt 0 ]]; do
   --adminpassword)
     fail_if_empty "$PARAM" "$VALUE"
     ADMINPASSWORD=$VALUE
+    ;;
+  --indexer_cpu)
+    fail_if_empty "$PARAM" "$VALUE"
+    INDEXERCPU=$VALUE
+    ;;
+  --indexer_memory)
+    fail_if_empty "$PARAM" "$VALUE"
+    INDEXERMEMORY=$VALUE
     ;;
   --storage_account)
     fail_if_empty "$PARAM" "$VALUE"
@@ -480,6 +494,20 @@ check_v2() {
   fi
 }
 
+check_indexer_cpu_memory() {
+  # check entered indexer cpu and memory value is integer or not
+  if [[ $INDEXERCPU ]] && [ $INDEXERCPU -eq $INDEXERCPU ] && [ $INDEXERCPU -gt 0 ]; then
+    log_info "Entered indexer cpu value $INDEXERCPU and is an integer"
+  else
+    log_fatal "Entered indexer cpu value $INDEXERCPU and is not an integer"
+  fi
+   if [[ $INDEXERMEMORY ]] && [ $INDEXERMEMORY -eq $INDEXERMEMORY ] && [ $INDEXERCPU -gt 0 ]; then
+    log_info "Entered indexer memory value $INDEXERMEMORY and is an integer"
+  else
+    log_fatal "Entered indexer memory value $INDEXERMEMORY and is not an integer"
+  fi
+}
+
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
@@ -512,7 +540,7 @@ preflight_check() {
     if [ $AVAIILABLE_NODES -ge 2 ]; then
       log_info "This cluster is ready for dashbase installation on resources"
     else
-      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 16 cores and 32 Gi memory at least)."
+      log_warning "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 16 cores and 32 Gi memory at least)."
     fi
   else
     AVAIILABLE_NODES=0
@@ -526,9 +554,11 @@ preflight_check() {
     if [ $AVAIILABLE_NODES -ge 2 ]; then
       log_info "This cluster is ready for dashbase installation on resources"
     else
-      log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 cores and 64 Gi memory at least)."
+      log_warning "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 cores and 64 Gi memory at least)."
     fi
   fi
+
+  check_indexer_cpu_memory
 }
 
 adminpod_setup() {
@@ -689,6 +719,14 @@ update_dashbase_valuefile() {
   log_info "update dashbase-values.yaml file with table name = $TABLENAME"
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/dashbase-values.yaml
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/exporter_metric.yaml
+
+  # update indexer cpu and memory
+  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
+    log_info "update dashbase indexer cpu value to $INDEXERCPU"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INXCPU|$INDEXERCPU|g" /data/dashbase-values.yaml
+    log_info "update dashbase indexer memory value to $INDEXERMEMORY"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INXMEM|$INDEXERMEMORY|g" /data/dashbase-values.yaml
+  fi
 
   # update dashbase system logs
   if [ "$SYSTEM_LOG" == "true" ]; then

@@ -81,11 +81,11 @@ tablesv2:
       containerConfig:
         resources:
           requests:
-            cpu: 7
-            memory: 15G
+            cpu: INXCPU
+            memory: INXMEMG
           limits:
-            cpu: 7
-            memory: 15G
+            cpu: INXCPU
+            memory: INXMEMG
 
 services:
   etcd:
