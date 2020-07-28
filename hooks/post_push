@@ -1,0 +1,5 @@
+#!/bin/bash
+
+SHORT_SHA="$(git rev-parse --short=6 HEAD)"
+docker tag $IMAGE_NAME $DOCKER_REPO:nightly-$SHORT_SHA
+docker push $DOCKER_REPO:nightly-$SHORT_SHA
