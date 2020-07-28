@@ -18,16 +18,18 @@ input {
 }
 
 filter {
-  date {
-    match => ["time_start", "ISO8601", "yyyy-MM-dd HH:mm:ss"]
+  mutate {
+    copy => {
+      "time_start" => "@timestamp"
+    }
+    add_field => {
+      "type" => "cdr"
+    }
   }
   mutate {
     rename => {
       "orig_callid" => "call-id"
       "time_start" => "sas_time_start"
-    }
-    add_field => {
-      "type" => "cdr"
     }
   }
 }
