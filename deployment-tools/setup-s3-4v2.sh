@@ -140,6 +140,7 @@ insert_s3_policy_to_nodegroup() {
 # main process below this line
 #run_by_root
 check_commands
+check_ostype
 create_s3
 update_s3_policy_json
 create_s3_bucket_policy
