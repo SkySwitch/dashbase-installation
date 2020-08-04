@@ -55,6 +55,7 @@ display_help() {
   echo "                     e.g. --indexer_cpu=4"
   echo "     --indexer_memory specify the indexer memory requirement, default memory per indexer is 15"
   echo "                     e.g. --indexer_memory=8"
+  echo "     --syslog       enable dashbase syslog daemon, e.g. --syslog"
   echo "     --valuefile    specify a custom values yaml file"
   echo "                    e.g. --valuefile=/tmp/mydashbase_values.yaml"
   echo "     --presto       enable presto component e.g. --presto"
@@ -214,6 +215,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --webrtc)
     WEBRTC_FLAG="true"
+    ;;
+  --syslog)
+    SYSLOG_FLAG="true"
     ;;
   *)
     log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
@@ -726,6 +730,12 @@ update_dashbase_valuefile() {
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INXCPU|$INDEXERCPU|g" /data/dashbase-values.yaml
     log_info "update dashbase indexer memory value to $INDEXERMEMORY"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INXMEM|$INDEXERMEMORY|g" /data/dashbase-values.yaml
+  fi
+
+  # update fluentd for syslog ingestion
+  if [ "$SYSLOG_FLAG" == "true " ]; then
+     log_info "update dashbase-values.yaml file to enable fluentd for syslog ingestion"
+     kubectl exec -it admindash-0 -n dashbase -- sed -i '/syslog\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
   fi
 
   # update dashbase system logs

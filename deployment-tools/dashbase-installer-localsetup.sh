@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="2.2.7"
-INSTALLER_VERSION="2.2.7"
+DASHVERSION="2.2.11"
+INSTALLER_VERSION="2.2.11"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
@@ -21,6 +21,9 @@ TABLENAME="logs"
 CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
+SYSTEM_LOG="false"
+INDEXERCPU=4
+INDEXERMEMORY=8
 
 echo "Installer script version is $INSTALLER_VERSION local setup for install testing only"
 
@@ -48,6 +51,11 @@ display_help() {
   echo "     --adminpassword specify admin password to access to admin page web portal"
   echo "                     default admin passowrd is dashbase123"
   echo "                     e.g. --adminpassword=myadminpass"
+  echo "     --indexer_cpu   specify each indexer cpu requirement, default cpu per indexer is 7"
+  echo "                     e.g. --indexer_cpu=4"
+  echo "     --indexer_memory specify the indexer memory requirement, default memory per indexer is 15"
+  echo "                     e.g. --indexer_memory=8"
+  echo "     --syslog       enable dashbase syslog daemon, e.g. --syslog"
   echo "     --valuefile    specify a custom values yaml file"
   echo "                    e.g. --valuefile=/tmp/mydashbase_values.yaml"
   echo "     --presto       enable presto component e.g. --presto"
@@ -57,6 +65,8 @@ display_help() {
   echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
   echo "     --help         display command options and usage example"
   echo "     --webrtc       enable remote read on prometheus to api url for webrtc data e.g. --webrtc"
+  echo "     --systemlog    enable dashbase system log table, e.g. --systemlog  this will create a table called system."
+  echo "                    and contains all dashbase pods logs in this system table"
   echo "     --demo         setup freeswitch,filebeat pods and feed log data into the target table"
   echo ""
   echo "   The following options only be used on V2 dashbase"
@@ -166,6 +176,14 @@ while [[ $# -gt 0 ]]; do
     fail_if_empty "$PARAM" "$VALUE"
     ADMINPASSWORD=$VALUE
     ;;
+  --indexer_cpu)
+    fail_if_empty "$PARAM" "$VALUE"
+    INDEXERCPU=$VALUE
+    ;;
+  --indexer_memory)
+    fail_if_empty "$PARAM" "$VALUE"
+    INDEXERMEMORY=$VALUE
+    ;;
   --storage_account)
     fail_if_empty "$PARAM" "$VALUE"
     STORAGE_ACCOUNT=$VALUE
@@ -192,8 +210,14 @@ while [[ $# -gt 0 ]]; do
   --demo)
     DEMO_FLAG="true"
     ;;
+  --systemlog)
+    SYSTEM_LOG="true"
+    ;;
   --webrtc)
     WEBRTC_FLAG="true"
+    ;;
+  --syslog)
+    SYSLOG_FLAG="true"
     ;;
   *)
     log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
@@ -369,6 +393,14 @@ check_ostype() {
   fi
 }
 
+check_systemlog() {
+  if [ "$SYSTEM_LOG" == "false" ]; then
+    log_info "Dashbase system logs is not collected and displayed in the dashbase web portal"
+  else
+    log_info "Dashbase system logs is enabled, a table named system will use to display dashbase pods logs"
+  fi
+}
+
 check_basic_auth() {
   # check basic auth input
   if [ "$BASIC_AUTH" != "true" ]; then
@@ -403,6 +435,7 @@ check_v2() {
        log_fatal "V2 is selected but not provide any cloud object storage bucket name"
     elif [ "$BUCKETNAME" != "undefined" ]; then
        log_info "V2 is selected and bucket name is $BUCKETNAME"
+       V2_NODE="true"
     fi
     if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ]; then
        log_info "V2 is selected and cloud platform is $PLATFORM"
@@ -412,6 +445,21 @@ check_v2() {
     fi
   elif [[ "$V2_FLAG" ==  "false" ]] && [[ ${VNUM} -eq 1 ]]; then
       log_info "V2 is not selected in this installation"
+      V2_NODE="false"
+  fi
+}
+
+check_indexer_cpu_memory() {
+  # check entered indexer cpu and memory value is integer or not
+  if [[ $INDEXERCPU ]] && [ $INDEXERCPU -eq $INDEXERCPU ] && [ $INDEXERCPU -gt 0 ]; then
+    log_info "Entered indexer cpu value $INDEXERCPU and is an integer"
+  else
+    log_fatal "Entered indexer cpu value $INDEXERCPU and is not an integer"
+  fi
+   if [[ $INDEXERMEMORY ]] && [ $INDEXERMEMORY -eq $INDEXERMEMORY ] && [ $INDEXERCPU -gt 0 ]; then
+    log_info "Entered indexer memory value $INDEXERMEMORY and is an integer"
+  else
+    log_fatal "Entered indexer memory value $INDEXERMEMORY and is not an integer"
   fi
 }
 
@@ -434,10 +482,10 @@ preflight_check() {
 
   echo ""
   echo "Checking kubernetes nodes capacity..."
+
   AVAIILABLE_NODES=0
 #  REQUIRED_AVAILABLE_NODES=0
   # get comma separated nodes info
-  # gke-chao-debug-default-pool-a5df0776-588v,3920m,12699052Ki
   for NODE_INFO in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name},{.status.capacity.cpu},{.status.capacity.memory}{"\n"}{end}'); do
     # replace comma with spaces.
     read -r NODE_NAME NODE_CPU NODE_MEMORY <<<"$(echo "$NODE_INFO" | tr ',' ' ')"
@@ -448,7 +496,7 @@ preflight_check() {
   if [ $AVAIILABLE_NODES -ge 1 ]; then
     log_info "This cluster is ready for dashbase installation on resources"
   else
-    log_fatal "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
+    log_warning "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 4 core and 32 Gi at least)."
   fi
 }
 
@@ -532,6 +580,23 @@ create_storageclass() {
   if [ "$STORECLASSCHK" -eq "3" ]; then echo "Dashbase storageclasses are available"; else log_fatal "Dashbase storageclasses not found"; fi
 }
 
+install_etcd_operator() {
+  # setup etcd-operator
+  log_info "Setup etcd operator via helm"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
+  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase-etcd stable/etcd-operator --namespace dashbase"
+  sleep 15
+  ETCD_COUNT=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get po -n dashbase |grep -c etcd-operator")
+  # check etcd-operator pod counts
+  if [ "$ETCD_COUNT" -eq "3" ]; then
+    log_info "Dashbase etcd operator is created successfully"
+  elif [ "$ETCD_COUNT" -eq "0" ]; then
+    log_fatal "Dashbase etcd operator failed to create"
+  else
+    log_warning "Dashbase etcd operator is still creating"
+  fi
+}
+
 download_dashbase() {
   # download and update the dashbase helm value yaml files
   log_info "Downloading dashbase setup tar file from Github"
@@ -593,6 +658,31 @@ update_dashbase_valuefile() {
   log_info "update dashbase-values.yaml file with table name = $TABLENAME"
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/dashbase-values.yaml
   kubectl exec -it admindash-0 -n dashbase -- sed -i "s|LOGS|$TABLENAME|" /data/exporter_metric.yaml
+
+  # update indexer cpu and memory
+  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
+    log_info "update dashbase indexer cpu value to $INDEXERCPU"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INXCPU|$INDEXERCPU|g" /data/dashbase-values.yaml
+    log_info "update dashbase indexer memory value to $INDEXERMEMORY"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i "s|INXMEM|$INDEXERMEMORY|g" /data/dashbase-values.yaml
+  fi
+
+  # update fluentd for syslog ingestion
+  if [ "$SYSLOG_FLAG" == "true " ]; then
+     log_info "update dashbase-values.yaml file to enable fluentd for syslog ingestion"
+     kubectl exec -it admindash-0 -n dashbase -- sed -i '/syslog\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
+  fi
+
+  # update dashbase system logs
+  if [ "$SYSTEM_LOG" == "true" ]; then
+    log_info "update dashbase-values.yaml file to enable dashbase system log collection"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i '/filebeat\:/!b;n;c\ \ enabled\: true' /data/dashbase-values.yaml
+    if [ "$VNUM" -ge 2 ]; then
+       kubectl exec -it admindash-0 -n dashbase -- sed -i '/V1_tables/ r /data/dashbase_system_log_table_v2.yaml' /data/dashbase-values.yaml
+    else
+       kubectl exec -it admindash-0 -n dashbase -- sed -i '/Dashbase_Logs/ r /data/dashbase_system_log_table_v1.yaml' /data/dashbase-values.yaml
+    fi
+  fi
 
   # update ucaas feature
   if [ "$UCAAS_FLAG" == "true" ]; then
@@ -802,6 +892,7 @@ fi
 
 check_helm
 create_sslcert
+install_etcd_operator
 
 # setup dashbase value yaml file and install dashbase
 if [ "$VALUEFILE" == "dashbase-values.yaml" ]; then
