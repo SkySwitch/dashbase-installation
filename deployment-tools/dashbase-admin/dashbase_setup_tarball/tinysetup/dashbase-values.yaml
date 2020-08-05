@@ -39,9 +39,18 @@ ingress:
   certmanager: false
   host: test.dashbase.io
 
+etcd_cluster:
+  enabled: true
+  replicas: 3
+
+filebeat:
+  enabled: false
+  elasticsearch_url: https://table-system:7888
+
 tables:
   LOGS:
       replicas: 1
+# Dashbase_Logs
 
 presto:
   enabled: false
@@ -58,9 +67,25 @@ presto:
 
 services:
   etcd:
-    enabled: true
+    enabled: false
   api:
     enabled: true
+    environment:
+      ENABLE_K8S_DISCOVERY: "true"
+  syslog:
+    enabled: false
+    image: dashbase/fluentd:nightly
+    kind: Deployment
+    componentName: fluentd
+    ports:
+      syslog: 5040
+      admin: 23241
+    expose: false
+    annotations:
+      dashbase.io/scrape: "true"
+      dashbase.io/scrape_port: "24231"
+      dashbase.io/filebeat.parser.type: "simple"
+      dashbase.io/filebeat.parser.pattern: "yyyy-MM-dd HH:mm:ss Z"
   web:
     expose: true
     enabled: true
@@ -100,9 +125,9 @@ services:
 
   prometheus:
     enabled: true
-   # image: "dashbase/prometheus:nightly"
+  # image: "dashbase/prometheus:nightly"
     imagePullPolicy: Always
-   # prometheus_env_variable
+  # prometheus_env_variable
 
   grafana:
     enabled: true
