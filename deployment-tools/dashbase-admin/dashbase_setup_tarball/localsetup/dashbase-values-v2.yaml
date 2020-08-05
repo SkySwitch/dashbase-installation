@@ -71,7 +71,7 @@ services:
       ENABLE_K8S_DISCOVERY: "true"
   syslog:
     enabled: false
-    image: dashbase/fluentd:2.3.0-rc10
+    image: dashbase/fluentd:nightly
     kind: Deployment
     componentName: fluentd
     ports:

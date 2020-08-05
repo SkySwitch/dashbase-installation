@@ -22,6 +22,7 @@ CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 SYSTEM_LOG="false"
+SYSLOG_FLAG="false"
 INDEXERCPU=4
 INDEXERMEMORY=8
 
@@ -423,7 +424,14 @@ check_version() {
       log_fatal "Entered dashbase version $VERSION is invalid"
     fi
   fi
-  VNUM=$(echo $VERSION |cut -d "." -f1)
+  # set VNUM
+  if [[ "$VERSION" == *"nightly"* ]]; then
+    log_info "nightly version is used, VNUM is set to 2 by default"
+     VNUM="2"
+  else
+     VNUM=$(echo $VERSION |cut -d "." -f1)
+     log_info "version is $VERSION and VNUM is $VNUM"
+  fi
 }
 
 check_ostype() {
@@ -512,6 +520,12 @@ check_indexer_cpu_memory() {
   fi
 }
 
+check_syslog() {
+  if [ "$SYSLOG_FLAG" == "true" ]; then
+    log_info "Dashbase syslog is enabled, syslog deployment set will be created for receiving syslog"
+  fi
+}
+
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
@@ -527,6 +541,7 @@ preflight_check() {
     log_fatal "Failed to connect your Kubernetes API server, please check your config or network."
   fi
 
+  check_syslog
   check_k8s_permission
 
   echo ""
@@ -651,11 +666,12 @@ install_etcd_operator() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase-etcd stable/etcd-operator --namespace dashbase"
   sleep 15
-  ETCD_COUNT=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get po -n dashbase |grep -c etcd-operator")
+  ETCD_COUNT=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get po -n dashbase |grep -c etcd-operator | tr -d '\r')
   # check etcd-operator pod counts
-  if [ "$ETCD_COUNT" -eq "3" ]; then
+  echo "Number of etcd operator pod is $ETCD_COUNT"
+  if [[ ${ETCD_COUNT} -eq 3 ]]; then
     log_info "Dashbase etcd operator is created successfully"
-  elif [ "$ETCD_COUNT" -eq "0" ]; then
+  elif [[ ${ETCD_COUNT} -eq 0 ]]; then
     log_fatal "Dashbase etcd operator failed to create"
   else
     log_warning "Dashbase etcd operator is still creating"
@@ -733,7 +749,7 @@ update_dashbase_valuefile() {
   fi
 
   # update fluentd for syslog ingestion
-  if [ "$SYSLOG_FLAG" == "true " ]; then
+  if [ "$SYSLOG_FLAG" == "true" ]; then
      log_info "update dashbase-values.yaml file to enable fluentd for syslog ingestion"
      kubectl exec -it admindash-0 -n dashbase -- sed -i '/syslog\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
   fi
@@ -801,6 +817,12 @@ update_dashbase_valuefile() {
   # update keystore passwords for both dashbase and presto
   log_info "update dashbase and presto keystore password in dashbase-values.yaml"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "cd /data ; /data/configure_presto.sh"
+
+  # update prometheus image version
+  if [[ "$VERSION" == *"nightly"* ]]; then
+    log_info "dashbase nightly version is used, update prometheus image to use nightly version"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i '/\# image\: \"dashbase\/prometheus\:nightly\"/a\ \ \ \ image\: dashbase\/prometheus\:nightly' /data/dashbase-values.yaml
+  fi
 
   # update dashbase license information
   if [[ "$USERNAME" == "undefined" && "$LICENSE" == "undefined" ]]; then
@@ -872,7 +894,13 @@ install_dashbase() {
   log_info "the filename for dashbase value yaml file is $DASHVALUEFILE"
   log_info "Dashbase version $VERSION  and chart version $VERSION is going to install on the target K8s cluster"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug > /dev/null"
+  if [[ "$VERSION" == *"nightly"* ]]; then
+    log_info "kubectl exec -it admindash-0 -n dashbase -- helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --devel --debug"
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --devel --debug > /dev/null"
+  else
+    log_info "kubectl exec -it admindash-0 -n dashbase -- bash -c helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug"
+     kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install dashbase dashbase/dashbase -f /data/$DASHVALUEFILE --namespace dashbase --version $VERSION --debug > /dev/null"
+  fi
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
