@@ -70,6 +70,17 @@ remove_demo_setup() {
   fi
 }
 
+remove_fluentd() {
+  # delete syslog pods
+  # delete demo freeswitch pods
+  if [ "$(kubectl get deployment -n dashbase |grep -c syslog)" -gt "0" ]; then
+     log_info "syslog deployment sets exists"
+     kubectl delete deployment syslog -n dashbase
+  else
+     log_info "no syslog deployment set is found"
+  fi
+}
+
 remove_tiller() {
     #  delete helm tiller
     if [ "$(kubectl get po -n kube-system |grep -c tiller-deploy)" -gt "0" ]; then
@@ -332,6 +343,8 @@ remove_sa_dashadmin() {
 remove_combo() {
     # delete demo setup
     remove_demo_setup
+    # delete syslog deployment set
+    remove_fluentd
     # delete pvc
     delete_dashbase_pvc
     # delete secrets

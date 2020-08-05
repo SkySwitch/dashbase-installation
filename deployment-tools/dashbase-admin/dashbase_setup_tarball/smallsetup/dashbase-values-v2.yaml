@@ -81,11 +81,11 @@ tablesv2:
       containerConfig:
         resources:
           requests:
-            cpu: 4
-            memory: 15G
+            cpu: INXCPU
+            memory: INXMEMG
           limits:
-            cpu: 4
-            memory: 15G
+            cpu: INXCPU
+            memory: INXMEMG
 
 services:
   etcd:
@@ -94,6 +94,20 @@ services:
     enabled: true
     environment:
       ENABLE_K8S_DISCOVERY: "true"
+  syslog:
+    enabled: false
+    image: dashbase/fluentd:nightly
+    kind: Deployment
+    componentName: fluentd
+    ports:
+      syslog: 5040
+      admin: 23241
+    expose: false
+    annotations:
+      dashbase.io/scrape: "true"
+      dashbase.io/scrape_port: "24231"
+      dashbase.io/filebeat.parser.type: "simple"
+      dashbase.io/filebeat.parser.pattern: "yyyy-MM-dd HH:mm:ss Z"
   web:
     expose: true
     enabled: true

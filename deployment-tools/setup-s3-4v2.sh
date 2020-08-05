@@ -4,7 +4,7 @@ openssl rand -hex 4 >randomstring2
 RSTRING2=$(cat randomstring2)
 
 CLUSTERNAME="dashbase-$RSTRING2"
-CMDS="curl tar unzip git aws"
+CMDS="curl tar unzip git aws kubectl"
 REGION="us-east-2"
 
 # log functions and input flag setup
@@ -64,7 +64,6 @@ check_commands() {
 
 BUCKETNAME="s3-$CLUSTERNAME"
 
-# main process below this line
 log_info "the S3 bucket that will be created with name $BUCKETNAME"
 # create s3 bucket
 create_s3() {
@@ -77,13 +76,30 @@ create_s3() {
   fi
 }
 
+check_ostype() {
+  if [[ $OSTYPE == *"darwin"* ]]; then
+    WKOSTYPE="mac"
+    log_fatal "Dedected current workstation is a $WKOSTYPE, this script only tested on linux"
+    WKOSTYPE="mac"
+  elif [[ $OSTYPE == *"linux"* ]]; then
+    log_info "Dedected current workstation is a $WKOSTYPE"
+    WKOSTYPE="linux"
+  else
+    log_fatal "This script is only tested on linux; and fail to detect the current worksattion os type"
+  fi
+}
+
 # update bucket policy json with BUCKETNAME
 update_s3_policy_json() {
    # remove any previous mydash-s3.json file if exists
    rm -rf mydash-s3.json
    # download the mydash-s3.json from github
    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/mydash-s3.json -o mydash-s3.json
-   sed -i "s/MYDASHBUCKET/$BUCKETNAME/" mydash-s3.json
+   if [ "$WKOSTYPE" == "mac" ]; then
+      sed -i "" "s/MYDASHBUCKET/$BUCKETNAME/" mydash-s3.json
+   elif [ "$WKOSTYPE" == "linux" ]; then
+      sed -i "s/MYDASHBUCKET/$BUCKETNAME/" mydash-s3.json
+   fi
 }
 
 # create s3 bucket policy
@@ -120,8 +136,11 @@ insert_s3_policy_to_nodegroup() {
   fi
 
 }
+
+# main process below this line
 #run_by_root
 check_commands
+check_ostype
 create_s3
 update_s3_policy_json
 create_s3_bucket_policy
