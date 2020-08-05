@@ -22,6 +22,7 @@ CDR_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 SYSTEM_LOG="false"
+SYSLOG_FLAG="false"
 INDEXERCPU=7
 INDEXERMEMORY=15
 
@@ -512,6 +513,12 @@ check_indexer_cpu_memory() {
   fi
 }
 
+check_syslog() {
+  if [ "$SYSLOG_FLAG" == "true" ]; then
+    log_info "Dashbase syslog is enabled, syslog deployment set will be created for receiving syslog"
+  fi
+}
+
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
@@ -563,6 +570,7 @@ preflight_check() {
   fi
 
   check_indexer_cpu_memory
+  check_syslog
 }
 
 adminpod_setup() {
@@ -653,6 +661,7 @@ install_etcd_operator() {
   sleep 15
   ETCD_COUNT=$(kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get po -n dashbase |grep -c etcd-operator")
   # check etcd-operator pod counts
+  echo "Number of etcd operator pod is $ETCD_COUNT"
   if [ "$ETCD_COUNT" -eq "3" ]; then
     log_info "Dashbase etcd operator is created successfully"
   elif [ "$ETCD_COUNT" -eq "0" ]; then
@@ -733,7 +742,7 @@ update_dashbase_valuefile() {
   fi
 
   # update fluentd for syslog ingestion
-  if [ "$SYSLOG_FLAG" == "true " ]; then
+  if [ "$SYSLOG_FLAG" == "true" ]; then
      log_info "update dashbase-values.yaml file to enable fluentd for syslog ingestion"
      kubectl exec -it admindash-0 -n dashbase -- sed -i '/syslog\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
   fi
