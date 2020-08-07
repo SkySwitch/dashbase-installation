@@ -1,0 +1,7 @@
+- key: PortalOne
+  title: PortalOne log content
+  description: >
+    Template PortalOne logs
+  fields:
+    - name: hostname
+      type: keyword

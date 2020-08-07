@@ -1,0 +1,53 @@
+filebeat.inputs:
+
+- type: log
+  paths:
+    - /data/input/portalone/ep-signaling.log
+    - /data/input/portalone/mub-signaling.log
+  pipeline: "portalone"
+  multiline.pattern: ^\d{4}-\d{2}-\d{2}
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+
+
+#============================= Filebeat modules ===============================
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
+
+#==================== Elasticsearch template setting ==========================
+#setup.template.name: "webrtc"
+#setup.template.enabled: true
+#setup.template.pattern: "webrtc"
+#setup.template.fields: "fields.yml"
+#setup.template.overwrite: true
+#setup.template.settings:
+  #index.number_of_shards: 3
+  #index.codec: best_compression
+ # _source.enabled: true
+
+
+setup.kibana:
+
+#output.console:
+
+output.elasticsearch:
+  bulk_max_size: 3000
+  worker: 30
+  compression_level: 5
+ # hosts: "http://table-logs.127.0.0.1.xip.io:80"
+  hosts: "http://localhost:7888"
+#  index: "webrtc"
+#  ssl.verification_mode: none

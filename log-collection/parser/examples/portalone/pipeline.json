@@ -1,0 +1,42 @@
+{
+    "description": "PortalOne pipeline",
+    "processors": [
+        {
+            "dashbase_parser": {
+                "parser": {
+                    "type": "multi",
+                    "parsers_list": [
+                        {
+                           "name": "signaling",
+                           "config": {
+                              "type": "multi",
+                              "applyAll": "true",
+                              "parsers": {
+                                 "dispatch": {
+                                    "type": "grok",
+                                    "pattern": "%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}\\|%{DATA:component:meta}\\[%{INT:lwp:int}\\]\\|%{DATA:call-id:meta}\\|%{DATA:val1}\\|%{INT:val2:int}\\|%{DATA:sending}UDP:%{DATA:capture.dst.ip}:%{DATA:capture.dst.port} from UDP:%{DATA:capture.src.ip}:%{DATA:capture.src.port}:%{GREEDYDATA:message}"
+                                 },
+                                 "processing": {
+                                    "type": "grok",
+                                    "pattern": "%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}\\|%{DATA:component:meta}\\[%{INT:lwp:int}\\]\\|%{DATA:call-id:meta}\\|%{DATA:val1}\\|%{INT:val2:int}\\|%{DATA:received}UDP:%{DATA:capture.src.ip}:%{DATA:capture.src.port} at UDP:%{DATA:capture.dst.ip}:%{DATA:capture.dst.port}:%{GREEDYDATA:message}"
+                                 },
+                                 "sip": {
+                                    "type": "sip",
+                                    "sortedFields": "call-id,user-agent"
+                                 }
+                              }
+                           }
+                        },
+                        {
+                           "name": "universal",
+                           "config": {
+                              "type": "grok",
+                              "pattern": "%{TIMESTAMP_ISO8601_NANO:timestamp:datetime}\\|%{DATA:component:meta}\\[%{INT:lwp:int}\\]\\|(?:%{DATA:call-id:meta})\\|%{DATA:val1}\\|%{INT:val2:int}\\|%{GREEDYDATA:message}"
+                           }
+                        }
+                     ]
+                }
+            }
+        }
+    ]
+}
