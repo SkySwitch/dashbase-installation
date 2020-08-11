@@ -6,3 +6,7 @@
 inventory
 
 logstash-oss-7.6.1.deb
+
+# ETCD backup tool
+etcd-templates-backup.json
+generated/
