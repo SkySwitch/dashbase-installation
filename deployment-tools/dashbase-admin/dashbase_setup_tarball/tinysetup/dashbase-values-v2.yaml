@@ -90,17 +90,12 @@ services:
   syslog:
     enabled: false
     image: dashbase/fluentd:nightly
-    kind: Deployment
-    componentName: fluentd
-    ports:
-      syslog: 5040
-      admin: 23241
-    expose: false
-    annotations:
-      dashbase.io/scrape: "true"
-      dashbase.io/scrape_port: "24231"
-      dashbase.io/filebeat.parser.type: "simple"
-      dashbase.io/filebeat.parser.pattern: "yyyy-MM-dd HH:mm:ss Z"
+    imagePullPolicy: Always
+    environment:
+      SYSLOG_ELASTICSEARCH_HOSTS: https://table-LOGS:7888
+      SYSLOG_MESSAGE_PARSER: "{\"_message_parser\":{\"type\":\"grok\",\"pattern\":\"%{HTTPD_COMBINEDLOG}\"}}"
+      SYSLOG_MESSAGE_FORMAT: rfc5424
+
   web:
     expose: true
     enabled: true
@@ -142,6 +137,9 @@ services:
     enabled: true
   # image: "dashbase/prometheus:nightly"
     imagePullPolicy: Always
+    storage:
+      class: "dashbase-meta"
+      size: 20Gi
   # prometheus_env_variable
 
   grafana:

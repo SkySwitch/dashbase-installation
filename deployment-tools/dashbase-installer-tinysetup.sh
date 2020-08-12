@@ -875,6 +875,13 @@ expose_endpoints() {
   fi
 }
 
+expose_syslog() {
+  if [ "$SYSLOG_FLAG" == "true" ]; then
+    log_info "Expose dashbase syslog via load balancer in TCP port 5040"
+    kubectl expose service syslog --port=5040 --target-port=5040 --name=syslog-lb --type=LoadBalancer -l type=lb -n dashbase
+  fi
+}
+
 demo_setup() {
   if [ "$DEMO_FLAG" == "true" ]; then
     ES_HOSTS="https://table-$TABLENAME:7888"
@@ -935,6 +942,7 @@ fi
 
 # expose services
 expose_endpoints
+expose_syslog
 
 # demo setup
 demo_setup
