@@ -93,8 +93,8 @@ services:
     imagePullPolicy: Always
     environment:
       SYSLOG_ELASTICSEARCH_HOSTS: https://table-LOGS:7888
-      SYSLOG_MESSAGE_PARSER: "{\"_message_parser\":{\"type\":\"grok\",\"pattern\":\"%{HTTPD_COMBINEDLOG}\"}}"
-      SYSLOG_MESSAGE_FORMAT: rfc5424
+#     SYSLOG_MESSAGE_PARSER: "{\"_message_parser\":{\"type\":\"grok\",\"pattern\":\"%{HTTPD_COMBINEDLOG}\"}}"
+#     SYSLOG_MESSAGE_FORMAT: rfc5424
 
   web:
     expose: true
