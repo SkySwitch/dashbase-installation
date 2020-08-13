@@ -16,17 +16,34 @@
             type: multi
             applyAll: 'true'
             parsers:
-              request:
+              greatergreater:
                 type: grok
-                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text} [-#]> %{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<>]+ %{WORD:request_type:meta} [<>]+%{SPACE})?%{GREEDYDATA:message}'
+                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text} [-#]> %{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[>]+ %{WORD:request_type:meta} [>]+%{SPACE})?%{GREEDYDATA:message}'
                 subParsers:
                   message:
                     type: sip
                     sortedFields: "call-id,user-agent,x-inin-cnv"
 
-              response:
+              greaterless:
                 type: grok
-                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text} <[-#] %{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<>]+ %{WORD:request_type:meta} [<>]+%{SPACE})?%{GREEDYDATA:message}'
+                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text} [-#]> %{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<]+ %{WORD:request_type:meta} [<]+%{SPACE})?%{GREEDYDATA:message}'
+                subParsers:
+                  message:
+                    type: sip
+                    sortedFields: "call-id,user-agent,x-inin-cnv"
+
+
+              lessgreater:
+                type: grok
+                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text} <[-#] %{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[>]+ %{WORD:request_type:meta} [>]+%{SPACE})?%{GREEDYDATA:message}'
+                subParsers:
+                  message:
+                    type: sip
+                    sortedFields: "call-id,user-agent,x-inin-cnv"
+
+              lessless:
+                type: grok
+                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text} <[-#] %{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<]+ %{WORD:request_type:meta} [<]+%{SPACE})?%{GREEDYDATA:message}'
                 subParsers:
                   message:
                     type: sip
