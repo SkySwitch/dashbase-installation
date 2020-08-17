@@ -20,7 +20,7 @@
             parsers:
               heplify_grok:
                 type: grok
-                pattern: "%{DATA:timestamp:datetime} %{WORD:level:meta} HEP packet:\\{Version:%{WORD:capture.version:text},Protocol:%{WORD:capture.protocol:text},SrcIP:%{IPORHOST:capture.src.ip:text},DstIP:%{IPORHOST:capture.dst.ip:text},SrcPort:%{INT:capture.src.port:text},DstPort:%{INT:capture.dst.port:text},Tsec:%{INT:capture.tsec:int},Tmsec:%{INT:capture.tmsec:int},ProtoType:%{WORD:capture.proto.type:text},NodeID:%{WORD:capture.node.id:text},NodePW:(?:%{DATA:capture.node.pw:text}|),CID:(?:%{DATA:capture.cid:text}|),Vlan:(?:%{WORD:capture.vlan:text}|)\\} with Payload:%{GREEDYDATA:message}"
+                pattern: "%{DATA:log.timestamp:text} %{WORD:level:meta} HEP packet:\\{Version:%{WORD:capture.version:text},Protocol:%{WORD:capture.protocol:text},SrcIP:%{IPORHOST:capture.src.ip:text},DstIP:%{IPORHOST:capture.dst.ip:text},SrcPort:%{INT:capture.src.port:text},DstPort:%{INT:capture.dst.port:text},Tsec:%{INT:timestamp:datetime:epoch},Tmsec:%{INT:timestamp_delta:datetime_delta},ProtoType:%{WORD:capture.proto.type:text},NodeID:%{WORD:capture.node.id:text},NodePW:(?:%{DATA:capture.node.pw:text}|),CID:(?:%{DATA:capture.cid:text}|),Vlan:(?:%{WORD:capture.vlan:text}|)\\} with Payload:%{GREEDYDATA:message}"
                 timestamp:
                   format: iso
               heplify_sip:
