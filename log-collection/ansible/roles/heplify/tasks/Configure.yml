@@ -19,8 +19,8 @@
     mode: 0755
 
 - name: Copy heplify systemd config
-  copy:
-    src: heplify.service
+  template:
+    src: heplify.service.j2
     dest: /lib/systemd/system/heplify.service
     owner: root
     group: root
@@ -30,3 +30,4 @@
   systemd:
     name: heplify
     state: restarted
+    daemon_reload: yes

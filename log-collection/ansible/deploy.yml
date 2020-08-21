@@ -27,4 +27,5 @@
     prometheus_pushgateway_url: "{{ pushgateway_url }}/metrics/job/filebeat/instance/{{ ansible_hostname }}"
     nightwatch_version: 1.1.1
     nightwatch_configs: ""
-    heplify_version: 1.56
+    heplify_version: 1.57-rc1
+    heplify_args: ""
