@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DASHVERSION="2.2.11"
-INSTALLER_VERSION="2.2.11"
+DASHVERSION="2.3.1-rc5"
+INSTALLER_VERSION="2.3.1-rc5"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
