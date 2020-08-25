@@ -711,7 +711,7 @@ update_dashbase_valuefile() {
   fi
 
   # update ucaas callflow options cdr, sip or netsapiens log type
-  if [ "$CALL_FLOW_SIP_FLAG" == "true" ] || [ "$CALL_FLOW_CDR_FLAG" == "treu" ] || [ "$CALL_FLOW_NET_FLAG" == "true" ]; then
+  if [ "$CALL_FLOW_SIP_FLAG" == "true" ] || [ "$CALL_FLOW_CDR_FLAG" == "true" ] || [ "$CALL_FLOW_NET_FLAG" == "true" ]; then
     log_info "update dashbase-values.yaml file to enable UCAAS call flow feature"
     kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_UCAAS\:\ \"false\"/ENABLE_UCAAS\:\ \"true\"/' /data/dashbase-values.yaml
