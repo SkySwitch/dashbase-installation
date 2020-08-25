@@ -1,11 +1,10 @@
 #!/bin/bash
 
-DASHVERSION="2.3.1-rc5"
-INSTALLER_VERSION="2.3.1-rc5"
+DASHVERSION="2.3.1"
+INSTALLER_VERSION="2.3.1"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
-UCAAS_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
@@ -18,7 +17,9 @@ STORAGE_ACCOUNT="undefined"
 STORAGE_KEY="undefined"
 PRESTO_FLAG="false"
 TABLENAME="logs"
-CDR_FLAG="false"
+CALL_FLOW_CDR_FLAG="false"
+CALL_FLOW_SIP_FLAG="false"
+CALL_FLOW_NET_FLAG="false"
 DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 SYSTEM_LOG="false"
@@ -62,8 +63,12 @@ display_help() {
   echo "     --presto       enable presto component e.g. --presto"
   echo "     --tablename        dashbase table name, default table name is logs"
   echo "                        e.g. --tablename=freeswitch"
-  echo "     --ucaas        enable ucaas feature  e.g. --ucaas"
-  echo "     --cdr          enable cdr log data for insight page  e.g. --cdr"
+  echo ""
+  echo "     UCASS CALL FLOW features, enable either call flow cdr or sip or netsapiens log"
+  echo "     --callflow_cdr enable ucass call flow cdr log feature, e.g. --callflow_cdr"
+  echo "     --callflow_sip enable ucass call flow SIP log feature, e.g. --callflow_sip"
+  echo "     --callflow_net enable ucass call flow netsapiens log feature, e.g. --callflow_net"
+  echo ""
   echo "     --help         display command options and usage example"
   echo "     --webrtc       enable remote read on prometheus to api url for webrtc data e.g. --webrtc"
   echo "     --systemlog    enable dashbase system log table, e.g. --systemlog  this will create a table called system."
@@ -158,8 +163,14 @@ while [[ $# -gt 0 ]]; do
   --v2)
     V2_FLAG="true"
     ;;
-  --cdr)
-    CDR_FLAG="true"
+  --callflow_cdr)
+    CALL_FLOW_CDR_FLAG="true"
+    ;;
+  --callflow_sip)
+    CALL_FLOW_SIP_FLAG="true"
+    ;;
+  --callflow_net)
+    CALL_FLOW_NET_FLAG="true"
     ;;
   --authusername)
     fail_if_empty "$PARAM" "$VALUE"
@@ -201,9 +212,6 @@ while [[ $# -gt 0 ]]; do
     ;;
   --exposemon)
     EXPOSEMON="--exposemon"
-    ;;
-  --ucaas)
-    UCAAS_FLAG="true"
     ;;
   --presto)
     PRESTO_FLAG="true"
@@ -765,19 +773,28 @@ update_dashbase_valuefile() {
     fi
   fi
 
-  # update ucaas feature
-  if [ "$UCAAS_FLAG" == "true" ]; then
-    log_info "update dashbase-values.yaml file to enable UCAAS features"
+  # update ucaas callflow options cdr, sip or netsapiens log type
+ if [ "$CALL_FLOW_SIP_FLAG" == "true" ] || [ "$CALL_FLOW_CDR_FLAG" == "treu" ] || [ "$CALL_FLOW_NET_FLAG" == "true" ]; then
+    log_info "update dashbase-values.yaml file to enable UCAAS call flow feature"
     kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_UCAAS\:\ \"false\"/ENABLE_UCAAS\:\ \"true\"/' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_CALL\:\ \"false\"/ENABLE_CALL\:\ \"true\"/' /data/dashbase-values.yaml
-    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_INSIGHTS\:\ \"false\"/ENABLE_INSIGHTS\:\ \"true\"/' /data/dashbase-values.yaml
+    kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
+    kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/exporter_metric.yaml >> /data/dashbase-values.yaml"
+    #kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_INSIGHTS\:\ \"false\"/ENABLE_INSIGHTS\:\ \"true\"/' /data/dashbase-values.yaml
   fi
-  # update CDR log data for insight
-  if [ "$CDR_FLAG" == "true" ]; then
-     log_info "update dashbase-values.yaml file for CDR data in insights page"
-     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/INSIGHTS_IS_CDR\:\ \"false\"/INSIGHTS_IS_CDR\:\ \"true\"/' /data/dashbase-values.yaml
-     kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/exporter_metric.yaml >> /data/dashbase-values.yaml"
+  # update log data type for call flow
+  if [ "$CALL_FLOW_SIP_FLAG" == "true" ]; then
+     log_info "The default dashbase-values.yaml file is set for SIP log data in call flow feature"
+  elif [ "$CALL_FLOW_CDR_FLAG" == "true" ]; then
+     log_info "update dashbase-values.yaml file for CDR log data in call flow feature"
+     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/CALLFLOW_TYPE\:\ \"SIP\"/CALLFLOW_TYPE\:\ \"CDR\"/' /data/dashbase-values.yaml
+  elif [ "$CALL_FLOW_NET_FLAG" == "true" ]; then
+     log_info "update dashbase-values.yaml file for Netsapiens log data in call flow feature"
+     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/CALLFLOW_TYPE\:\ \"SIP\"/CALLFLOW_TYPE\:\ \"CALLFLOW\"/' /data/dashbase-values.yaml
+     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_APPS\:\ \"false\"/ENABLE_APPS\:\ \"true\"/' /data/dashbase-values.yaml
+     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_APPS_NETSAPIENS\:\ \"false\"/ENABLE_APPS_NETSAPIENS\:\ \"true\"/' /data/dashbase-values.yaml
+     kubectl exec -it admindash-0 -n dashbase -- sed -i "/ENABLE\_APPS\_NETSAPIENS\:\ \"false\"/a\ \ \ \ \ \ APPS\_NETSAPIENS\_TABLE\:\ $TABLENAME" /data/dashbase-values.yaml
   fi
   # update webrtc remote read url for prometheus
   if [ "$WEBRTC_FLAG" == "true" ]; then
