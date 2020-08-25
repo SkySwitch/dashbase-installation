@@ -727,7 +727,8 @@ update_dashbase_valuefile() {
      kubectl exec -it admindash-0 -n dashbase -- sed -i 's/CALLFLOW_TYPE\:\ \"SIP\"/CALLFLOW_TYPE\:\ \"CALLFLOW\"/' /data/dashbase-values.yaml
      kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_APPS\:\ \"false\"/ENABLE_APPS\:\ \"true\"/' /data/dashbase-values.yaml
      kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_APPS_NETSAPIENS\:\ \"false\"/ENABLE_APPS_NETSAPIENS\:\ \"true\"/' /data/dashbase-values.yaml
-     kubectl exec -it admindash-0 -n dashbase -- sed -i "/ENABLE\_APPS\_NETSAPIENS\:\ \"false\"/a\ \ \ \ \ \ APPS\_NETSAPIENS\_TABLE\:\ $TABLENAME" /data/dashbase-values.yaml
+     sleep 3
+     kubectl exec -it admindash-0 -n dashbase -- sed -i "/ENABLE\_APPS\_NETSAPIENS\:\ \"true\"/a\ \ \ \ \ \ APPS\_NETSAPIENS\_TABLE\:\ $TABLENAME" /data/dashbase-values.yaml
   fi
   # update webrtc remote read url for prometheus
   if [ "$WEBRTC_FLAG" == "true" ]; then
