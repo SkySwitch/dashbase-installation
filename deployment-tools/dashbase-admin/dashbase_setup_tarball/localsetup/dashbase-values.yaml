@@ -90,11 +90,12 @@ services:
       ENABLE_CHRONOLOGICAL_SORT: "true"
       ENABLE_SCHEDULED_METRICS: "true"
       DISPLAY_COLOREDFIELDS: "from.sip-uri.user,to.sip-uri.user,call-id,level"
-      ENABLE_UCAAS: "false"
       ENABLE_CALL: "false"
-      ENABLE_INSIGHTS: "false"
       CALL_TABLES: "LOGS"
-      INSIGHTS_IS_CDR: "false"
+      CALLFLOW_TYPE: "SIP"
+      ENABLE_UCAAS: "false"
+      ENABLE_APPS: "false"
+      ENABLE_APPS_NETSAPIENS: "false"
       UCAAS_PROMETHEUS_URL: "http://prometheus:9090"
 #     UCAAS_PRESTO_URL: "jdbc:presto://presto-coordinator-0.presto-coordinator.dashbase.svc.cluster.local:8443/thrift/dashbase?user=test&password=&SSL=true&SSLKeyStorePath=/run/prestojks/presto-keystore&SSLKeyStorePassword=PRESTO_KEYSTORE_PASSWORD"
 
@@ -102,6 +103,9 @@ services:
     enabled: true
    # image: "dashbase/prometheus:nightly"
     imagePullPolicy: Always
+    storage:
+      class: "dashbase-meta"
+      size: 20Gi
    # prometheus_env_variable
 
   grafana:
