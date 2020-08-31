@@ -3,57 +3,27 @@
     - /var/log/inin*.txt
   fields:
     _message_parser:
+      defaultTimeZone: 'UTC'
       type: multi
       parsers_list:
         - name: conversation
           config:
             type: grok
             pattern: |-
-              %{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\]callflowstates::DocumentLoaded::send_basichttp_handler_i%{DATA:message1}\'call\' => \[String: \{\"%{NOTSPACE:call-id:meta}\"\}\]%{DATA:message2}\'conversationId\' => \[String: \{\"%{NOTSPACE:x-inin-cnv:meta}\"\}\](%{DATA:message3}\'conversationPeerId\' => \[String: \{\"%{NOTSPACE:peer-cnv:meta}\"\}\])?%{GREEDYDATA:message}
+              %{TIME:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\]callflowstates::DocumentLoaded::send_basichttp_handler_i%{DATA:message1}\'call\' => \[String: \{\"%{NOTSPACE:call-id:meta}\"\}\]%{DATA:message2}\'conversationId\' => \[String: \{\"%{NOTSPACE:x-inin-cnv:meta}\"\}\](%{DATA:message3}\'conversationPeerId\' => \[String: \{\"%{NOTSPACE:peer-cnv:meta}\"\}\])?%{GREEDYDATA:message}
 
         - name: signaling
           config:
-            type: multi
-            applyAll: 'true'
-            parsers:
-              greatergreater:
-                type: grok
-                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text} [-#]> %{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[>]+ %{WORD:request_type:meta} [>]+%{SPACE})?%{GREEDYDATA:message}'
-                subParsers:
+            type: grok
+            pattern: '%{TIME:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} (?:\(%{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text} <?[-#]>? %{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[>]+|\(%{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text} <?[-#]>? %{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<]+) %{WORD:request_type:meta} [<>]+%{SPACE})?%{GREEDYDATA:message}'
+            subParsers:
                   message:
                     type: sip
                     sortedFields: "call-id,user-agent,x-inin-cnv"
-
-              greaterless:
-                type: grok
-                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text} [-#]> %{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<]+ %{WORD:request_type:meta} [<]+%{SPACE})?%{GREEDYDATA:message}'
-                subParsers:
-                  message:
-                    type: sip
-                    sortedFields: "call-id,user-agent,x-inin-cnv"
-
-
-              lessgreater:
-                type: grok
-                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text} <[-#] %{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[>]+ %{WORD:request_type:meta} [>]+%{SPACE})?%{GREEDYDATA:message}'
-                subParsers:
-                  message:
-                    type: sip
-                    sortedFields: "call-id,user-agent,x-inin-cnv"
-
-              lessless:
-                type: grok
-                pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](%{DATA:message_header} on connection #%{NOTSPACE:connection_number} \(%{IPORHOST:capture.dst.ip:text}:%{INT:capture.dst.port:text} <[-#] %{IPORHOST:capture.src.ip:text}:%{INT:capture.src.port:text}(\(%{NOTSPACE:cloud_host_port}\))?\)%{SPACE}[<]+ %{WORD:request_type:meta} [<]+%{SPACE})?%{GREEDYDATA:message}'
-                subParsers:
-                  message:
-                    type: sip
-                    sortedFields: "call-id,user-agent,x-inin-cnv"
-
         - name: universal
           config:
             type: grok
-            pattern: '%{NOTSPACE:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](\[%{DATA:other}\])?%{GREEDYDATA:message}'
-
+            pattern: '%{TIME:timestamp:datetime:HH:mm:ss.SSS}\[%{DATA:thread}\](\[%{DATA:other}\])?%{GREEDYDATA:message}'
 
   multiline.pattern: ^\d{2}:\d{2}:\d{2}
   multiline.negate: true
