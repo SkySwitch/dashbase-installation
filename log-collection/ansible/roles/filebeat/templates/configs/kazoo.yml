@@ -1,6 +1,7 @@
-- paths:
+- type: log
+  paths:
     - /var/log/kamailio/kamailio.log*
-  type: log
+  exclude_files: ['\.gz$']
   fields:
     app: kamailio
     _message_parser:
@@ -17,9 +18,10 @@
   symlinks: true
   clean_removed: true
 
-- paths:
-  type: log
+- type: log
+  paths:
     - /var/log/kazoo/kazoo.log*
+  exclude_files: ['\.gz$']
   fields:
     app: kazoo
     _message_parser:
@@ -36,9 +38,10 @@
   symlinks: true
   clean_removed: true
 
-- paths:
-  type: log
+- type: log
+  paths:
     - /var/log/freeswitch/kazoo-debug.log*
+  exclude_files: ['\.gz$']
   fields:
     app: freeswitch
     _message_parser:
