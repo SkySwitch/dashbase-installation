@@ -261,8 +261,10 @@ check_platform_input() {
     log_info "entered plaform type is $PLATFORM"
   elif [ "$PLATFORM" == "docker" ]; then
     log_info "entered plaform type is $PLATFORM"
+  elif [ "$PLATFORM" == "minikube" ]; then
+    log_info "entered platform type is $PLATFORM"
   else
-    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure or docker"
+    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure, docker or minikube"
   fi
 }
 
@@ -576,33 +578,6 @@ check_helm() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo add stable https://kubernetes-charts.storage.googleapis.com"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo update"
   kubectl exec -it admindash-0 -n dashbase -- bash -c "helm repo list"
-}
-
-create_storageclass() {
-  # create storageclass
-  if [ "$PLATFORM" == "aws" ]; then
-    log_info "create storageclass for AWS disk"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-aws.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-aws.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-aws.yaml -n dashbase"
-  elif [ "$PLATFORM" == "gce" ]; then
-    log_info "create storageclass for GCE disk"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-gce.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-gce.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-gce.yaml -n dashbase"
-  elif [ "$PLATFORM" == "azure" ]; then
-    log_info "create storageclass for Azure disk"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-azure.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-azure.yaml -n dashbase"
-  elif [ "$PLATFORM" == "docker" ]; then
-    log_info "create storageclass for docker"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-indexer-docker.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-meta-docker.yaml -n dashbase"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl apply -f /data/dashbase-data-docker.yaml -n dashbase"
-  fi
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get storageclass |grep dashbase"
-  STORECLASSCHK=$(kubectl get storageclass | grep -c dashbase)
-  if [ "$STORECLASSCHK" -eq "3" ]; then echo "Dashbase storageclasses are available"; else log_fatal "Dashbase storageclasses not found"; fi
 }
 
 install_etcd_operator() {
@@ -936,8 +911,7 @@ if [ "$(kubectl get storageclass -n dashbase | grep -c dashbase)" -gt "0" ]; the
     log_fatal "previous dashbase persistent volumes are detected in this cluster"
   fi
 else
-  echo "creating dashbase storageclass"
-  create_storageclass
+  echo "helm chart will create dashbase storageclass"
 fi
 
 check_helm
