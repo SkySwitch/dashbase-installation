@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
+
 DASHVERSION="2.3.1"
 INSTALLER_VERSION="2.3.1"
 PLATFORM="undefined"
@@ -548,7 +550,7 @@ check_syslog() {
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
-  CMDS="kubectl curl"
+  CMDS="kubectl tar bash"
   for x in $CMDS; do
     command -v "$x" >/dev/null && continue || {
       log_fatal "This script requires $x command and is not found."
@@ -619,9 +621,7 @@ adminpod_setup() {
   if [ "$(kubectl get po -n dashbase | grep -c admindash)" -gt 0 ]; then
     log_fatal "Previous admin pod admindash exists"
   else
-    # Download and install installer helper statefulset yaml file
-    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-server-sts_helm3.yaml -o admindash-server-sts_helm3.yaml
-    kubectl apply -f admindash-server-sts_helm3.yaml -n dashbase
+    kubectl apply -f "$BASEDIR"/deployment-tools/config/admindash-server-sts_helm3.yaml -n dashbase
     log_info "setting up admin pod, please wait for three minutes"
     kubectl wait --for=condition=Ready pods/admindash-0 --timeout=180s -n dashbase
     # Check to ensure admin pod is available else exit 1
@@ -630,6 +630,7 @@ adminpod_setup() {
   fi
 }
 
+# deprecated
 setup_helm_tiller() {
   # create tiller service account in kube-system namespace
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/rbac-config.yaml https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/rbac-config.yaml"
@@ -672,17 +673,18 @@ install_etcd_operator() {
 
 download_dashbase() {
   # download and update the dashbase helm value yaml files
-  log_info "Downloading dashbase setup tar file from Github"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicy.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar"
+  log_info "Copying dashbase setup tar file"
+  bash "$BASEDIR"/deployment-tools/dashbase-admin/package.sh
+  kubectl cp -n dashbase deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar admindash-0:/data/dashbase_setup_nolicy.tar
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicy.tar -C /data/"
   # get the custom values yaml file
   echo "VNUM is $VNUM"
-  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
-    log_info "Download dashbase-values-v2.yaml file for v2 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values-v2.yaml"
+  if [[ "$V2_FLAG" == "true" ]] || [[ "$VNUM" -ge 2 ]]; then
+    log_info "Copy dashbase-values-v2.yaml file for v2 setup"
+    kubectl cp -n dashbase "$BASEDIR"/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values-v2.yaml admindash-0:/data/dashbase-values.yaml
   else
-    log_info "Download dashbase-values.yaml file for v1 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values.yaml"
+    log_info "Copy dashbase-values.yaml file for v1 setup"
+    kubectl cp -n dashbase "$BASEDIR"/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values.yaml admindash-0:/data/dashbase-values.yaml
   fi
 
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
@@ -965,7 +967,7 @@ demo_setup() {
     ES_HOSTS="https://table-$TABLENAME:7888"
     NAMESPACE="dashbase"
     log_info "Setting up demo freeswitch and configure filebeat to send logs to target table $TABLENAME"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/resources.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/example-applications/freeswitch/resources.tar"
+    kubectl cp -n dashbase "$BASEDIR"/deployment-tools/example-applications/freeswitch/resources.tar admindash-0:/data/resources.tar
     kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/resources.tar -C /data/"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FILEBEAT_ES_HOSTS|$ES_HOSTS|" /data/resources/filebeat.yml
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FILEBEAT_ES_HOSTS|$ES_HOSTS|" /data/resources/filebeat-loader.yml
