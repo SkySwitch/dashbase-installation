@@ -1,0 +1,79 @@
+- paths:
+    - /var/log/kamailio/kamailio.log*
+  type: log
+  fields:
+    app: kamailio
+    _message_parser:
+      type: grok
+      pattern: |-
+        %{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd'T'HH:mm:ss.SSSSSS}%{ISO8601_TIMEZONE} %{WORD:app-group:meta} %{WORD:application:meta}\[%{NUMBER:pid}\]: %{WORD:level:meta}: (?:<%{WORD:agent:meta}>: %{NOTSPACE:call-id:meta}\|%{WORD:phase:meta}\||%{WORD:module:meta} \[%{NOTSPACE:code-source:meta}:%{NUMBER:line}\]:)%{GREEDYDATA:message}
+
+  multiline.pattern: ^\d{4}-\d{2}-\d{2}
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+
+- paths:
+  type: log
+    - /var/log/kazoo/kazoo.log*
+  fields:
+    app: kazoo
+    _message_parser:
+      type: grok
+      pattern: |-
+        %{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd'T'HH:mm:ss.SSSSSS}%{ISO8601_TIMEZONE} %{WORD:app-group:meta} %{WORD:application:meta}\[%{NUMBER:pid}\]: \|%{NOTSPACE:call-id:meta}\|%{WORD:agent:meta}:%{NUMBER:line}\(<%{NOTSPACE:num-id}>\) %{GREEDYDATA:message}
+
+  multiline.pattern: ^\d{4}-\d{2}-\d{2}
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+
+- paths:
+  type: log
+    - /var/log/freeswitch/kazoo-debug.log*
+  fields:
+    app: freeswitch
+    _message_parser:
+      type: multi
+      parsers_list:
+        - name: freeswitch
+          config:
+            type: grok
+            pattern: '(?:%{DATA:call-id:meta} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} %{NUMBER:percent}\% \[%{WORD:level:meta}\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}'
+        - name: sip
+          config:
+            type: multi
+            applyAll: 'true'
+            parsers:
+              sip_capture:
+                type: grok
+                pattern: '(?:send|recv) %{INT} bytes (?:(from %{WORD}/\[%{IPORHOST:capture.src.ip:text}\]:%{INT:capture.src.port:text})|(to %{WORD}/\[%{IPORHOST:capture.dst.ip:text}\]:%{INT:capture.dst.port:text})) at %{TIME:timestamp:datetime:HH:mm:ss.SSSSSS}:%{GREEDYDATA:message}'
+              sip_sip:
+                type: sip
+                sortedFields: call-id,user-agent
+        - name: universal
+          config:
+            type: grok
+            pattern: '(?:%{DATA:call-id:meta} |)%{GREEDYDATA:message}'
+
+  multiline.pattern:
+    "\
+    ^(?:\\S+ )?\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}.\\d{6}|\
+    ^recv|\
+    ^send\
+    "
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
