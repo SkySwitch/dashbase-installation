@@ -15,6 +15,7 @@ ADMINPASSWORD="dashbase123"
 BUCKETNAME="undefined"
 STORAGE_ACCOUNT="undefined"
 STORAGE_KEY="undefined"
+STORAGE_ENDPOINT="undefined"
 PRESTO_FLAG="false"
 TABLENAME="logs"
 CALL_FLOW_CDR_FLAG="false"
@@ -33,7 +34,7 @@ display_help() {
   echo "Usage: $0 [options...]"
   echo ""
   echo "   all options usage e.g. --option_key=value  or --option_key"
-  echo "     --platform     aws/azure/gce  e.g. --platform=aws"
+  echo "     --platform     aws/azure/gce/aliyun  e.g. --platform=aws"
   echo "     --version      dashbase version e.g. --version=1.3.2"
   echo "     --ingress      exposed dashbase services using ingress controller  e.g. --ingress"
   echo "     --subdomain    use together with ingress option e.g.  --subdomain=test.dashbase.io"
@@ -83,6 +84,8 @@ display_help() {
   echo "                        e.g. --storage_account=MYSTORAGEACCOUNTSTRING"
   echo "     --storage_key      cloud object storage key, in AWS is the ACCESS SECRET"
   echo "                        e.g. --storage_key=MYSTORAGEACCOUNTACCESSKEY"
+  echo "     --storage_endpoint cloud object endpoint url. (currently only available in aliyun platform)"
+  echo "                        e.g. --storage_endpoint=https://oss-cn-hangzhou.aliyuncs.com"
   echo ""
   echo "   Command example in V1"
   echo "   ./dashbase-installer.sh --platform=aws --ingress --subdomain=test.dashbase.io"
@@ -204,6 +207,10 @@ while [[ $# -gt 0 ]]; do
     fail_if_empty "$PARAM" "$VALUE"
     STORAGE_KEY=$VALUE
     ;;
+  --storage_endpoint)
+    fail_if_empty "$PARAM" "$VALUE"
+    STORAGE_ENDPOINT=$VALUE
+    ;;
   --basic_auth)
     BASIC_AUTH="true"
     ;;
@@ -254,17 +261,19 @@ check_platform_input() {
   if [[ "$PLATFORM" == "undefined" || -z "$PLATFORM" ]]; then
     log_fatal "--platform is required"
   elif [ "$PLATFORM" == "aws" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "azure" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "gce" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
+  elif [ "$PLATFORM" == "aliyun" ]; then
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "docker" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "minikube" ]; then
     log_info "entered platform type is $PLATFORM"
   else
-    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure, docker or minikube"
+    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure, aliyun, docker or minikube"
   fi
 }
 
@@ -504,7 +513,7 @@ check_v2() {
        log_info "V2 is selected and bucket name is $BUCKETNAME"
        V2_NODE="true"
     fi
-    if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ]; then
+    if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ] || [ "$PLATFORM" == "aliyun" ]; then
        log_info "V2 is selected and cloud platform is $PLATFORM"
        if [ "$STORAGE_ACCOUNT" == "undefined" ] || [ "$STORAGE_KEY" == "undefined" ]; then
           log_fatal "V2 setup on $PLATFORM requires inputs for --storage_account and --storage_key"
@@ -698,6 +707,9 @@ update_dashbase_valuefile() {
   elif [ "$PLATFORM" == "azure" ]; then
     log_info "update platform type azure in dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/azure/' /data/dashbase-values.yaml
+  elif [ "$PLATFORM" == "aliyun" ]; then
+    log_info "update platform type aliyun in dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/aliyun/' /data/dashbase-values.yaml
   fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
@@ -805,6 +817,12 @@ update_dashbase_valuefile() {
     if [ "$PLATFORM" == "gce" ]; then
       log_info "update dashbase-values.yaml file with google bucket mount options"
       kubectl exec -it admindash-0 -n dashbase -- sed -i '/^\ \ bucket\:/ r /data/gce_mount_options' /data/dashbase-values.yaml
+    elif [ "$PLATFORM" == "aliyun" ]; then
+      log_info "update dashbase-values.yaml file with aliyun bucket mount options"
+      kubectl exec -it admindash-0 -n dashbase -- sed -i '/^\ \ bucket\:/ r /data/aliyun_mount_options' /data/dashbase-values.yaml
+      if [ "$STORAGE_ENDPOINT" != "undefined" ]; then
+        kubectl exec -it admindash-0 -n dashbase -- sed -i "s|https://oss-accelerate.aliyuncs.com|$STORAGE_ENDPOINT|" /data/dashbase-values.yaml
+      fi
     fi
   fi
   # update keystore passwords for both dashbase and presto

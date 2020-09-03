@@ -1,0 +1,4 @@
+  mountOptions:
+    - --endpoint
+    - https://oss-accelerate.aliyuncs.com
+    - --subdomain

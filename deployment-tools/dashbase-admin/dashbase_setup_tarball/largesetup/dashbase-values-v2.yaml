@@ -11,7 +11,7 @@ v2:
 default:
   storage:
     class: "dashbase-meta"
-    size: 10Gi
+    size: 20Gi
   containerConfig:
     resources:
       requests:
