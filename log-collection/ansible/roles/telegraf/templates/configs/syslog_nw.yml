@@ -1,3 +1,0 @@
-- paths: ["/var/log/syslog"]
-  format: "Jan  2 2006 15:04:05"
-  zone: Local
