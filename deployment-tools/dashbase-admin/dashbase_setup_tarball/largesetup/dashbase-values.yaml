@@ -8,7 +8,7 @@ default_storageclass_provider:
 default:
   storage:
     class: "dashbase-meta"
-    size: 10Gi
+    size: 20Gi
   containerConfig:
     resources:
       requests:

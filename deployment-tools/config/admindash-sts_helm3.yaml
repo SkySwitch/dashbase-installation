@@ -13,7 +13,7 @@ spec:
     app: dashbase
     component: installer
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: admindash
@@ -54,4 +54,4 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
+          storage: 20Gi

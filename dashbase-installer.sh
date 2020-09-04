@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
+
 DASHVERSION="2.3.1"
 INSTALLER_VERSION="2.3.1"
 PLATFORM="undefined"
@@ -15,6 +17,7 @@ ADMINPASSWORD="dashbase123"
 BUCKETNAME="undefined"
 STORAGE_ACCOUNT="undefined"
 STORAGE_KEY="undefined"
+STORAGE_ENDPOINT="undefined"
 PRESTO_FLAG="false"
 TABLENAME="logs"
 CALL_FLOW_CDR_FLAG="false"
@@ -24,8 +27,8 @@ DEMO_FLAG="false"
 WEBRTC_FLAG="false"
 SYSTEM_LOG="false"
 SYSLOG_FLAG="false"
-INDEXERCPU=7
-INDEXERMEMORY=15
+CLUSTERTYPE="large"
+MIRROR_FLAG="false"
 
 echo "Installer script version is $INSTALLER_VERSION"
 
@@ -33,7 +36,7 @@ display_help() {
   echo "Usage: $0 [options...]"
   echo ""
   echo "   all options usage e.g. --option_key=value  or --option_key"
-  echo "     --platform     aws/azure/gce  e.g. --platform=aws"
+  echo "     --platform     aws/azure/gce/aliyun  e.g. --platform=aws"
   echo "     --version      dashbase version e.g. --version=1.3.2"
   echo "     --ingress      exposed dashbase services using ingress controller  e.g. --ingress"
   echo "     --subdomain    use together with ingress option e.g.  --subdomain=test.dashbase.io"
@@ -53,16 +56,17 @@ display_help() {
   echo "     --adminpassword specify admin password to access to admin page web portal"
   echo "                     default admin passowrd is dashbase123"
   echo "                     e.g. --adminpassword=myadminpass"
-  echo "     --indexer_cpu   specify each indexer cpu requirement, default cpu per indexer is 7"
-  echo "                     e.g. --indexer_cpu=4"
-  echo "     --indexer_memory specify the indexer memory requirement, default memory per indexer is 15"
-  echo "                     e.g. --indexer_memory=8"
   echo "     --syslog       enable dashbase syslog daemon, e.g. --syslog"
   echo "     --valuefile    specify a custom values yaml file"
   echo "                    e.g. --valuefile=/tmp/mydashbase_values.yaml"
   echo "     --presto       enable presto component e.g. --presto"
   echo "     --tablename        dashbase table name, default table name is logs"
   echo "                        e.g. --tablename=freeswitch"
+  echo "     --cluster_type specify the cluster type using the predefined standard"
+  echo "                    e.g. --cluster_type=large         2 * 16core/32Gi required"
+  echo "                         --cluster_type=small         3 * 8core/32Gi required"
+  echo "                         --cluster_type=local         no limits"
+  echo "     --mirror       use mirror to download images. (Currently, it's only for ingress controller)"
   echo ""
   echo "     UCASS CALL FLOW features, enable either call flow cdr or sip or netsapiens log"
   echo "     --callflow_cdr enable ucass call flow cdr log feature, e.g. --callflow_cdr"
@@ -83,6 +87,8 @@ display_help() {
   echo "                        e.g. --storage_account=MYSTORAGEACCOUNTSTRING"
   echo "     --storage_key      cloud object storage key, in AWS is the ACCESS SECRET"
   echo "                        e.g. --storage_key=MYSTORAGEACCOUNTACCESSKEY"
+  echo "     --storage_endpoint cloud object endpoint url. (currently only available in aliyun platform)"
+  echo "                        e.g. --storage_endpoint=https://oss-cn-hangzhou.aliyuncs.com"
   echo ""
   echo "   Command example in V1"
   echo "   ./dashbase-installer.sh --platform=aws --ingress --subdomain=test.dashbase.io"
@@ -188,13 +194,9 @@ while [[ $# -gt 0 ]]; do
     fail_if_empty "$PARAM" "$VALUE"
     ADMINPASSWORD=$VALUE
     ;;
-  --indexer_cpu)
+  --cluster_type)
     fail_if_empty "$PARAM" "$VALUE"
-    INDEXERCPU=$VALUE
-    ;;
-  --indexer_memory)
-    fail_if_empty "$PARAM" "$VALUE"
-    INDEXERMEMORY=$VALUE
+    CLUSTERTYPE=$VALUE
     ;;
   --storage_account)
     fail_if_empty "$PARAM" "$VALUE"
@@ -203,6 +205,10 @@ while [[ $# -gt 0 ]]; do
   --storage_key)
     fail_if_empty "$PARAM" "$VALUE"
     STORAGE_KEY=$VALUE
+    ;;
+  --storage_endpoint)
+    fail_if_empty "$PARAM" "$VALUE"
+    STORAGE_ENDPOINT=$VALUE
     ;;
   --basic_auth)
     BASIC_AUTH="true"
@@ -227,6 +233,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --syslog)
     SYSLOG_FLAG="true"
+    ;;
+  --mirror)
+    MIRROR_FLAG="true"
     ;;
   *)
     log_fatal "Unknown parameter ($PARAM) with ${VALUE:-no value}"
@@ -254,18 +263,72 @@ check_platform_input() {
   if [[ "$PLATFORM" == "undefined" || -z "$PLATFORM" ]]; then
     log_fatal "--platform is required"
   elif [ "$PLATFORM" == "aws" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "azure" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "gce" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
+  elif [ "$PLATFORM" == "aliyun" ]; then
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "docker" ]; then
-    log_info "entered plaform type is $PLATFORM"
+    log_info "entered platform type is $PLATFORM"
   elif [ "$PLATFORM" == "minikube" ]; then
     log_info "entered platform type is $PLATFORM"
   else
-    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure, docker or minikube"
+    log_fatal "Incorrect platform type, and platform type should be either aws, gce, azure, aliyun, docker or minikube"
   fi
+}
+
+check_cluster_type_input() {
+  # check entered cluster type
+  if [ "$CLUSTERTYPE" == "large" ]; then
+    log_info "using cluster type: $CLUSTERTYPE"
+  elif [ "$CLUSTERTYPE" == "small" ]; then
+    log_info "using cluster type:  $CLUSTERTYPE"
+  elif [ "$CLUSTERTYPE" == "local" ]; then
+    log_info "using cluster type:  $CLUSTERTYPE"
+  else
+    log_fatal "Incorrect cluster type, and platform type should be either large, small or local"
+  fi
+
+  case "$CLUSTERTYPE" in
+  large)
+    INDEXERCPU=7
+    INDEXERMEMORY=15
+    INTERNAL_V1_DESIRED_NODE_NUM=2
+    INTERNAL_V1_DESIRED_NODE_CPU=6
+    INTERNAL_V1_DESIRED_NODE_CPU_M=6000
+    INTERNAL_V1_DESIRED_NODE_MEM_GI=60
+    INTERNAL_V1_DESIRED_NODE_MEM_MI=60000
+    INTERNAL_V1_DESIRED_NODE_MEM_KI=60000000
+    INTERNAL_V2_DESIRED_NODE_NUM=2
+    INTERNAL_V2_DESIRED_NODE_CPU=14
+    INTERNAL_V2_DESIRED_NODE_CPU_M=14000
+    INTERNAL_V2_DESIRED_NODE_MEM_GI=26
+    INTERNAL_V2_DESIRED_NODE_MEM_MI=26000
+    INTERNAL_V2_DESIRED_NODE_MEM_KI=26000000
+    ;;
+  small)
+    INDEXERCPU=4
+    INDEXERMEMORY=8
+    INTERNAL_V1_DESIRED_NODE_NUM=3
+    INTERNAL_V1_DESIRED_NODE_CPU=3
+    INTERNAL_V1_DESIRED_NODE_CPU_M=3000
+    INTERNAL_V1_DESIRED_NODE_MEM_GI=30
+    INTERNAL_V1_DESIRED_NODE_MEM_MI=30000
+    INTERNAL_V1_DESIRED_NODE_MEM_KI=30000000
+    INTERNAL_V2_DESIRED_NODE_NUM=3
+    INTERNAL_V2_DESIRED_NODE_CPU=7
+    INTERNAL_V2_DESIRED_NODE_CPU_M=7000
+    INTERNAL_V2_DESIRED_NODE_MEM_GI=26
+    INTERNAL_V2_DESIRED_NODE_MEM_MI=26000
+    INTERNAL_V2_DESIRED_NODE_MEM_KI=26000000
+    ;;
+  local)
+    INDEXERCPU=4
+    INDEXERMEMORY=8
+    ;;
+  esac
 }
 
 check_ingress_subdomain() {
@@ -327,11 +390,11 @@ check_k8s_permission() {
 check_node_cpu_v1() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 6000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V1_DESIRED_NODE_CPU_M ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 6 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V1_DESIRED_NODE_CPU ]]; then
       return 0
     fi
   else
@@ -343,11 +406,11 @@ check_node_cpu_v1() {
 check_node_cpu_v2() {
   ## check nodes resources
   if [[ "$2" =~ ^([0-9]+)m$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V2_DESIRED_NODE_CPU_M ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 14 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V2_DESIRED_NODE_CPU ]]; then
       return 0
     fi
   else
@@ -358,15 +421,15 @@ check_node_cpu_v2() {
 
 check_node_memory_v1() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 60000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V1_DESIRED_NODE_MEM_KI ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 60000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V1_DESIRED_NODE_MEM_MI ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 60 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V1_DESIRED_NODE_MEM_GI ]]; then
       return 0
     fi
   else
@@ -377,15 +440,15 @@ check_node_memory_v1() {
 
 check_node_memory_v2() {
   if [[ "$2" =~ ^([0-9]+)Ki?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 26000000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V2_DESIRED_NODE_MEM_KI ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Mi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 26000 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V2_DESIRED_NODE_MEM_MI ]]; then
       return 0
     fi
   elif [[ "$2" =~ ^([0-9]+)Gi?$ ]]; then
-    if [[ ${BASH_REMATCH[1]} -ge 26 ]]; then
+    if [[ ${BASH_REMATCH[1]} -ge $INTERNAL_V2_DESIRED_NODE_MEM_GI ]]; then
       return 0
     fi
   else
@@ -396,11 +459,11 @@ check_node_memory_v2() {
 
 check_node_v1() {
   if ! check_node_cpu_v1 "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(6 core at least)."
+    echo "Node($1) doesn't have enough cpu resources($INTERNAL_V1_DESIRED_NODE_CPU cores at least)."
     return 0
   fi
   if ! check_node_memory_v1 "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(60 Gi at least)."
+    echo "Node($1) doesn't have enough memory resources($INTERNAL_V1_DESIRED_NODE_MEM_GI Gi at least)."
     return 0
   fi
 
@@ -410,11 +473,11 @@ check_node_v1() {
 
 check_node_v2() {
   if ! check_node_cpu_v2 "$1" "$2"; then
-    echo "Node($1) doesn't have enough cpu resources(16 cores at least)."
+    echo "Node($1) doesn't have enough cpu resources($INTERNAL_V2_DESIRED_NODE_CPU cores at least)."
     return 0
   fi
   if ! check_node_memory_v2 "$1" "$3"; then
-    echo "Node($1) doesn't have enough memory resources(30 Gi at least)."
+    echo "Node($1) doesn't have enough memory resources($INTERNAL_V2_DESIRED_NODE_MEM_GI Gi at least)."
     return 0
   fi
 
@@ -504,7 +567,7 @@ check_v2() {
        log_info "V2 is selected and bucket name is $BUCKETNAME"
        V2_NODE="true"
     fi
-    if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ]; then
+    if [ "$PLATFORM" == "gce" ] || [ "$PLATFORM" == "azure" ] || [ "$PLATFORM" == "aliyun" ]; then
        log_info "V2 is selected and cloud platform is $PLATFORM"
        if [ "$STORAGE_ACCOUNT" == "undefined" ] || [ "$STORAGE_KEY" == "undefined" ]; then
           log_fatal "V2 setup on $PLATFORM requires inputs for --storage_account and --storage_key"
@@ -513,20 +576,6 @@ check_v2() {
   elif [[ "$V2_FLAG" ==  "false" ]] && [[ ${VNUM} -eq 1 ]]; then
       log_info "V2 is not selected in this installation"
       V2_NODE="false"
-  fi
-}
-
-check_indexer_cpu_memory() {
-  # check entered indexer cpu and memory value is integer or not
-  if [[ $INDEXERCPU ]] && [ $INDEXERCPU -eq $INDEXERCPU ] && [ $INDEXERCPU -gt 0 ]; then
-    log_info "Entered indexer cpu value $INDEXERCPU and is an integer"
-  else
-    log_fatal "Entered indexer cpu value $INDEXERCPU and is not an integer"
-  fi
-   if [[ $INDEXERMEMORY ]] && [ $INDEXERMEMORY -eq $INDEXERMEMORY ] && [ $INDEXERCPU -gt 0 ]; then
-    log_info "Entered indexer memory value $INDEXERMEMORY and is an integer"
-  else
-    log_fatal "Entered indexer memory value $INDEXERMEMORY and is not an integer"
   fi
 }
 
@@ -539,7 +588,7 @@ check_syslog() {
 preflight_check() {
   # preflight checks
   log_info "OS type running this script is $OSTYPE"
-  CMDS="kubectl curl"
+  CMDS="kubectl tar bash"
   for x in $CMDS; do
     command -v "$x" >/dev/null && continue || {
       log_fatal "This script requires $x command and is not found."
@@ -556,6 +605,10 @@ preflight_check() {
 
   echo ""
   echo "Checking kubernetes nodes capacity..."
+  if [ "$CLUSTERTYPE" == "local" ]; then
+      "Skipped kubernetes nodes capacity due to localsetup."
+      return
+  fi
 
   if [ "$V2_NODE" == "true" ]; then
     AVAIILABLE_NODES=0
@@ -566,10 +619,10 @@ preflight_check() {
       check_node_v2 "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
     done
     echo ""
-    if [ $AVAIILABLE_NODES -ge 2 ]; then
+    if [ $AVAIILABLE_NODES -ge $INTERNAL_V2_DESIRED_NODE_NUM ]; then
       log_info "This cluster is ready for dashbase installation on resources"
     else
-      log_warning "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 16 cores and 32 Gi memory at least)."
+      log_warning "This cluster doesn't have enough resources for dashbase installation($INTERNAL_V2_DESIRED_NODE_NUM nodes with each have $INTERNAL_V2_DESIRED_NODE_CPU cores and $INTERNAL_V2_DESIRED_NODE_MEM_GI Gi memory at least)."
     fi
   else
     AVAIILABLE_NODES=0
@@ -580,14 +633,12 @@ preflight_check() {
       check_node_v1 "$NODE_NAME" "$NODE_CPU" "$NODE_MEMORY"
     done
     echo ""
-    if [ $AVAIILABLE_NODES -ge 2 ]; then
+    if [ $AVAIILABLE_NODES -ge $INTERNAL_V1_DESIRED_NODE_NUM ]; then
       log_info "This cluster is ready for dashbase installation on resources"
     else
-      log_warning "This cluster doesn't have enough resources for dashbase installation(2 nodes with each have 8 cores and 64 Gi memory at least)."
+      log_warning "This cluster doesn't have enough resources for dashbase installation($INTERNAL_V1_DESIRED_NODE_NUM nodes with each have $INTERNAL_V1_DESIRED_NODE_CPU cores and $INTERNAL_V1_DESIRED_NODE_MEM_GI Gi memory at least)."
     fi
   fi
-
-  check_indexer_cpu_memory
 }
 
 adminpod_setup() {
@@ -610,17 +661,16 @@ adminpod_setup() {
   if [ "$(kubectl get po -n dashbase | grep -c admindash)" -gt 0 ]; then
     log_fatal "Previous admin pod admindash exists"
   else
-    # Download and install installer helper statefulset yaml file
-    curl -k https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/admindash-server-sts_helm3.yaml -o admindash-server-sts_helm3.yaml
-    kubectl apply -f admindash-server-sts_helm3.yaml -n dashbase
-    log_info "setting up admin pod, please wait for three minutes"
-    kubectl wait --for=condition=Ready pods/admindash-0 --timeout=180s -n dashbase
+    kubectl apply -f "$BASEDIR"/deployment-tools/config/admindash-server-sts_helm3.yaml -n dashbase
+    log_info "setting up admin pod, please wait for 10 minutes at most"
+    kubectl wait --for=condition=Ready pods/admindash-0 --timeout=600s -n dashbase
     # Check to ensure admin pod is available else exit 1
     APODSTATUS=$(kubectl wait --for=condition=Ready pods/admindash-0 -n dashbase | grep -c "condition met")
     if [ "$APODSTATUS" -eq "1" ]; then echo "Admin Pod is available"; else log_fatal "Admin Pod  admindash-0 is not available"; fi
   fi
 }
 
+# deprecated
 setup_helm_tiller() {
   # create tiller service account in kube-system namespace
   kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/rbac-config.yaml https://raw.githubusercontent.com/dashbase/dashbase-installation/master/deployment-tools/config/rbac-config.yaml"
@@ -663,17 +713,18 @@ install_etcd_operator() {
 
 download_dashbase() {
   # download and update the dashbase helm value yaml files
-  log_info "Downloading dashbase setup tar file from Github"
-  kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase_setup_nolicy.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar"
+  log_info "Copying dashbase setup tar file"
+  bash "$BASEDIR"/deployment-tools/dashbase-admin/package.sh
+  kubectl cp -n dashbase deployment-tools/dashbase-admin/dashbase_setup_tarball/dashbase_setup_nolicy.tar admindash-0:/data/dashbase_setup_nolicy.tar
   kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/dashbase_setup_nolicy.tar -C /data/"
   # get the custom values yaml file
   echo "VNUM is $VNUM"
-  if [[ "$V2_FLAG" ==  "true" ]] || [[ "$VNUM" -ge 2 ]]; then
-    log_info "Download dashbase-values-v2.yaml file for v2 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values-v2.yaml"
+  if [[ "$V2_FLAG" == "true" ]] || [[ "$VNUM" -ge 2 ]]; then
+    log_info "Copy dashbase-values-v2.yaml file for v2 setup"
+    kubectl cp -n dashbase "$BASEDIR"/deployment-tools/dashbase-admin/dashbase_setup_tarball/${CLUSTERTYPE}setup/dashbase-values-v2.yaml admindash-0:/data/dashbase-values.yaml
   else
-    log_info "Download dashbase-values.yaml file for v1 setup"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/dashbase-values.yaml https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/dashbase-admin/dashbase_setup_tarball/largesetup/dashbase-values.yaml"
+    log_info "Copy dashbase-values.yaml file for v1 setup"
+    kubectl cp -n dashbase "$BASEDIR"/deployment-tools/dashbase-admin/dashbase_setup_tarball/${CLUSTERTYPE}setup/dashbase-values.yaml admindash-0:/data/dashbase-values.yaml
   fi
 
   kubectl exec -it admindash-0 -n dashbase -- bash -c "chmod a+x /data/*.sh"
@@ -698,6 +749,9 @@ update_dashbase_valuefile() {
   elif [ "$PLATFORM" == "azure" ]; then
     log_info "update platform type azure in dashbase-values.yaml"
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/azure/' /data/dashbase-values.yaml
+  elif [ "$PLATFORM" == "aliyun" ]; then
+    log_info "update platform type aliyun in dashbase-values.yaml"
+    kubectl exec -it admindash-0 -n dashbase -- sed -i 's/aws/aliyun/' /data/dashbase-values.yaml
   fi
   # update dashbase version
   if [ -z "$VERSION" ]; then
@@ -805,6 +859,12 @@ update_dashbase_valuefile() {
     if [ "$PLATFORM" == "gce" ]; then
       log_info "update dashbase-values.yaml file with google bucket mount options"
       kubectl exec -it admindash-0 -n dashbase -- sed -i '/^\ \ bucket\:/ r /data/gce_mount_options' /data/dashbase-values.yaml
+    elif [ "$PLATFORM" == "aliyun" ]; then
+      log_info "update dashbase-values.yaml file with aliyun bucket mount options"
+      kubectl exec -it admindash-0 -n dashbase -- sed -i '/^\ \ bucket\:/ r /data/aliyun_mount_options' /data/dashbase-values.yaml
+      if [ "$STORAGE_ENDPOINT" != "undefined" ]; then
+        kubectl exec -it admindash-0 -n dashbase -- sed -i "s|https://oss-accelerate.aliyuncs.com|$STORAGE_ENDPOINT|" /data/dashbase-values.yaml
+      fi
     fi
   fi
   # update keystore passwords for both dashbase and presto
@@ -897,7 +957,12 @@ install_dashbase() {
   echo ""
   echo "please wait a few minutes for all dashbase resources be ready"
   echo ""
-  sleep 120 &
+  # wait 5 minutes by default if mirror flag is enable cuz not all images are mirrored.
+  if [ "$MIRROR_FLAG" == "true" ]; then
+    sleep 300 &
+  else
+    sleep 120 &
+  fi
   show_spinner "$!"
   # check dashbase deployed resources success or not
   kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/check-dashbase-deploy.sh > >(tee check-dashbase-deploy-output.txt) 2>&1"
@@ -910,7 +975,11 @@ install_dashbase() {
 expose_endpoints() {
   if [ "$INGRESS_FLAG" == "true" ]; then
     log_info "setup ngnix ingress controller to expose service "
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install nginx-ingress stable/nginx-ingress --namespace dashbase"
+    if [ "$MIRROR_FLAG" == "true" ]; then
+      kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install nginx-ingress stable/nginx-ingress --namespace dashbase --version 1.41.3 --set controller.image.registry=registry.cn-hongkong.aliyuncs.com --set controller.image.repository=dashbase/nginx-ingress-controller --set defaultBackend.image.repository=registry.cn-hongkong.aliyuncs.com/dashbase/defaultbackend-amd64"
+    else
+      kubectl exec -it admindash-0 -n dashbase -- bash -c "helm install nginx-ingress stable/nginx-ingress --namespace dashbase --version 1.41.3"
+    fi
     kubectl exec -it admindash-0 -n dashbase -- bash -c "kubectl get po -n dashbase |grep ingress"
     # get the exposed IP address from nginx ingress controller
     EXTERNAL_IP=$(kubectl exec -it admindash-0 -n dashbase -- kubectl get svc nginx-ingress-controller -n dashbase | tail -n +2 | awk '{ print $4}')
@@ -947,7 +1016,7 @@ demo_setup() {
     ES_HOSTS="https://table-$TABLENAME:7888"
     NAMESPACE="dashbase"
     log_info "Setting up demo freeswitch and configure filebeat to send logs to target table $TABLENAME"
-    kubectl exec -it admindash-0 -n dashbase -- bash -c "wget -O /data/resources.tar  https://github.com/dashbase/dashbase-installation/raw/master/deployment-tools/example-applications/freeswitch/resources.tar"
+    kubectl cp -n dashbase "$BASEDIR"/deployment-tools/example-applications/freeswitch/resources.tar admindash-0:/data/resources.tar
     kubectl exec -it admindash-0 -n dashbase -- bash -c "tar -xvf /data/resources.tar -C /data/"
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FILEBEAT_ES_HOSTS|$ES_HOSTS|" /data/resources/filebeat.yml
     kubectl exec -it admindash-0 -n dashbase -- sed -i "s|FILEBEAT_ES_HOSTS|$ES_HOSTS|" /data/resources/filebeat-loader.yml
@@ -961,6 +1030,7 @@ demo_setup() {
 
 {
 check_platform_input
+check_cluster_type_input
 check_ingress_subdomain
 check_basic_auth
 check_version

@@ -31,8 +31,7 @@ RUN pip install --upgrade pip
 
 # ENV PATH $PATH:/root/google-cloud-sdk/bin
 
-RUN mkdir -p /dashbase
-RUN mkdir -p /usr/local/lib/dashbase
+RUN mkdir -p /dashbase /usr/local/lib/dashbase /data
 
 ADD .bash_profile /dashbase
 ADD docker-entrypoint.sh /dashbase
