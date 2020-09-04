@@ -156,7 +156,7 @@ for MSVC in pushgateway,9091 prometheus,9090; do
 done
 }
 
-expose_admin_server() {
+expose_dashbase_admin_server() {
 # expose admindash service
 if kubectl get service admindash-lb -n dashbase &>/dev/null; then
     echo "LoadBalancer admindash-lb is already existed, skip creation."
