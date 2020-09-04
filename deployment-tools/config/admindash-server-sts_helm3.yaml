@@ -41,7 +41,7 @@ spec:
       containers:
         - name: admindash
           #image: dashbase/dashbase-admin:chaotest
-          image: dashbase/dashbase-admin-server:nightly-93c2fb
+          image: dashbase/dashbase-admin-server:nightly-eb98dc
           imagePullPolicy: Always
           command: ["flask", "run", '--host=0.0.0.0']
           env:
