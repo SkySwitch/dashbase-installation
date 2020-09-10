@@ -4,6 +4,8 @@
   exclude_files: ['\.gz$']
   fields:
     app: kamailio
+    dashbase.voip.app: kamailio
+    dashbase.voip.type: application_log
     capture.src.ip: kazoo
     capture.src.port: '7000'
     _message_parser:
@@ -26,6 +28,8 @@
   exclude_files: ['\.gz$']
   fields:
     app: kazoo
+    dashbase.voip.app: kazoo
+    dashbase.voip.type: application_log
     capture.src.ip: kazoo
     capture.src.port: '0'
     _message_parser:
@@ -49,6 +53,8 @@
   exclude_lines: ['SIP/2.0']
   fields:
     app: freeswitch
+    dashbase.voip.app: freeswitch
+    dashbase.voip.type: application_log
     capture.src.ip: kazoo
     capture.src.port: '11000'
     _message_parser:
@@ -90,3 +96,5 @@
   clean_removed: true
   fields:
     type: cdr
+    dashbase.voip.app: freeswitch
+    dashbase.voip.type: cdr
