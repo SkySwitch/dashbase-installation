@@ -63,7 +63,7 @@
         - name: freeswitch
           config:
             type: grok
-            pattern: '(?:%{DATA:call-id:meta} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} %{NUMBER:percent}\% \[%{WORD:level:meta}\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}'
+            pattern: '(?:%{DATA:call-id:meta} |)%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSSSSS} %{NUMBER:percent:double}\% \[%{WORD:level:meta}\] %{JAVAFILE:source:meta}:%{INT:line:int} %{GREEDYDATA:message}'
         - name: universal
           config:
             type: grok
