@@ -21,8 +21,8 @@
     mode: 0755
 
 ## Copy app related config files
-- name: Copy filebeat app config files
-  copy:
+- name: Template filebeat app config files
+  template:
     src: "templates/configs/{{ item }}.yml"
     dest: "/etc/filebeat/configs/{{ item }}.yml"
   with_items:

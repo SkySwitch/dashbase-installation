@@ -4,6 +4,8 @@
   exclude_files: ['\.gz$']
   fields:
     app: kamailio
+    capture.src.ip: kazoo
+    capture.src.port: '7000'
     _message_parser:
       type: grok
       pattern: |-
@@ -24,6 +26,8 @@
   exclude_files: ['\.gz$']
   fields:
     app: kazoo
+    capture.src.ip: kazoo
+    capture.src.port: '0'
     _message_parser:
       type: grok
       pattern: |-
@@ -45,6 +49,8 @@
   exclude_lines: ['SIP/2.0']
   fields:
     app: freeswitch
+    capture.src.ip: kazoo
+    capture.src.port: '11000'
     _message_parser:
       type: multi
       parsers_list:

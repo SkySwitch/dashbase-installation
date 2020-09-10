@@ -1,3 +1,4 @@
+{%- raw -%}
 - type: log
   paths:
     - /var/log/kamailio.log
@@ -57,3 +58,4 @@
   scan_frequency: 1s
   symlinks: true
   clean_removed: true
+{%- endraw -%}

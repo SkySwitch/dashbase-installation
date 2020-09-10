@@ -1,2 +1,2 @@
 [filebeat_hosts]
-127.0.0.1
+127.0.0.1 kazoo_host_ip=kazoo
