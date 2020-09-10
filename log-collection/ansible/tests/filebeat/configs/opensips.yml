@@ -1,0 +1,15 @@
+- type: log
+  paths:
+    - /var/log/syslog
+  fields:
+    _message_parser:
+      type: grok
+      pattern: '%{SYSLOGTIMESTAMP:timestamp:datetime:MMM ppd HH:mm:ss} %{IPORHOST:host:meta} %{DATA:source:meta}\\[%{INT:lwp:int}\\]: (%{LOGLEVEL:level:META}:)?%{GREEDYDATA:message}'
+  multiline.pattern: ^.
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 5000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true

@@ -1,0 +1,42 @@
+- paths:
+    - /var/log/asterisk/full*
+  type: log
+  multiline.pattern: '^\['
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    _message_parser:
+      type: multi
+      applyAll: 'true'
+      parsers:
+        grok:
+          type: multi
+          parsers:
+            freepbx:
+              type: grok
+              pattern: "\\[%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss}\\] %{WORD:level:meta}\\[%{INT:lwp:int}\\](\\[%{DATA:callid:text}\\])? %{JAVAFILE:source:meta}: %{GREEDYDATA:message}"
+            asterisk:
+              type: grok
+              pattern: "\\[%{SYSLOGTIMESTAMP:timestamp:datetime:MMM ppd HH:mm:ss}\\] %{WORD:level:meta}\\[%{INT:lwp:int}\\](\\[%{DATA:callid:text}\\])? %{JAVAFILE:source:meta}: %{GREEDYDATA:message}"
+        sip:
+          type: sip
+
+- paths:
+    - /var/log/asterisk/freepbx.log
+    - /var/log/asterisk/freepbx_security.log
+  type: log
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    _message_parser:
+      type: "timestamp"
+      format: "yyyy-MMM-dd HH:mm:ss"
+      scan: "true"
