@@ -29,7 +29,7 @@
   fields_under_root: true
   json.keys_under_root: true
   json.add_error_key: true
-  close_inactive: 90s
+  close_eof: true
   harvester_limit: 1000
   scan_frequency: 1s
   symlinks: true
