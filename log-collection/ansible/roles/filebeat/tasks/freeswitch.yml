@@ -1,0 +1,26 @@
+---
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+
+- name: Copy FreeSWITCH CDR rotate script
+  copy:
+    src: freeswitch_cdr_rotate.py
+    dest: /opt/scripts/freeswitch_cdr_rotate.py
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create cron job to remove old CDR files for FreeSWITCH
+  cron:
+    name: "Dashbase FreeSWITCH CDR Rotate Script"
+    minute: "*/10"
+    job: |-
+      /opt/scripts/freeswitch_cdr_rotate.py -v -p '*.cdr.json' -d {{ freeswitch_cdr_dir | default("/var/log/freeswitch/json_cdr")}} -r 3600 >> /var/log/dashbase_freeswitch_cdr_rotate.log 2>&1
+

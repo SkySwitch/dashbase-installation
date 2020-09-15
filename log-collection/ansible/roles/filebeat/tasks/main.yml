@@ -8,4 +8,7 @@
   when:
     - ansible_os_family == "Debian"
 
+- include_tasks: freeswitch.yml
+  when: '"freeswitch" in configs_list'
+
 - include_tasks: Configure.yml
