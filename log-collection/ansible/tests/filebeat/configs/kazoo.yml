@@ -7,7 +7,7 @@
     dashbase.voip.app: kamailio
     dashbase.voip.type: application_log
     capture.src.ip: kazoo
-    capture.src.port: '7000'
+    capture.src.port: '0'
     _message_parser:
       type: grok
       pattern: |-
