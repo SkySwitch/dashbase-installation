@@ -2150,3 +2150,28 @@
             - name: rtcp_octet_count
               type: integer
 
+- key: capture
+  title: Dashbase captured metadata information
+  description: >
+    Template for Dashbase captured metadata.
+  fields:
+    - name: capture
+      type: group
+      fields:
+        - name: src
+          type: group
+          fields:
+            - name: ip
+              type: text
+
+            - name: port
+              type: text
+
+        - name: dst
+          type: group
+          fields:
+            - name: ip
+              type: text
+
+            - name: port
+              type: text
