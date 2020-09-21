@@ -162,7 +162,7 @@ if kubectl get service admindash-lb -n dashbase &>/dev/null; then
     echo "LoadBalancer admindash-lb is already existed, skip creation."
   else
     echo "Exposing dashbase monitoring service admindash..."
-    kubectl expose service admindash --port=${PORT} --target-port=5000 --name=admindash-lb --type=LoadBalancer -n dashbase
+    kubectl expose service admindash --port=80 --target-port=5000 --name=admindash-lb --type=LoadBalancer -n dashbase
     echo "Waiting kubernetes to ensure LoadBalancer..."
     SECONDS_WAITED=0
 
@@ -171,10 +171,10 @@ if kubectl get service admindash-lb -n dashbase &>/dev/null; then
       read -r ADMINDASH_LB_IP ADMINDASH_LB_HOSTNAME <<<"$(echo "$ADMINDASH_LB_INFO" | tr ',' ' ')"
 
       if [[ -n "$ADMINDASH_LB_IP" ]]; then
-        echo "admindash exposed to $SCHEMA://$ADMINDASH_LB_IP:$PORT successfully."
+        echo "admindash exposed to http://$ADMINDASH_LB_IP successfully."
         break
       elif [[ -n "$ADMINDASH_LB_HOSTNAME" ]]; then
-        echo "admindash exposed to $SCHEMA://$ADMINDASH_LB_HOSTNAME:$PORT successfully."
+        echo "admindash exposed to http://$ADMINDASH_LB_HOSTNAME  successfully."
         break
       fi
 
