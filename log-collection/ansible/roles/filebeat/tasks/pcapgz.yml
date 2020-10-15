@@ -1,0 +1,49 @@
+- name: Install tshark(Debian)
+  apt: pkg=tshark state=latest
+  when:
+    - ansible_os_family == "Debian"
+
+- name: Install gunzip(Debian)
+  apt: pkg=gzip state=latest
+  when:
+    - ansible_os_family == "Debian"
+
+- name: Install tshark(RedHat)
+  yum:
+    name: tshark
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: Install gunzip(RedHat)
+  yum:
+    name: gzip
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - /opt/scripts
+
+- name: Copy script for pcapgz
+  copy:
+    src: pcapgz.sh
+    dest: /opt/scripts/pcapgz.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create cron job to run pcapgz
+  cron:
+    name: "Dashbase PCAPGZ Script"
+    minute: "*/10"
+    job: |-
+      /opt/scripts/pcapgz.sh /var/log/pcapgz >> /var/log/pcapgz.log 2>&1
+

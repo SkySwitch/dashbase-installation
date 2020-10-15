@@ -1,0 +1,13 @@
+- paths:
+    - /var/log/pcapgz/*.pcap.json
+  type: log
+  fields_under_root: true
+  json.keys_under_root: true
+  json.add_error_key: true
+  close_eof: true
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    type: pcap
