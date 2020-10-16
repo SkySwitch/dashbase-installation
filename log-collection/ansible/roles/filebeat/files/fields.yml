@@ -2175,3 +2175,1283 @@
 
             - name: port
               type: text
+
+- key: viber
+  title: viber metadata
+  description: >
+    Template for viber metadata
+  fields:
+    - name: Zone_id
+      type: text
+
+    - name: Record_Sequence_Identifier
+      type: text
+
+    - name: Parent_Global_Call_Identifier
+      type: text
+
+    - name: Global_Call_Identifier
+      type: text
+
+    - name: Last_Received_Update_Time_Stamp
+      type: text
+
+    - name: Event_Order
+      type: text
+
+    - name: CDR_Status
+      type: text
+
+    - name: Call_Type
+      type: text
+
+    - name: Calling_party_number
+      type: text
+
+    - name: Charge_Number
+      type: text
+
+    - name: Called_Party_Number
+      type: text
+
+    - name: Nature_of_Address_for_Called_Party_Number
+      type: text
+
+    - name: Originating_Line_Information
+      type: text
+
+    - name: Ingress_LRN
+      type: text
+
+    - name: Ingress_Carrier_Identifier_Code
+      type: text
+
+    - name: Ingress_Carrier_Selection_Information
+      type: text
+
+    - name: Ingress_Call_Control_Element_ID
+      type: text
+
+    - name: Ingress_Trunk_Group_Protocol
+      type: text
+
+    - name: Ingress_Trunk_Group_Type
+      type: text
+
+    - name: Ingress_Trunk_Group_Id
+      type: text
+
+    - name: Ingress_Signal_Start_Time_Stamp
+      type: text
+
+    - name: Ingress_Gateway_Id
+      type: text
+
+    - name: Ingress_Card_Id
+      type: text
+
+    - name: Ingress_Span_Id
+      type: text
+
+    - name: Ingress_Channel_Number
+      type: text
+
+    - name: Ingress_D_Channel
+      type: text
+
+    - name: Ingress_ISDN_Call_Reference_Number
+      type: text
+
+    - name: Ingress_Create_Connection_Complete_Time_Stamp
+      type: text
+
+    - name: Ingress_Address_complete_Time_Stamp
+      type: text
+
+    - name: Ingress_Call_Answer_Time_Stamp
+      type: text
+
+    - name: Translated_Number.
+      type: text
+
+    - name: Terminating_LRN
+      type: text
+
+    - name: Translated_Carrier_IC
+      type: text
+
+    - name: Ingress_Call_Release_Time_Stamp
+      type: text
+
+    - name: Ingress_Release_Complete_Time_Stamp
+      type: text
+
+    - name: Ingress_Release_Cause_Code
+      type: text
+
+    - name: Egress_Call_Control_Element_ID
+      type: text
+
+    - name: Egress_Trunk_Protocol
+      type: text
+
+    - name: Egress_Trunk_group_Type
+      type: text
+
+    - name: Egress_Trunk_Group_Id
+      type: text
+
+    - name: Egress_Call_Start_time_stamp
+      type: text
+
+    - name: Egress_Gateway_ID
+      type: text
+
+    - name: Egress_Card_Id
+      type: text
+
+    - name: Egress_Span_Number
+      type: text
+
+    - name: Egress_Channel_Number
+      type: text
+
+    - name: Egress_D_Channel_Number
+      type: text
+
+    - name: Egress_ISDN_Call_Reference
+      type: text
+
+    - name: Egress_Create_Connection_Complete_Time_Stamp
+      type: text
+
+    - name: Egress_Address_complete_Time_Stamp
+      type: text
+
+    - name: Egress_Call_Answer_Time_Stamp
+      type: text
+
+    - name: Egress_Call_Release_Time_Stamp
+      type: text
+
+    - name: Egress_Release_Complete_Time_Stamp
+      type: text
+
+    - name: Egress_Release_Cause_Code
+      type: text
+
+    - name: First_Check_Point_Time_Stamp
+      type: text
+
+    - name: Last_Check_Point_Time_Stamp
+      type: text
+
+    - name: Ingress_Gateway_Access_Id
+      type: text
+
+    - name: Egress_Gateway_Access_Id
+      type: text
+
+    - name: Ingress_Trunk_Group_Name
+      type: text
+
+    - name: Egress_Trunk_Group_Name
+      type: text
+
+    - name: Originating_Gateway_IP_address
+      type: text
+
+    - name: Terminating_Gateway_IP_address
+      type: text
+
+    - name: H323_Conference_Id
+      type: text
+
+    - name: Ingress_Card_Port_Number
+      type: text
+
+    - name: Ingress_Card_Path_Number
+      type: text
+
+    - name: Egress_Card_Port_Number
+      type: text
+
+    - name: Egress_Card_Path_Number
+      type: text
+
+    - name: Ingress_Trunk_Group_Number
+      type: text
+
+    - name: Egress_Trunk_Group_Number
+      type: text
+
+    - name: Original_Dialed_Number
+      type: text
+
+    - name: Original_Dialed_Number_Nature_of_Address
+      type: text
+
+    - name: Redirecting_Information
+      type: text
+
+    - name: Jurisdiction_Parameter_from_Ingress
+      type: text
+
+    - name: Jurisdiction_Parameter_from_Egress
+      type: text
+
+    - name: Ingress_trunk_bearer_capability
+      type: text
+
+    - name: Egress_trunk_bearer_capability
+      type: text
+
+    - name: Transit_Network_Selection_Carrier_Code
+      type: text
+
+    - name: Nature_of_Address_of_the_Calling_Party_Number
+      type: text
+
+    - name: Ingress_internal_release_cause
+      type: text
+
+    - name: Egress_internal_release_cause
+      type: text
+
+    - name: Egress_Called_Number
+      type: text
+
+    - name: Nature_of_Address_for_egress_Called_Number
+      type: text
+
+    - name: Egress_Connected_Number
+      type: text
+
+    - name: Nature_of_Address_for_egress_Connected_Number
+      type: text
+
+    - name: Presentation_Indicator_for_Calling_Party_Number
+      type: text
+
+    - name: Ingress_IRI
+      type: text
+
+    - name: Egress_ORI
+      type: text
+
+    - name: Ingress_External_Call_Id
+      type: text
+
+    - name: Egress_External_Call_Id
+      type: text
+
+    - name: Ingress_Charge_Info
+      type: text
+
+    - name: Egress_Charge_Info
+      type: text
+
+    - name: Incoming_Partial_Call_Indicator
+      type: text
+
+    - name: Incoming_National_Forward_Call_Indicator
+      type: text
+
+    - name: Incoming_Last_Diverting_Line_Identity
+      type: text
+
+    - name: J7_specific_information
+      type: text
+
+    - name: Ingress_SS7_Generic_Parameter
+      type: text
+
+    - name: Egress_SS7_Generic_Parameter
+      type: text
+
+    - name: Ingress_Packets_Sent
+      type: text
+
+    - name: Ingress_Packets_Received
+      type: text
+
+    - name: Ingress_Packets_Lost
+      type: text
+
+    - name: Ingress_Packets_Transferred
+      type: text
+
+    - name: Ingress_Bytes_Sent
+      type: text
+
+    - name: Ingress_Bytes_Received
+      type: text
+
+    - name: Ingress_Bytes_Lost
+      type: text
+
+    - name: Ingress_Jitter
+      type: text
+
+    - name: Ingress_Latency
+      type: text
+
+    - name: Egress_Packets_Sent
+      type: text
+
+    - name: Egress_Packets_Received
+      type: text
+
+    - name: Egress_Packets_Lost
+      type: text
+
+    - name: Egress_Packets_Transferred
+      type: text
+
+    - name: Egress_Bytes_Sent
+      type: text
+
+    - name: Egress_Bytes_Received
+      type: text
+
+    - name: Egress_Bytes_Lost
+      type: text
+
+    - name: Egress_Jitter
+      type: text
+
+    - name: Egress_Latency
+      type: text
+
+    - name: Ingress_CIC
+      type: text
+
+    - name: Egress_CIC
+      type: text
+
+    - name: Ingress_codec
+      type: text
+
+    - name: Egress_codec
+      type: text
+
+    - name: IIngress_local_gateway_id
+      type: text
+
+    - name: Egress_local_gateway_id
+      type: text
+
+    - name: Ingress_CAS_circuit_seizure_time
+      type: text
+
+    - name: Egress_CAS_circuit_seizure_time
+      type: text
+
+    - name: Ingress_ZZ_code
+      type: text
+
+    - name: Egress_ZZ_code
+      type: text
+
+    - name: Ingress_country_address_type
+      type: text
+
+    - name: Egress_country_address_type
+      type: text
+
+    - name: Ingress_partition_number
+      type: text
+
+    - name: Egress_partition_number
+      type: text
+
+    - name: Ingress_calling_party_category
+      type: text
+
+    - name: Ingress_service
+      type: text
+
+    - name: Egress_service
+      type: text
+
+    - name: Early_events
+      type: text
+
+    - name: Ingress_Release_Cause_Location
+      type: text
+
+    - name: Egress_Release_Cause_Location
+      type: text
+
+    - name: Reverse_Charge_Indicator
+      type: text
+
+    - name: Called_Party_category
+      type: text
+
+    - name: Call_duration
+      type: text
+
+    - name: Ingress_Release_Direction
+      type: text
+
+    - name: Egress_Release_Direction
+      type: text
+
+    - name: Ingress_ANM_Time_Local_Time
+      type: text
+
+    - name: Egress_ANM_Time_Local_Time
+      type: text
+
+    - name: Ingress_HLC_Characteristics_Identification
+      type: text
+
+    - name: Egress_HLC_Characteristics_Identification
+      type: text
+
+    - name: Ingress_LLC_Transfer_Capability
+      type: text
+
+    - name: Egress_LLC_Transfer_Capability
+      type: text
+
+    - name: Ingress_Codec_History
+      type: text
+
+    - name: Egress_Codec_History
+      type: text
+
+    - name: Final_Codec_List
+      type: text
+
+    - name: Ingress_Forward_Call_Indicator
+      type: text
+
+    - name: Egress_Backward_Call_Indicator
+      type: text
+
+    - name: Ingress_Clear_Forward_Time
+      type: text
+
+    - name: Egress_Clear_Forward_Time
+      type: text
+
+    - name: Ingress_Clear_Back_Time
+      type: text
+
+    - name: Egress_Clear_Back_Time
+      type: text
+
+    - name: Egress_calling_party_category
+      type: text
+
+    - name: Border_Gateway_Info
+      type: text
+
+    - name: Border_Gateway_ID
+      type: text
+
+    - name: Ingress_LCC_Transfer_UILP
+      type: text
+
+    - name: Egress_LCC_Transfer_UILP
+      type: text
+
+    - name: Ingress_RELEASE_Time_in_local_time
+      type: text
+
+    - name: Egress_RELEASE_Time_in_local_time
+      type: text
+
+    - name: Egress_final_codec_list
+      type: text
+
+    - name: SEE_ID
+      type: text
+
+    - name: P-Charging-Vector_ICID
+      type: text
+
+    - name: P-Charging-Vector_IOI
+      type: text
+
+    - name: 
+      type: text
+
+    - name: SDR_Version
+      type: text
+
+    - name: SDR_SeqId
+      type: text
+
+    - name: Local_TimeZone
+      type: text
+
+    - name: Software_Version
+      type: text
+
+    - name: Terminal_Name
+      type: text
+
+    - name: Terminal_Id
+      type: text
+
+    - name: Account_StatusType
+      type: text
+
+    - name: Account_Event_Reason
+      type: text
+
+    - name: SwitchOver_TimeStmp
+      type: text
+
+    - name: Accounting_Timestamp
+      type: text
+
+    - name: SDR_Session_Number
+      type: text
+
+    - name: SDR_Record_Number
+      type: text
+
+    - name: Service_Type
+      type: text
+
+    - name: Routing_Type
+      type: text
+
+    - name: Accounting_Session_Duration
+      type: text
+
+    - name: SDR_Session_Status
+      type: text
+
+    - name: LRBT_file_name
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: Spare
+      type: text
+
+    - name: IngressAudio_MediaEncryption
+      type: text
+
+    - name: IngressVideo_MediaEncryption
+      type: text
+
+    - name: InSpare3
+      type: text
+
+    - name: InSpare4
+      type: text
+
+    - name: InSpare5
+      type: text
+
+    - name: InSpare6
+      type: text
+
+    - name: InSpare7
+      type: text
+
+    - name: InSpare8
+      type: text
+
+    - name: InSpare9
+      type: text
+
+    - name: InRFactor
+      type: text
+
+    - name: EgressAudio_MediaEncryption
+      type: text
+
+    - name: EgressVideo_MediaEncryption
+      type: text
+
+    - name: EgSpare3
+      type: text
+
+    - name: EgSpare4
+      type: text
+
+    - name: EgSpare5
+      type: text
+
+    - name: EgSpare6
+      type: text
+
+    - name: EgSpare7
+      type: text
+
+    - name: EgSpare8
+      type: text
+
+    - name: EgSpare9
+      type: text
+
+    - name: EgRFactor
+      type: text
+
+    - name: GenSpare1
+      type: text
+
+    - name: GenSpare2
+      type: text
+
+    - name: GenSpare3
+      type: text
+
+    - name: GenSpare4
+      type: text
+
+    - name: GenSpare5
+      type: text
+
+    - name: GenSpare6
+      type: text
+
+    - name: GenSpare7
+      type: text
+
+    - name: GenSpare8
+      type: text
+
+    - name: GenSpare9
+      type: text
+
+    - name: GenSpare10
+      type: text
+
+    - name: Payload_TypeIW
+      type: text
+
+    - name: Ingress_Originating_TgId
+      type: text
+
+    - name: IngressOriginating_TrunkContext
+      type: text
+
+    - name: Egress_Originating_TgId
+      type: text
+
+    - name: EgressOriginating_TrunkContext
+      type: text
+
+    - name: Ingress_Destination_TgId
+      type: text
+
+    - name: IngressDestination_TrunkContext
+      type: text
+
+    - name: Egress_Destination_TgId
+      type: text
+
+    - name: EgressDestination_TrunkContext
+      type: text
+
+    - name: Egress3xx_DestinationTgId
+      type: text
+
+    - name: Egress3xxDestination_TrunkContext
+      type: text
+
+    - name: Emergency_Call
+      type: text
+
+    - name: IngressSig_Protocol
+      type: text
+
+    - name: IngressQ850_CauseCodeValue
+      type: text
+
+    - name: IngressSig_RemoteAddress
+      type: text
+
+    - name: IngressSig_LocalAddress
+      type: text
+
+    - name: IngressSig_ReqLine
+      type: text
+
+    - name: IngressSig_FromHeader
+      type: text
+
+    - name: IngressSig_ToHeader
+      type: text
+
+    - name: IngressSig_Asserted
+      type: text
+
+    - name: IngressSig_Preferred
+      type: text
+
+    - name: IngressSig_SourceContact
+      type: text
+
+    - name: IngressSig_LocalContact
+      type: text
+
+    - name: EgressSig_Protocol
+      type: text
+
+    - name: EgressQ850_CauseCodeValue
+      type: text
+
+    - name: OutSig_LocalAddr
+      type: text
+
+    - name: OutSig_DstAddr
+      type: text
+
+    - name: OutSig_ReqLine
+      type: text
+
+    - name: OutSigFrom
+      type: text
+
+    - name: OutSigTo
+      type: text
+
+    - name: OutSig_Asserted
+      type: text
+
+    - name: OutSig_Preferred
+      type: text
+
+    - name: OutSig_LocalContct
+      type: text
+
+    - name: OutSig_DstContct
+      type: text
+
+    - name: IngressPeer
+      type: text
+
+    - name: Ingress_Interface
+      type: text
+
+    - name: Ingress_ParamProfile
+      type: text
+
+    - name: Ingress_ServiceProfile
+      type: text
+
+    - name: Ingress_SecurityProfile
+      type: text
+
+    - name: Ingress_MediaProfile
+      type: text
+
+    - name: Ingress_TLSProfile
+      type: text
+
+    - name: Ingress_AdvPolicy
+      type: text
+
+    - name: IngressIncoming_SipMsgProfiler
+      type: text
+
+    - name: IngressOutgoing_SipMsgProfiler
+      type: text
+
+    - name: IngressSip_CallId
+      type: text
+
+    - name: IngressSip_FromTag
+      type: text
+
+    - name: IngressSip_ToTag
+      type: text
+
+    - name: IngressTime_StampINVITE
+      type: text
+
+    - name: IngressTime_Stamp18x
+      type: text
+
+    - name: Ingress_AlertingSent
+      type: text
+
+    - name: Ingress_AnswerSent
+      type: text
+
+    - name: Ingress_ReleaseTimeStamp
+      type: text
+
+    - name: IngressRelease_CompleteTimeStamp
+      type: text
+
+    - name: Ingress_ReleaseSent
+      type: text
+
+    - name: Ingress_ReleaseReceived
+      type: text
+
+    - name: IngressRelease_CodeValue
+      type: text
+
+    - name: IngressInternal_CauseCode
+      type: text
+
+    - name: EgressPeer
+      type: text
+
+    - name: Egress_Interface
+      type: text
+
+    - name: Egress_ParamProfile
+      type: text
+
+    - name: EgressService_Profile
+      type: text
+
+    - name: EgressSecurity_Profile
+      type: text
+
+    - name: Egress_MediaProfile
+      type: text
+
+    - name: EgressTLS_Profile
+      type: text
+
+    - name: Egress_AdvPolicy
+      type: text
+
+    - name: EgressIncSip_MsgProfiler
+      type: text
+
+    - name: EgressOutSip_MsgProfiler
+      type: text
+
+    - name: EgressSip_CallId
+      type: text
+
+    - name: EgressSip_FromTag
+      type: text
+
+    - name: EgressSip_ToTag
+      type: text
+
+    - name: EgressTime_StmpInvite
+      type: text
+
+    - name: EgressTime_Stmp18xRcvd
+      type: text
+
+    - name: EgressAlerting_Received
+      type: text
+
+    - name: EgressAnswer_Received
+      type: text
+
+    - name: EgressRelease_TimeStamp
+      type: text
+
+    - name: EgressRelease_CompleteTimeStamp
+      type: text
+
+    - name: Egress_ReleaseSent
+      type: text
+
+    - name: Egress_ReleaseRcvd
+      type: text
+
+    - name: EgressRelease_CodeValue
+      type: text
+
+    - name: EgressTime_StmpResp
+      type: text
+
+    - name: Egress_ResponseCode
+      type: text
+
+    - name: EgressResponse_Warning
+      type: text
+
+    - name: EgressInternal_CauseCodeValue
+      type: text
+
+    - name: Calling_PartyUser
+      type: text
+
+    - name: Called_PartyUser
+      type: text
+
+    - name: OrigCalling_PartyUser
+      type: text
+
+    - name: OrigCalled_PartyUser
+      type: text
+
+    - name: Generic_ParameterSipProf
+      type: text
+
+    - name: PolicySipMsg_Profiler_Optional_
+      type: text
+
+    - name: PCharging_Vector
+      type: text
+
+    - name: PCharging_FuncAddr
+      type: text
+
+    - name: Media_Interception
+      type: text
+
+    - name: MediaOffer_SentTimeStamp
+      type: text
+
+    - name: MediaAnswerSent_TimeStamp_Optional_
+      type: text
+
+    - name: Release_Type
+      type: text
+
+    - name: InAudioSentOut_CodecListProfileId
+      type: text
+
+    - name: InAudioSentOut_CodecListType
+      type: text
+
+    - name: InAudioRcvdCodec_ListProfileId
+      type: text
+
+    - name: InAudioRcvd_CodecListType
+      type: text
+
+    - name: InAudioPType
+      type: text
+
+    - name: InAudioSrc_Addr_Optional_
+      type: text
+
+    - name: InAudio_LocalAddr
+      type: text
+
+    - name: InAudioSts__Media_Ingress_
+      type: text
+
+    - name: InImageSentOut_CodecListProfileId
+      type: text
+
+    - name: InImageSentOut_CodecListType
+      type: text
+
+    - name: InImageRcvdCodec_ListProfileId
+      type: text
+
+    - name: InImageRcvd_CodecListType
+      type: text
+
+    - name: InImage_Ptype
+      type: text
+
+    - name: InImage_SrcAddr
+      type: text
+
+    - name: InImage_LocalAddr
+      type: text
+
+    - name: InImageSts
+      type: text
+
+    - name: InVideoSentOut_CodecListProfileId
+      type: text
+
+    - name: InVideoSentOut_CodecListType
+      type: text
+
+    - name: InVideoRcvdCodec_ListProfileId
+      type: text
+
+    - name: InVideoRcvd_CodecListType
+      type: text
+
+    - name: InVideoPType__Optional_
+      type: text
+
+    - name: InVideo_SrcAddr
+      type: text
+
+    - name: InVideo_LocalAddr
+      type: text
+
+    - name: InVideoSts
+      type: text
+
+    - name: OutAudioSentOut_CodecListProfileId
+      type: text
+
+    - name: OutAudioSentOut_CodecListType
+      type: text
+
+    - name: OutAudioRcvd_CodecListProfileId
+      type: text
+
+    - name: OutAudioRcvd_CodecListType
+      type: text
+
+    - name: OutVoice_Ptype
+      type: text
+
+    - name: OutAudio_LocalAddr
+      type: text
+
+    - name: OutAudio_DstAddr
+      type: text
+
+    - name: OutAudioSts__Media_Egress_
+      type: text
+
+    - name: OutImageSentOut_CodecListProfileId
+      type: text
+
+    - name: OutImageSentOut_CodecListType
+      type: text
+
+    - name: OutImageRcvd_CodecListProfileId
+      type: text
+
+    - name: OutImageRcvd_CodecListType
+      type: text
+
+    - name: OutImage_Ptype
+      type: text
+
+    - name: OutImage_LocalAddr
+      type: text
+
+    - name: OutImage_DstAddr
+      type: text
+
+    - name: OutImageSts
+      type: text
+
+    - name: OutVideoSentOut_CodecListProfileId
+      type: text
+
+    - name: OutVideoSentOut_CodecListType
+      type: text
+
+    - name: OutVideoRcvd_CodecListProfileId
+      type: text
+
+    - name: OutVideoRcvd_CodecListType
+      type: text
+
+    - name: OutVideo_Ptype
+      type: text
+
+    - name: OutVideo_LocalAddr
+      type: text
+
+    - name: OutVideo_DstAddr
+      type: text
+
+    - name: OutVideoSts
+      type: text
+
+    - name: Diameter_SessionId
+      type: text
+
+    - name: ServerIP_Address
+      type: text
+
+    - name: ServerPort
+      type: text
+
+    - name: IngressSecurity_Type_Optional_
+      type: text
+
+    - name: IngressSecurity_Protocol_O_
+      type: text
+
+    - name: EgressSecurity_Type_Optional_
+      type: text
+
+    - name: EgressSecurity_Protocol_Optional_
+      type: text
+
+    - name: SIPICall
+      type: text
+
+    - name: IS_TRANSCODED__CALL_Optional_
+      type: text
+
+    - name: CDR_date
+      type: text
+
+    - name: ViberToken
+      type: keyword
+
+    - name: SIPCallID
+      type: text
+
+    - name: SIPtoken
+      type: text
+
+    - name: SetupTime
+      type: text
+
+    - name: CallType
+      type: text
+
+    - name: SourceSignalingIPAddress
+      type: text
+
+    - name: DestinationSignalingIPAddress
+      type: text
+
+    - name: SwitchMediaIPAddress
+      type: text
+
+    - name: ViberMediaIPAddress
+      type: text
+
+    - name: SGWID
+      type: text
+
+    - name: SGWIP
+      type: text
+
+    - name: HSID
+      type: text
+
+    - name: HSIP
+      type: text
+
+    - name: ClientID
+      type: text
+
+    - name: CallDuration
+      type: text
+
+    - name: SGWDisconnectReason
+      type: text
+
+    - name: SGWDisconnectTime
+      type: text
+
+    - name: ViberDisconnectReason
+      type: text
+
+    - name: SIPDisconnectReason
+      type: text
+
+    - name: AnswerTime 
+      type: text
+
+    - name: DisconnectTime
+      type: text
+
+    - name: RingingTime 
+      type: text
+
+    - name: BusyTime 
+      type: text
+
+    - name: UnavailableTime
+      type: text
+
+    - name: CancelTime
+      type: text
+
+    - name: RejectTime
+      type: text
+
+    - name: HoldTime
+      type: text
+
+    - name: unHoldTime 
+      type: text
+
+    - name: InCallTimeoutTime
+      type: text
+
+    - name: PreCallTimeoutTime
+      type: text
+
+    - name: SourceNumber
+      type: text
+
+    - name: SourceNumberCountry
+      type: text
+
+    - name: DestinationNumber
+      type: text
+
+    - name: DestinationNumberCountry
+      type: text
+
+    - name: OriginDestinationNumber
+      type: text
+
+    - name: FinalDestinationNumber
+      type: text
+
+    - name: Region
+      type: text
+
+    - name: CodecType
+      type: text
+
+    - name: FormattedToken
+      type: text
+
+    - name: FromUDID
+      type: text
+
+    - name: Push
+      type: text
+
+    - name: PushTimer
+      type: text
+
+    - name: SystemType
+      type: text
+
+    - name: VLN_In
+      type: text
+
+    - name: VLNFlag 
+      type: text
+
+    - name: VORatePlanID
+      type: text
+
+    - name: MID
+      type: text
+
+    - name: Max_allowed_call_duration
+      type: text
+
+    - name: Amount
+      type: text
+
+    - name: Currency
+      type: text

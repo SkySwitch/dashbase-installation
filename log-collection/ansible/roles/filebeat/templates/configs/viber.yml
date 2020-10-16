@@ -1,0 +1,610 @@
+
+- paths:
+    - /var/logs/subset/*icdr*
+  type: log
+  fields_under_root: true
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  processors:
+    - decode_csv_fields:
+        fields:
+          message: decoded.csv
+        separator: ';'
+        ignore_missing: false
+        overwrite_keys: true
+        trim_leading_space: false
+        fail_on_error: true
+    - extract_array:
+        field: decoded.csv
+        mappings:
+          Zone_id: 0
+          Record_Sequence_Identifier: 1
+          Parent_Global_Call_Identifier: 2
+          Global_Call_Identifier: 3
+          Last_Received_Update_Time_Stamp: 4
+          Event_Order: 5
+          CDR_Status: 6
+          Call_Type: 7
+          Calling_party_number: 8
+          Charge_Number: 9
+          Called_Party_Number: 10
+          Nature_of_Address_for_Called_Party_Number: 11
+          Originating_Line_Information: 12
+          Ingress_LRN: 13
+          Ingress_Carrier_Identifier_Code: 14
+          Ingress_Carrier_Selection_Information: 15
+          Ingress_Call_Control_Element_ID: 16
+          Ingress_Trunk_Group_Protocol: 17
+          Ingress_Trunk_Group_Type: 18
+          Ingress_Trunk_Group_Id: 19
+          Ingress_Signal_Start_Time_Stamp: 20
+          Ingress_Gateway_Id: 21
+          Ingress_Card_Id: 22
+          Ingress_Span_Id: 23
+          Ingress_Channel_Number: 24
+          Ingress_D_Channel: 25
+          Ingress_ISDN_Call_Reference_Number: 26
+          Ingress_Create_Connection_Complete_Time_Stamp: 27
+          Ingress_Address_complete_Time_Stamp: 28
+          Ingress_Call_Answer_Time_Stamp: 29
+          Translated_Number.: 30
+          Terminating_LRN: 31
+          Translated_Carrier_IC: 32
+          Ingress_Call_Release_Time_Stamp: 33
+          Ingress_Release_Complete_Time_Stamp: 34
+          Ingress_Release_Cause_Code: 35
+          Egress_Call_Control_Element_ID: 36
+          Egress_Trunk_Protocol: 37
+          Egress_Trunk_group_Type: 38
+          Egress_Trunk_Group_Id: 39
+          Egress_Call_Start_time_stamp: 40
+          Egress_Gateway_ID: 41
+          Egress_Card_Id: 42
+          Egress_Span_Number: 43
+          Egress_Channel_Number: 44
+          Egress_D_Channel_Number: 45
+          Egress_ISDN_Call_Reference: 46
+          Egress_Create_Connection_Complete_Time_Stamp: 47
+          Egress_Address_complete_Time_Stamp: 48
+          Egress_Call_Answer_Time_Stamp: 49
+          Egress_Call_Release_Time_Stamp: 50
+          Egress_Release_Complete_Time_Stamp: 51
+          Egress_Release_Cause_Code: 52
+          First_Check_Point_Time_Stamp: 53
+          Last_Check_Point_Time_Stamp: 54
+          Ingress_Gateway_Access_Id: 55
+          Egress_Gateway_Access_Id: 56
+          Ingress_Trunk_Group_Name: 57
+          Egress_Trunk_Group_Name: 58
+          Originating_Gateway_IP_address: 59
+          Terminating_Gateway_IP_address: 60
+          H323_Conference_Id: 61
+          Ingress_Card_Port_Number: 62
+          Ingress_Card_Path_Number: 63
+          Egress_Card_Port_Number: 64
+          Egress_Card_Path_Number: 65
+          Ingress_Trunk_Group_Number: 66
+          Egress_Trunk_Group_Number: 67
+          Original_Dialed_Number: 68
+          Original_Dialed_Number_Nature_of_Address: 69
+          Redirecting_Information: 70
+          Jurisdiction_Parameter_from_Ingress: 71
+          Jurisdiction_Parameter_from_Egress: 72
+          Ingress_trunk_bearer_capability: 73
+          Egress_trunk_bearer_capability: 74
+          Transit_Network_Selection_Carrier_Code: 75
+          Nature_of_Address_of_the_Calling_Party_Number: 76
+          Ingress_internal_release_cause: 77
+          Egress_internal_release_cause: 78
+          Egress_Called_Number: 79
+          Nature_of_Address_for_egress_Called_Number: 80
+          Egress_Connected_Number: 81
+          Nature_of_Address_for_egress_Connected_Number: 82
+          Presentation_Indicator_for_Calling_Party_Number: 83
+          Ingress_IRI: 84
+          Egress_ORI: 85
+          Ingress_External_Call_Id: 86
+          Egress_External_Call_Id: 87
+          Ingress_Charge_Info: 88
+          Egress_Charge_Info: 89
+          Incoming_Partial_Call_Indicator: 90
+          Incoming_National_Forward_Call_Indicator: 91
+          Incoming_Last_Diverting_Line_Identity: 92
+          J7_specific_information: 93
+          Ingress_SS7_Generic_Parameter: 94
+          Egress_SS7_Generic_Parameter: 95
+          Ingress_Packets_Sent: 96
+          Ingress_Packets_Received: 97
+          Ingress_Packets_Lost: 98
+          Ingress_Packets_Transferred: 99
+          Ingress_Bytes_Sent: 100
+          Ingress_Bytes_Received: 101
+          Ingress_Bytes_Lost: 102
+          Ingress_Jitter: 103
+          Ingress_Latency: 104
+          Egress_Packets_Sent: 105
+          Egress_Packets_Received: 106
+          Egress_Packets_Lost: 107
+          Egress_Packets_Transferred: 108
+          Egress_Bytes_Sent: 109
+          Egress_Bytes_Received: 110
+          Egress_Bytes_Lost: 111
+          Egress_Jitter: 112
+          Egress_Latency: 113
+          Ingress_CIC: 114
+          Egress_CIC: 115
+          Ingress_codec: 116
+          Egress_codec: 117
+          IIngress_local_gateway_id: 118
+          Egress_local_gateway_id: 119
+          Ingress_CAS_circuit_seizure_time: 120
+          Egress_CAS_circuit_seizure_time: 121
+          Ingress_ZZ_code: 122
+          Egress_ZZ_code: 123
+          Ingress_country_address_type: 124
+          Egress_country_address_type: 125
+          Ingress_partition_number: 126
+          Egress_partition_number: 127
+          Ingress_calling_party_category: 128
+          Ingress_service: 129
+          Egress_service: 130
+          Early_events: 131
+          Ingress_Release_Cause_Location: 132
+          Egress_Release_Cause_Location: 133
+          Reverse_Charge_Indicator: 134
+          Called_Party_category: 135
+          Call_duration: 136
+          Ingress_Release_Direction: 137
+          Egress_Release_Direction: 138
+          Ingress_ANM_Time_Local_Time: 139
+          Egress_ANM_Time_Local_Time: 140
+          Ingress_HLC_Characteristics_Identification: 141
+          Egress_HLC_Characteristics_Identification: 142
+          Ingress_LLC_Transfer_Capability: 143
+          Egress_LLC_Transfer_Capability: 144
+          Ingress_Codec_History: 145
+          Egress_Codec_History: 146
+          Final_Codec_List: 147
+          Ingress_Forward_Call_Indicator: 148
+          Egress_Backward_Call_Indicator: 149
+          Ingress_Clear_Forward_Time: 150
+          Egress_Clear_Forward_Time: 151
+          Ingress_Clear_Back_Time: 152
+          Egress_Clear_Back_Time: 153
+          Egress_calling_party_category: 154
+          Border_Gateway_Info: 155
+          Border_Gateway_ID: 156
+          Ingress_LCC_Transfer_UILP: 157
+          Egress_LCC_Transfer_UILP: 158
+          Ingress_RELEASE_Time_in_local_time: 159
+          Egress_RELEASE_Time_in_local_time: 160
+          Egress_final_codec_list: 161
+          SEE_ID: 162
+          P-Charging-Vector_ICID: 163
+          P-Charging-Vector_IOI: 164
+
+    - copy_fields:
+        fields:
+          - from: Ingress_External_Call_Id 
+            to: call-id
+          - from: Call_duration 
+            to: duration
+          - from: Ingress_Signal_Start_Time_Stamp 
+            to: time-start
+          - from: Egress_Call_Release_Time_Stamp 
+            to: time-end
+          - from: Calling_party_number 
+            to: from-user
+          - from: Called_Party_Number
+            to: to-user
+          - from: Originating_Gateway_IP_address
+            to: from-host
+          - from: Terminating_Gateway_IP_address
+            to: to-host
+          - from: Ingress_internal_release_cause 
+            to: release-text
+          - from: Egress_External_Call_Id 
+            to: next-call-id
+
+
+        fail_on_error: false
+        ignore_missing: true
+    - drop_fields:
+        fields: [ "decoded.csv", "message" ]
+        ignore_missing: true
+    - drop_event:
+        when:
+          and:
+            - not:
+                equals:
+                  CDR_Status: S
+            - not:
+                equals:
+                  CDR_Status: U
+  fields:
+    type: cdr
+    dashbase.voip.cdr_type: cscdr
+    dashbase.voip.app: common
+    dashbase.voip.type: cdr
+
+
+- paths:
+    - /var/logs/subset/*sdr*.csv
+  type: log
+  fields_under_root: true
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  processors:
+    - decode_csv_fields:
+        fields:
+          message: decoded.csv
+        separator: '|'
+        ignore_missing: false
+        overwrite_keys: true
+        trim_leading_space: false
+        fail_on_error: true
+    - extract_array:
+        field: decoded.csv
+        ignore_missing: true
+        overwrite_keys: true
+        fail_on_error: false
+        mappings:
+          SDR_Version: 0
+          SDR_SeqId: 1
+          Local_TimeZone: 2
+          Software_Version: 3
+          Terminal_Name: 4
+          Terminal_Id: 5
+          Account_StatusType: 6
+          Account_Event_Reason: 7
+          SwitchOver_TimeStmp: 8
+          Accounting_Timestamp: 9
+          SDR_Session_Number: 10
+          SDR_Record_Number: 11
+          Service_Type: 12
+          Routing_Type: 13
+          Accounting_Session_Duration: 14
+          SDR_Session_Status: 15
+          LRBT_file_name: 16
+          Spare: 17
+          Spare: 18
+          Spare: 19
+          Spare: 20
+          Spare: 21
+          Spare: 22
+          Spare: 23
+          Spare: 24
+          Spare: 25
+          IngressAudio_MediaEncryption: 26
+          IngressVideo_MediaEncryption: 27
+          InSpare3: 28
+          InSpare4: 29
+          InSpare5: 30
+          InSpare6: 31
+          InSpare7: 32
+          InSpare8: 33
+          InSpare9: 34
+          InRFactor: 35
+          EgressAudio_MediaEncryption: 36
+          EgressVideo_MediaEncryption: 37
+          EgSpare3: 38
+          EgSpare4: 39
+          EgSpare5: 40
+          EgSpare6: 41
+          EgSpare7: 42
+          EgSpare8: 43
+          EgSpare9: 44
+          EgRFactor: 45
+          GenSpare1: 46
+          GenSpare2: 47
+          GenSpare3: 48
+          GenSpare4: 49
+          GenSpare5: 50
+          GenSpare6: 51
+          GenSpare7: 52
+          GenSpare8: 53
+          GenSpare9: 54
+          GenSpare10: 55
+          Payload_TypeIW: 56
+          Ingress_Originating_TgId: 57
+          IngressOriginating_TrunkContext: 58
+          Egress_Originating_TgId: 59
+          EgressOriginating_TrunkContext: 60
+          Ingress_Destination_TgId: 61
+          IngressDestination_TrunkContext: 62
+          Egress_Destination_TgId: 63
+          EgressDestination_TrunkContext: 64
+          Egress3xx_DestinationTgId: 65
+          Egress3xxDestination_TrunkContext: 66
+          Emergency_Call: 67
+          IngressSig_Protocol: 68
+          IngressQ850_CauseCodeValue: 69
+          IngressSig_RemoteAddress: 70
+          IngressSig_LocalAddress: 71
+          IngressSig_ReqLine: 72
+          IngressSig_FromHeader: 73
+          IngressSig_ToHeader: 74
+          IngressSig_Asserted: 75
+          IngressSig_Preferred: 76
+          IngressSig_SourceContact: 77
+          IngressSig_LocalContact: 78
+          EgressSig_Protocol: 79
+          EgressQ850_CauseCodeValue: 80
+          OutSig_LocalAddr: 81
+          OutSig_DstAddr: 82
+          OutSig_ReqLine: 83
+          OutSigFrom: 84
+          OutSigTo: 85
+          OutSig_Asserted: 86
+          OutSig_Preferred: 87
+          OutSig_LocalContct: 88
+          OutSig_DstContct: 89
+          IngressPeer: 90
+          Ingress_Interface: 91
+          Ingress_ParamProfile: 92
+          Ingress_ServiceProfile: 93
+          Ingress_SecurityProfile: 94
+          Ingress_MediaProfile: 95
+          Ingress_TLSProfile: 96
+          Ingress_AdvPolicy: 97
+          IngressIncoming_SipMsgProfiler: 98
+          IngressOutgoing_SipMsgProfiler: 99
+          IngressSip_CallId: 100
+          IngressSip_FromTag: 101
+          IngressSip_ToTag: 102
+          IngressTime_StampINVITE: 103
+          IngressTime_Stamp18x: 104
+          Ingress_AlertingSent: 105
+          Ingress_AnswerSent: 106
+          Ingress_ReleaseTimeStamp: 107
+          IngressRelease_CompleteTimeStamp: 108
+          Ingress_ReleaseSent: 109
+          Ingress_ReleaseReceived: 110
+          IngressRelease_CodeValue: 111
+          IngressInternal_CauseCode: 112
+          EgressPeer: 113
+          Egress_Interface: 114
+          Egress_ParamProfile: 115
+          EgressService_Profile: 116
+          EgressSecurity_Profile: 117
+          Egress_MediaProfile: 118
+          EgressTLS_Profile: 119
+          Egress_AdvPolicy: 120
+          EgressIncSip_MsgProfiler: 121
+          EgressOutSip_MsgProfiler: 122
+          EgressSip_CallId: 123
+          EgressSip_FromTag: 124
+          EgressSip_ToTag: 125
+          EgressTime_StmpInvite: 126
+          EgressTime_Stmp18xRcvd: 127
+          EgressAlerting_Received: 128
+          EgressAnswer_Received: 129
+          EgressRelease_TimeStamp: 130
+          EgressRelease_CompleteTimeStamp: 131
+          Egress_ReleaseSent: 132
+          Egress_ReleaseRcvd: 133
+          EgressRelease_CodeValue: 134
+          EgressTime_StmpResp: 135
+          Egress_ResponseCode: 136
+          EgressResponse_Warning: 137
+          EgressInternal_CauseCodeValue: 138
+          Calling_PartyUser: 139
+          Called_PartyUser: 140
+          OrigCalling_PartyUser: 141
+          OrigCalled_PartyUser: 142
+          Generic_ParameterSipProf: 143
+          PolicySipMsg_Profiler_Optional_: 144
+          PCharging_Vector: 145
+          PCharging_FuncAddr: 146
+          Media_Interception: 147
+          MediaOffer_SentTimeStamp: 148
+          MediaAnswerSent_TimeStamp_Optional_: 149
+          Release_Type: 150
+          InAudioSentOut_CodecListProfileId: 151
+          InAudioSentOut_CodecListType: 152
+          InAudioRcvdCodec_ListProfileId: 153
+          InAudioRcvd_CodecListType: 154
+          InAudioPType: 155
+          InAudioSrc_Addr_Optional_: 156
+          InAudio_LocalAddr: 157
+          InAudioSts__Media_Ingress_: 158
+          InImageSentOut_CodecListProfileId: 159
+          InImageSentOut_CodecListType: 160
+          InImageRcvdCodec_ListProfileId: 161
+          InImageRcvd_CodecListType: 162
+          InImage_Ptype: 163
+          InImage_SrcAddr: 164
+          InImage_LocalAddr: 165
+          InImageSts: 166
+          InVideoSentOut_CodecListProfileId: 167
+          InVideoSentOut_CodecListType: 168
+          InVideoRcvdCodec_ListProfileId: 169
+          InVideoRcvd_CodecListType: 170
+          InVideoPType__Optional_: 171
+          InVideo_SrcAddr: 172
+          InVideo_LocalAddr: 173
+          InVideoSts: 174
+          OutAudioSentOut_CodecListProfileId: 175
+          OutAudioSentOut_CodecListType: 176
+          OutAudioRcvd_CodecListProfileId: 177
+          OutAudioRcvd_CodecListType: 178
+          OutVoice_Ptype: 179
+          OutAudio_LocalAddr: 180
+          OutAudio_DstAddr: 181
+          OutAudioSts__Media_Egress_: 182
+          OutImageSentOut_CodecListProfileId: 183
+          OutImageSentOut_CodecListType: 184
+          OutImageRcvd_CodecListProfileId: 185
+          OutImageRcvd_CodecListType: 186
+          OutImage_Ptype: 187
+          OutImage_LocalAddr: 188
+          OutImage_DstAddr: 189
+          OutImageSts: 190
+          OutVideoSentOut_CodecListProfileId: 191
+          OutVideoSentOut_CodecListType: 192
+          OutVideoRcvd_CodecListProfileId: 193
+          OutVideoRcvd_CodecListType: 194
+          OutVideo_Ptype: 195
+          OutVideo_LocalAddr: 196
+          OutVideo_DstAddr: 197
+          OutVideoSts: 198
+          Diameter_SessionId: 199
+          ServerIP_Address: 200
+          ServerPort: 201
+          IngressSecurity_Type_Optional_: 202
+          IngressSecurity_Protocol_O_: 203
+          EgressSecurity_Type_Optional_: 204
+          EgressSecurity_Protocol_Optional_: 205
+          SIPICall: 206
+          IS_TRANSCODED__CALL_Optional_: 207
+
+    - copy_fields:
+        fields:
+          - from: IngressSip_CallId
+            to: call-id
+          - from: Accounting_Session_Duration 
+            to: duration
+          - from: IngressTime_StampINVITE 
+            to: time-start
+          - from: EgressRelease_TimeStamp 
+            to: time-end
+          - from: Calling_PartyUser
+            to: from-user
+          - from: Called_PartyUser
+            to: to-user
+          - from: IngressSig_LocalAddress
+            to: from-host
+          - from: IngressSig_RemoteAddress
+            to: to-host
+          - from: IngressRelease_CodeValue
+            to: release-text
+          - from: EgressSip_CallId
+            to: next-call-id
+        fail_on_error: false
+        ignore_missing: true
+
+    - drop_fields:
+        fields: [ "decoded.csv", "message" ]
+        ignore_missing: true
+    - drop_event:
+        when:
+          equals:
+            SDR_Session_Status: 2
+  fields:
+    type: cdr
+    dashbase.voip.cdr_type: sbccdr
+    dashbase.voip.app: common
+    dashbase.voip.type: cdr
+
+
+- paths:
+    - /var/logs/subset/*cdrs*
+  type: log
+  fields_under_root: true
+  close_inactive: 90s
+  harvester_limit: 1000
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  processors:
+    - decode_csv_fields:
+        fields:
+          message: decoded.csv
+        separator: ','
+        ignore_missing: false
+        overwrite_keys: true
+        trim_leading_space: false
+        fail_on_error: true
+    - extract_array:
+        field: decoded.csv
+        mappings:
+          CDR_date: 0
+          ViberToken: 1
+          SIPCallID: 2
+          SIPtoken: 3
+          SetupTime: 4
+          CallType: 5
+          SourceSignalingIPAddress: 6
+          DestinationSignalingIPAddress: 7
+          SwitchMediaIPAddress: 8
+          ViberMediaIPAddress: 9
+          SGWID: 10
+          SGWIP: 11
+          HSID: 12
+          HSIP: 13
+          ClientID: 14
+          CallDuration: 15
+          SGWDisconnectReason: 16
+          SGWDisconnectTime: 17
+          ViberDisconnectReason: 18
+          SIPDisconnectReason: 19
+          AnswerTime : 20
+          DisconnectTime: 21
+          RingingTime : 22
+          BusyTime : 23
+          UnavailableTime: 24
+          CancelTime: 25
+          RejectTime: 26
+          HoldTime: 27
+          unHoldTime : 28
+          InCallTimeoutTime: 29
+          PreCallTimeoutTime: 30
+          SourceNumber: 31
+          SourceNumberCountry: 32
+          DestinationNumber: 33
+          DestinationNumberCountry: 34
+          OriginDestinationNumber: 35
+          FinalDestinationNumber: 36
+          Region: 37
+          CodecType: 38
+          FormattedToken: 39
+          FromUDID: 40
+          Push: 41
+          PushTimer: 42
+          SystemType: 43
+          VLN_In: 44
+          VLNFlag : 45
+          VORatePlanID: 46
+          MID: 47
+          Max_allowed_call_duration: 48
+          Amount: 49
+          Currency: 50
+
+    - copy_fields:
+        fields:
+          - from: SIPCallID
+            to: call-id
+          - from: 
+            to: duration
+          - from: SetupTime
+            to: time-start
+          - from: DisconnectTime
+            to: time-end
+          - from: SourceNumber
+            to: from-user
+          - from: DestinationNumber
+            to: to-user
+          - from: SourceSignalingIPAddress
+            to: from-host
+          - from: DestinationSignalingIPAddress
+            to: to-host
+          - from: SIPDisconnectReason 
+            to: release-text
+          - from: SIPCallID 
+            to: next-call-id
+        fail_on_error: false
+        ignore_missing: true
+    - drop_fields:
+        fields: [ "decoded.csv", "message" ]
+        ignore_missing: true
+  fields:
+    type: cdr
+    dashbase.voip.cdr_type: sgwcdr
+    dashbase.voip.app: common
+    dashbase.voip.type: cdr
