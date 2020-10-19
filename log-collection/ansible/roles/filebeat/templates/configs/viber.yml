@@ -1,10 +1,10 @@
 
 - paths:
-    - /var/logs/subset/*icdr*
+    - /var/log/CS_CDR/icdr*
   type: log
   fields_under_root: true
   close_inactive: 90s
-  harvester_limit: 1000
+  harvester_limit: 100
   scan_frequency: 1s
   symlinks: true
   clean_removed: true
@@ -208,10 +208,36 @@
             to: release-text
           - from: Egress_External_Call_Id 
             to: next-call-id
-
-
         fail_on_error: false
         ignore_missing: true
+
+    - timestamp:
+        field: Ingress_Signal_Start_Time_Stamp
+        target_field: time-start
+        layouts:
+          - '2006-01-02+15:04:05.999'
+        test:
+          - '2020-10-07+23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+    - timestamp:
+        field: Ingress_Signal_Start_Time_Stamp
+        layouts:
+          - '2006-01-02+15:04:05.999'
+        test:
+          - '2020-10-07+23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+    - timestamp:
+        field: Egress_Call_Release_Time_Stamp
+        target_field: time-end
+        layouts:
+          - '2006-01-02+15:04:05.999'
+        test:
+          - '2020-10-07+23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+
     - drop_fields:
         fields: [ "decoded.csv", "message" ]
         ignore_missing: true
@@ -232,11 +258,12 @@
 
 
 - paths:
-    - /var/logs/subset/*sdr*.csv
+    - /var/log/SigSBCSDR/sdr*
+    - /var/log/MediaSBCSDR/sdr*
   type: log
   fields_under_root: true
   close_inactive: 90s
-  harvester_limit: 1000
+  harvester_limit: 100
   scan_frequency: 1s
   symlinks: true
   clean_removed: true
@@ -489,6 +516,33 @@
         fail_on_error: false
         ignore_missing: true
 
+    - timestamp:
+        field: IngressTime_StampINVITE
+        target_field: time-start
+        layouts:
+          - '2006-01-02+15:04:05.999'
+        test:
+          - '2020-10-07+23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+    - timestamp:
+        field: IngressTime_StampINVITE
+        layouts:
+          - '2006-01-02+15:04:05.999'
+        test:
+          - '2020-10-07+23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+    - timestamp:
+        field: EgressRelease_TimeStamp
+        target_field: time-end
+        layouts:
+          - '2006-01-02+15:04:05.999'
+        test:
+          - '2020-10-07+23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+
     - drop_fields:
         fields: [ "decoded.csv", "message" ]
         ignore_missing: true
@@ -504,11 +558,12 @@
 
 
 - paths:
-    - /var/logs/subset/*cdrs*
+    - /var/log/SGWCDR01/cdrs*
+    - /var/log/SGWCDR02/cdrs*
   type: log
   fields_under_root: true
   close_inactive: 90s
-  harvester_limit: 1000
+  harvester_limit: 100
   scan_frequency: 1s
   symlinks: true
   clean_removed: true
@@ -600,6 +655,34 @@
             to: next-call-id
         fail_on_error: false
         ignore_missing: true
+
+    - timestamp:
+        field: SetupTime
+        target_field: time-start
+        layouts:
+          - '2006-01-02 15:04:05.999'
+        test:
+          - '2020-10-07 23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+    - timestamp:
+        field: SetupTime
+        layouts:
+          - '2006-01-02 15:04:05.999'
+        test:
+          - '2020-10-07 23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+    - timestamp:
+        field: DisconnectTime
+        target_field: time-end
+        layouts:
+          - '2006-01-02 15:04:05.999'
+        test:
+          - '2020-10-07 23:59:38.531'
+        ignore_missing: true
+        ignore_failure: true
+
     - drop_fields:
         fields: [ "decoded.csv", "message" ]
         ignore_missing: true
@@ -608,3 +691,48 @@
     dashbase.voip.cdr_type: sgwcdr
     dashbase.voip.app: common
     dashbase.voip.type: cdr
+
+
+- paths:
+    - /var/log/SGWevent01/event*_cid
+    - /var/log/SGWevent02/event*_cid
+  type: log
+  multiline.pattern: '^20'
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 100
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    dashbase.voip.app: common
+    dashbase.voip.type: application_log
+    _message_parser:
+      type: grok
+      pattern: "%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSS} %{NOTSPACE:ViberToken:meta} %{NOTSPACE:call-id:meta} %{GREEDYDATA:message}"
+
+
+
+- paths:
+    - /var/log/SigBNEUWpcap/cap_log/SIPmsg*.log*
+  type: log
+  multiline.pattern: '^20'
+  multiline.negate: true
+  multiline.match: after
+  close_inactive: 90s
+  harvester_limit: 100
+  scan_frequency: 1s
+  symlinks: true
+  clean_removed: true
+  fields:
+    dashbase.voip.app: common
+    _message_parser:
+      type: grok
+      pattern: "%{DATA:log.timestamp:text} %{WORD:level:meta} HEP packet:\\{Version:%{WORD:capture.version:text},Protocol:%{WORD:capture.protocol:text},SrcIP:%{IPORHOST:capture.src.ip:text},DstIP:%{IPORHOST:capture.dst.ip:text},SrcPort:%{INT:capture.src.port:text},DstPort:%{INT:capture.dst.port:text},Tsec:%{INT:timestamp:datetime:epoch},Tmsec:%{INT:timestamp_delta:datetime_delta},ProtoType:%{WORD:capture.proto.type:text},NodeID:%{WORD:capture.node.id:text},NodePW:(?:%{DATA:capture.node.pw:text}|),CID:(?:%{DATA:capture.cid:text}|),Vlan:(?:%{WORD:capture.vlan:text}|)\\} with Payload:%{GREEDYDATA:message}"
+      subParsers:
+        message:
+          type: sip
+          sortedFields: "call-id,user-agent"
+
+
