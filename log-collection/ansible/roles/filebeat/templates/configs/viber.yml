@@ -706,8 +706,10 @@
   symlinks: true
   clean_removed: true
   fields:
-    dashbase.voip.app: common
+    dashbase.voip.app: SGW
     dashbase.voip.type: application_log
+    capture.src.ip: '0.0.0.0'
+    capture.src.port: '0'
     _message_parser:
       type: grok
       pattern: "%{TIMESTAMP_ISO8601:timestamp:datetime:yyyy-MM-dd HH:mm:ss.SSS} %{NOTSPACE:ViberToken:meta} %{NOTSPACE:call-id:meta} %{GREEDYDATA:message}"
