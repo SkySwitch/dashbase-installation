@@ -2,11 +2,12 @@
 
 BASEDIR=$(dirname "$0")
 
-DASHVERSION="2.3.1"
-INSTALLER_VERSION="2.3.1"
+DASHVERSION="2.4.1"
+INSTALLER_VERSION="2.4.1"
 PLATFORM="undefined"
 INGRESS_FLAG="false"
 V2_FLAG="false"
+V1_FLAG="false"
 VALUEFILE="dashbase-values.yaml"
 USERNAME="undefined"
 LICENSE="undefined"
@@ -81,6 +82,7 @@ display_help() {
   echo ""
   echo "   The following options only be used on V2 dashbase"
   echo "     --v2               setup dashbase V2"
+  echo "     --v1               setup dashbase using V1 backend even if dashbase version 2.X is specified"
   echo "     --bucketname       cloud object storage bucketname"
   echo "                        e.g. --bucketname=my-s3-bucket"
   echo "     --storage_account  cloud object storage account value, in AWS is the ACCESS KEY"
@@ -91,7 +93,8 @@ display_help() {
   echo "                        e.g. --storage_endpoint=https://oss-cn-hangzhou.aliyuncs.com"
   echo ""
   echo "   Command example in V1"
-  echo "   ./dashbase-installer.sh --platform=aws --ingress --subdomain=test.dashbase.io"
+  echo "   ./dashbase-installer.sh --platform=aws --ingress --subdomain=test.dashbase.io \ "
+  echo "                           --v1 --version=2.4.1 --callflow_cdr "
   echo ""
   echo "   Command example in V2"
   echo "   ./dashbase-installer.sh --platform=aws --v2 --ingress \ "
@@ -168,6 +171,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --v2)
     V2_FLAG="true"
+    ;;
+   --v1)
+    V1_FLAG="true"
     ;;
   --callflow_cdr)
     CALL_FLOW_CDR_FLAG="true"
@@ -498,12 +504,18 @@ check_version() {
     fi
   fi
   # set VNUM
-  if [[ "$VERSION" == *"nightly"* ]]; then
-    log_info "nightly version is used, VNUM is set to 2 by default"
-     VNUM="2"
+  if [ "$V1_FLAG" == "true" ]; then
+    log_info "V1 Backend is selected"
+    VNUM="1"
   else
-     VNUM=$(echo $VERSION |cut -d "." -f1)
-     log_info "version is $VERSION and VNUM is $VNUM"
+    log_info "V1 Backend is not specified, checking input dashbase version $VERSION"
+    if [[ "$VERSION" == *"nightly"* ]]; then
+       log_info "nightly version is used, VNUM is set to 2 by default"
+        VNUM="2"
+     else
+        VNUM=$(echo $VERSION |cut -d "." -f1)
+        log_info "version is $VERSION and VNUM is $VNUM"
+    fi
   fi
 }
 
@@ -805,10 +817,9 @@ update_dashbase_valuefile() {
   # update ucaas callflow options cdr, sip or netsapiens log type
   if [ "$CALL_FLOW_SIP_FLAG" == "true" ] || [ "$CALL_FLOW_CDR_FLAG" == "true" ] || [ "$CALL_FLOW_NET_FLAG" == "true" ]; then
     log_info "update dashbase-values.yaml file to enable UCAAS call flow feature"
-    kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
+    #kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_UCAAS\:\ \"false\"/ENABLE_UCAAS\:\ \"true\"/' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_CALL\:\ \"false\"/ENABLE_CALL\:\ \"true\"/' /data/dashbase-values.yaml
-    kubectl exec -it admindash-0 -n dashbase -- sed -i '/exporter\:/!b;n;c\ \ \ \ enabled\: true' /data/dashbase-values.yaml
     kubectl exec -it admindash-0 -n dashbase -- bash -c "cat /data/exporter_metric.yaml >> /data/dashbase-values.yaml"
     #kubectl exec -it admindash-0 -n dashbase -- sed -i 's/ENABLE_INSIGHTS\:\ \"false\"/ENABLE_INSIGHTS\:\ \"true\"/' /data/dashbase-values.yaml
   fi
@@ -968,7 +979,7 @@ install_dashbase() {
   kubectl exec -it admindash-0 -n dashbase -- bash -c "/data/check-dashbase-deploy.sh > >(tee check-dashbase-deploy-output.txt) 2>&1"
   CHKDEPLOYNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-dashbase-deploy-output.txt | grep -iv -c Checking)
   CHKSUCCEDNUM=$(kubectl exec -it admindash-0 -n dashbase -- cat check-dashbase-deploy-output.txt | grep -c met)
-  if [ "$CHKDEPLOYNUM" -eq "$CHKSUCCEDNUM" ]; then log_info "dashbase installation is completed"; else log_fatal "dashbase installation is failed"; fi
+  if [ "$CHKDEPLOYNUM" -eq "$CHKSUCCEDNUM" ]; then log_info "dashbase installation is completed"; else log_warning "dashbase installation may have issue, please check K8s pod status"; fi
 }
 
 # Expose endpoints via Ingress or LoadBalancer
