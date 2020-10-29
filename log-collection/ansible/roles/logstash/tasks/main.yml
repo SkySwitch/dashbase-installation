@@ -146,7 +146,7 @@
 
 - name: Create Sas CDR mysql_statement file
   shell: |-
-    echo "SELECT * FROM cdr WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/sascdr_mysql_statement
+    echo "SELECT * FROM cdr WHERE time_release >= :sql_last_value AND time_release < DATE_SUB(NOW(), INTERVAL 3 second)">/etc/logstash/conf.d/sascdr_mysql_statement
   when: isSasCDR.changed
 
 - name: Create Homer mysql_statement file
