@@ -6,10 +6,12 @@ input {
 		jdbc_connection_string => "{{ homer_1.connection_string }}"
 		jdbc_user => "{{ homer_1.user}}"
 		jdbc_password => "{{ homer_1.password }}"
+                jdbc_paging_enabled => true
+                jdbc_page_size => "{{ jdbc_page_size }}"
 
                 last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_homer_1"
                 statement_filepath => "/etc/logstash/conf.d/homer_mysql_statement"
-                schedule => "*/10 * * * *"
+                schedule => "*/1 * * * *"
                 use_column_value => true
                 tracking_column => "id"
 	}

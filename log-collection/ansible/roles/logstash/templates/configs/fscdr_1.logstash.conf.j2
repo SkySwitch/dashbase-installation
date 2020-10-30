@@ -6,13 +6,14 @@ input {
 		jdbc_connection_string => "{{ fscdr_1.connection_string }}"
 		jdbc_user => "{{ fscdr_1.user}}"
 		jdbc_password => "{{ fscdr_1.password }}"
-                jdbc_fetch_size => 100000
+                jdbc_paging_enabled => true
+                jdbc_page_size => "{{ jdbc_page_size }}"
 
-        last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_fscdr_1"
-        statement_filepath => "/etc/logstash/conf.d/fscdr_mysql_statement"
-        schedule => "*/1 * * * *"
-        use_column_value => true
-        tracking_column => "id"
+                last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_fscdr_1"
+                statement_filepath => "/etc/logstash/conf.d/fscdr_mysql_statement"
+                schedule => "*/1 * * * *"
+                use_column_value => true
+                tracking_column => "id"
 	}
 }
 

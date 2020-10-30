@@ -3,13 +3,13 @@ input {
 		jdbc_driver_library => "/usr/share/java/mysql-connector-java-8.0.19.jar"
 		jdbc_driver_class => "com.mysql.jdbc.Driver"
 
-		jdbc_connection_string => "{{ netsapiens_2.connection_string }}"
-		jdbc_user => "{{ netsapiens_2.user}}"
-		jdbc_password => "{{ netsapiens_2.password }}"
+		jdbc_connection_string => "{{ netsapiens_7.connection_string }}"
+		jdbc_user => "{{ netsapiens_7.user}}"
+		jdbc_password => "{{ netsapiens_7.password }}"
                 jdbc_paging_enabled => true
                 jdbc_page_size => "{{ jdbc_page_size }}"
 
-                last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_netsapiens_2"
+                last_run_metadata_path => "/etc/logstash/conf.d/.logstash_jdbc_last_run_netsapiens_7"
                 statement_filepath => "/etc/logstash/conf.d/netsapiens_mysql_statement"
                 schedule => "*/1 * * * *"
                 use_column_value => true
@@ -26,8 +26,8 @@ filter {
       "event_text" => "message"
     }
     add_field => {
-      "capture.src.ip" => "{{ netsapiens_2.nsserver_ip }}"
-      "capture.src.port" => "{{ netsapiens_2.nsserver_port }}"
+      "capture.src.ip" => "{{ netsapiens_7.nsserver_ip }}"
+      "capture.src.port" => "{{ netsapiens_7.nsserver_port }}"
     }
   }
   date {
