@@ -131,7 +131,7 @@
 
 - name: Create Netsapiens CDR mysql_statement file
   shell: |-
-    echo "SELECT * FROM $(date +\%Y\%m)_r WHERE time_start >= :sql_last_value">/etc/logstash/conf.d/nscdr_mysql_statement
+    echo "SELECT * FROM $(date +\%Y\%m)_r WHERE time_release >= :sql_last_value AND time_release < DATE_SUB(NOW(), INTERVAL 3 second)">/etc/logstash/conf.d/nscdr_mysql_statement
   when: isNetsapiensCDR.changed
 
 - name: Create Netsapiens CDR cron job to update mysql statement based on current date
